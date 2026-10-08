@@ -360,7 +360,12 @@ function csvVendas(){const{vp}=relData();dl('bejoma_vendas_'+per+'_'+td()+'.csv'
 function printRel(){const{ag}=relData(),t={q:0,r:0,c:0,l:0};
 const r=Object.entries(ag).sort((a,b)=>b[1].l-a[1].l).map(([k,a])=>{for(const x in t)t[x]+=a[x];return`<tr><td>${esc(k)}</td><td>${c2(a.q)}</td><td>${money(a.r)}</td><td>${money(a.c)}</td><td>${money(a.l)}</td></tr>`}).join('');
 $('printSheet').innerHTML=`<div class="ph"><img src="${document.querySelector('.hero img').src}"><div><h2>Bejoma Doces</h2><p>Relatório por produto · ${perLabel[per]} · gerado em ${agora()}</p></div></div><table><tr><th>Produto</th><th>Unidades</th><th>Receita</th><th>Custo</th><th>Lucro</th></tr>${r||'<tr><td colspan="5">Sem vendas neste período.</td></tr>'}<tr class="t"><td>TOTAL</td><td>${c2(t.q)}</td><td>${money(t.r)}</td><td>${money(t.c)}</td><td>${money(t.l)}</td></tr></table>`;assina();window.print()}
-function delProd(id){const p=P(id);if(!confirm('Apagar '+p.nome+'?'))return;D.prods=D.prods.filter(x=>x.id!=id);save();R()}
+function delProd(id){const p=P(id);if(!p||!confirm('Apagar '+p.nome+'?'))return;
+const cs=D.compras.filter(c=>c.pid==id||(!c.pid&&c.nome===p.nome)),tot=cs.reduce((a,c)=>a+(c.total||0),0),vs=D.vendas.filter(v=>v.pid==id||(!v.pid&&v.nome===p.nome)).length;
+let dev=false;
+if(cs.length&&tot>0){if(vs)alert('Este produto já tem '+vs+' venda(s), por isso o dinheiro das compras não volta à caixa automaticamente.');else dev=confirm('Este produto tem '+cs.length+' compra(s), no total de '+money(tot)+'.\n\nOK = devolver esse dinheiro à caixa.\nCancelar = apagar só o produto, sem mexer na caixa.')}
+if(dev){const ids=cs.map(c=>c.id);D.compras=D.compras.filter(c=>ids.indexOf(c.id)<0);D.caixa=D.caixa.filter(x=>ids.indexOf(x.ref)<0)}
+D.prods=D.prods.filter(x=>x.id!=id);save();R()}
 
 function caixaAdd(){const[t,l]=$('cTipo').value.split('|'),v=n($('cValor').value);
 if(v<=0)return alert('Indique o valor.');
