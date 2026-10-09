@@ -1,7 +1,7 @@
 /* Bejoma Gestão - Service Worker
    Sempre que alterares o index.html, muda o número da versão abaixo
    (ex.: v2 -> v3) para o telemóvel descarregar a versão nova. */
-const VERSION = 'v2';
+const VERSION = 'v3';
 const CACHE = 'bejoma-' + VERSION;
 const FONTS = 'bejoma-fonts';
 const SHELL = [
