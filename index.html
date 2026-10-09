@@ -287,8 +287,9 @@ function lotesDraw(){const e=$('aLotes');if(!e)return;const p=P($('aProd').value
 if(!L.length){e.innerHTML='';return}
 e.innerHTML='<div class="tipb" style="margin-top:10px"><b>📦 Lotes em stock</b> (vende-se primeiro o mais antigo)'+L.map((l,i)=>{const k=-dvDias(l.ent),nm=L.length===1?'Lote único':i===0?'🕰️ Antigo':i===L.length-1?'🆕 Novo':'Intermédio';return`<div class="item" style="padding:6px 0"><div>${nm}<small>Entrada ${fmtD(l.ent)} · ${k<=0?'hoje':'há '+k+(k===1?' dia':' dias')}${l.val?' · validade '+fmtD(l.val)+(dvDias(l.val)<0?' ❌':dvDias(l.val)<=30?' ⏳':''):''}</small></div><b>${l.rest} un.</b></div>`}).join('')+'</div>'}
 
-function vender(){const p=P($('vProd').value),q=n($('vQtd').value),pr=n($('vPreco').value);
+function vender(){if(!once())return;const p=P($('vProd').value),q=n($('vQtd').value),pr=n($('vPreco').value);
 if(!p||q<=0)return alert('Escolha o produto e a quantidade.');
+if(pr<=0)return alert('Indique o preço de venda (maior que zero).');
 if(q>p.stock)return alert('Stock insuficiente: restam '+p.stock+' un. de '+p.nome+'.'+(p.stock<=0?' Primeiro dê entrada no stock em Armazém → Entrada de mercadoria.':''));
 const dev=fpV==='dev',cli=$('vDevNome').value.trim(),pz=$('vDevPrazo').value;
 if(dev&&!cli)return alert('Venda a dever: escreva o nome do cliente.');
@@ -300,22 +301,25 @@ save();$('vQtd').value='';if(dev){fpV='din';$('vDevNome').value='';$('vDevPrazo'
 function delVenda(id){const v=D.vendas.find(x=>x.id==id);if(!v||!confirm('Apagar esta venda? O stock volta.'+(v.fiado?' A dívida do cliente também é apagada (e o que ele já pagou sai da Caixa).':'')))return;
 const p=P(v.pid);if(p)p.stock+=v.qtd;const dv=dvL().find(x=>x.venda===id);if(dv){const ids=(dv.pagtos||[]).map(x=>x.id).filter(Boolean);D.caixa=D.caixa.filter(c=>ids.indexOf(c.dv)<0);D.dividas=dvL().filter(x=>x.id!==dv.id)}D.vendas=D.vendas.filter(x=>x.id!=id);D.caixa=D.caixa.filter(c=>c.ref!=id);save();R()}
 
-function entrada(){const p=P($('aProd').value),e=n($('aEmb').value),pr=n($('aPreco').value);
+function entrada(){if(!once())return;const p=P($('aProd').value),e=n($('aEmb').value),pr=n($('aPreco').value);
 if(!p||e<=0)return alert('Escolha o produto e as embalagens.');
 const ent=$('aData').value||td();if(ent>td())return alert('A data de entrada não pode ser no futuro.');
-const stk0=Math.max(0,p.stock),c0=custo(p);if(pr>0)p.precoEmb=pr;const un=e*p.unEmb,id=uid(),vl=$('aVal').value;p.stock+=un;if(vl&&(stk0<=0||!p.val||vl<p.val))p.val=vl;if(stk0+un>0&&p.unEmb>0)p.cm=(stk0*c0+un*(p.precoEmb/p.unEmb))/(stk0+un);
-D.compras.push({id,data:td(),ent,val:vl||'',hora:hh(),pid:p.id,nome:p.nome,emb:e,un,total:e*p.precoEmb});
+if(!(p.unEmb>0))return alert('Este produto não tem "unidades por embalagem". Edite o produto e preencha.');
+const pef=pr>0?pr:p.precoEmb;if(!(pef>0))return alert('Indique o preço da embalagem.');
+if(semSaldo(e*pef,fpA))return;
+const stk0=Math.max(0,p.stock),c0=custo(p),pe0=p.precoEmb,cm0=p.cm||0;if(pr>0)p.precoEmb=pr;const un=e*p.unEmb,id=uid(),vl=$('aVal').value;p.stock+=un;if(vl&&(stk0<=0||!p.val||vl<p.val))p.val=vl;if(stk0+un>0&&p.unEmb>0)p.cm=(stk0*c0+un*(p.precoEmb/p.unEmb))/(stk0+un);
+D.compras.push({id,pe0,cm0,data:td(),ent,val:vl||'',hora:hh(),pid:p.id,nome:p.nome,emb:e,un,total:e*p.precoEmb});
 D.caixa.push({id:uid(),data:td(),hora:hh(),tipo:'saida',desc:'Compra: '+p.nome+' ×'+e+' emb.',valor:e*p.precoEmb,ref:id,forma:fpA});
 save();$('aEmb').value='';$('aData').value=td();$('aVal').value='';R();$('aInfo').textContent=Math.abs(custo(p)-c0)>0.005?'✔ Custo médio de '+p.nome+': '+money(custo(p))+'/un. (antes '+money(c0)+').':''}
 function delCompra(id){const c=D.compras.find(x=>x.id===id);if(!c)return;const p=(c.pid&&P(c.pid))||D.prods.find(x=>x.nome===c.nome);
 let m='Apagar esta compra ('+c.nome+' ×'+c.emb+' emb., '+money(c.total)+')?\n'+(p?'O stock diminui '+c.un+' un. e '+money(c.total)+' voltam para a caixa.':'O dinheiro volta para a caixa.');
 if(p&&p.stock<c.un)m+='\nAtenção: parte desta mercadoria já foi vendida, por isso o stock vai ficar a 0.';
-if(!confirm(m))return;if(p){const rest=p.stock-c.un;if(p.cm>0&&rest>0&&c.total>0){const x=(p.stock*p.cm-c.total)/rest;if(x>0)p.cm=x}else if(rest<=0)delete p.cm;p.stock=Math.max(0,rest)}D.compras=D.compras.filter(x=>x.id!==id);D.caixa=D.caixa.filter(x=>x.ref!==id);save();R()}
+if(!confirm(m))return;if(p){const rest=p.stock-c.un,ult=c.pe0!==undefined&&D.compras.filter(x=>x.pid==p.id||(!x.pid&&x.nome===p.nome)).slice(-1)[0]===c;if(ult){p.precoEmb=c.pe0;if(c.cm0>0)p.cm=c.cm0;else delete p.cm}else if(p.cm>0&&rest>0&&c.total>0){const x=(p.stock*p.cm-c.total)/rest;if(x>0)p.cm=x}else if(rest<=0)delete p.cm;p.stock=Math.max(0,rest)}D.compras=D.compras.filter(x=>x.id!==id);D.caixa=D.caixa.filter(x=>x.ref!==id);save();R()}
 async function novoProd(){const nome=$('nNome').value.trim(),un=n($('nUn').value),pe=n($('nPreco').value),v=n($('nVenda').value);
 if(!nome||un<=0)return alert('Indique o nome e as unidades por embalagem.');
 if(D.prods.some(p=>p.nome.toLowerCase()===nome.toLowerCase()))return alert('Esse produto já existe.');
 const np={id:uid(),nome,unEmb:un,precoEmb:pe,venda:v,stock:0,val:$('nVal').value||'',min:$('nMin').value===''?5:n($('nMin').value)},ff=$('nFoto').files[0];if(ff){try{np.img=await imgFile(ff)}catch(e){alert('Não foi possível usar a foto. O produto foi guardado sem foto.')}}D.prods.push(np);save();['nNome','nUn','nPreco','nVenda','nMin','nVal','nFoto'].forEach(i=>$(i).value='');R()}
-function editVenda(id){const p=P(id),v=prompt('Novo preço de venda por unidade ('+p.nome+'):',p.venda);if(v===null)return;p.venda=n(v);save();R()}
+function editVenda(id){const p=P(id),v=prompt('Novo preço de venda por unidade ('+p.nome+'):',p.venda);if(v===null||!p)return;const x=n(v);if(x<=0)return alert('O preço de venda tem de ser maior que zero.');p.venda=x;save();R()}
 const mn=p=>p.min??5;
 let per='semana';const setPer=v=>{per=v;R()};
 const dAgo=k=>{const d=new Date();d.setDate(d.getDate()-k);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
@@ -365,8 +369,9 @@ function desfazCompra(id){const p=P(id);if(!p)return;const cs=D.compras.filter(c
 if(!cs.length)return alert('Este produto não tem compras para desfazer.');
 const c=cs[cs.length-1];delCompra(c.id)}
 
-function caixaAdd(){const[t,l]=$('cTipo').value.split('|'),v=n($('cValor').value);
+function caixaAdd(){if(!once())return;const[t,l]=$('cTipo').value.split('|'),v=n($('cValor').value);
 if(v<=0)return alert('Indique o valor.');
+if(t==='saida'&&semSaldo(v,fpC))return;
 D.caixa.push(Object.assign({id:uid(),data:td(),hora:hh(),tipo:t,desc:$('cDesc').value.trim()||l,valor:v,cat:l,forma:fpC},(l==='Despesa'&&$('cCap').checked)?{cap:true}:{}));save();$('cDesc').value='';$('cValor').value='';R()}
 function empTog(id){const c=D.caixa.find(x=>x.id==id);if(!c)return;c.cat=c.cat==='Empréstimo'?'Entrada extra':'Empréstimo';save();R()}
 function delCaixa(id){if(!confirm('Apagar este movimento?'))return;D.caixa=D.caixa.filter(c=>c.id!=id);save();R()}
@@ -557,6 +562,9 @@ return`<svg viewBox="0 0 ${W} ${H}" width="100%" xmlns="http://www.w3.org/2000/s
 function printTudo(){
 const ord=(a,b)=>a.data<b.data?-1:a.data>b.data?1:0,V=D.vendas.slice().sort(ord),C=D.caixa.slice().sort(ord),K=D.compras.slice().sort(ord);
 const sm=(l,f)=>l.reduce((s,x)=>s+f(x),0),sai=c=>c.tipo==='saida'&&!c.ref&&!c.dv&&!c.cap;
+let _lk=0;const once=()=>{const t=Date.now();if(t-_lk<600)return false;_lk=t;return true};
+const cxSaldo=f=>D.caixa.reduce((a,c)=>(c.forma||'din')===f?a+(c.tipo==='entrada'?c.valor:-c.valor):a,0);
+const semSaldo=(v,f)=>{const a=cxSaldo(f);return v>a+0.005&&!confirm('Atenção: em '+fpN(f)+' a caixa só tem '+money(a)+' e esta saída é de '+money(v)+'. O saldo ficaria em '+money(a-v)+'.\n\nContinuar mesmo assim?\n(Se usou dinheiro seu, registe primeiro um Investimento na Caixa.)')};
 const rec=sm(V,v=>v.qtd*v.preco),cst=sm(V,v=>v.qtd*v.custo),desp=sm(C.filter(c=>sai(c)&&catOf(c)!=='Retirada'),c=>c.valor),ret=sm(C.filter(isRet),c=>c.valor);
 const PD=pdL().slice().sort(ord),perd=sm(PD.filter(x=>x.mot!=='con'),pdV),capD=sm(C.filter(c=>c.tipo==='saida'&&c.cap),c=>c.valor);
 const saldo=sm(C,c=>c.tipo==='entrada'?c.valor:-c.valor),vstock=sm(D.prods,p=>Math.max(0,p.stock)*custo(p)),zero=D.prods.filter(p=>p.stock<=0).length,baixo=D.prods.filter(p=>p.stock>0&&p.stock<=mn(p)).length;
@@ -651,7 +659,7 @@ function lockNow(){if(!pinData())return;
 if(ENC&&!LOCKED){LOCKED=true;DEK=null;D=inicial();norm();fixL();R();$('printSheet').innerHTML=''}
 $('lkImg').src=document.querySelector('.hero img').src;$('lock').style.display='flex';document.body.classList.add('locked');$('lkPin').value='';$('lkRec').style.display='none';$('lkNew').style.display='none';lkMsg('');lkTick()}
 async function openData(dek){let raw=localStorage.getItem(K2),x=null;
-if(raw){try{x=JSON.parse(await decBlob(raw,dek))}catch(e){if(!confirm('Os dados cifrados estão danificados e não foi possível abri-los. Começar com dados vazios? (Depois pode importar um backup.)'))return false}}
+if(raw){try{x=JSON.parse(await decBlob(raw,dek))}catch(e){try{localStorage.setItem('bejoma_enc_copia',raw)}catch(_){}if(!confirm('Os dados cifrados estão danificados e não foi possível abri-los. Começar com dados vazios? (Depois pode importar um backup.)'))return false}}
 D=x||inicial();norm();fixL();DEK=dek;ENC=true;LOCKED=false;R();check();return true}
 async function lkTry(){if(busy)return;if(wait()>0)return lkTick();const d=pinData(),p=$('lkPin').value;if(!d)return unlock();if(!p)return;
 if(d.v===3&&!HASSUB){lkMsg('Este navegador não consegue abrir dados cifrados (precisa de ligação segura HTTPS).',1);return}
@@ -807,7 +815,7 @@ function dvSet(t){dvT=t;dvDraw()}
 function dvDraw(){const e=$('dvTipo');if(!e)return;const r=dvT==='receber';
 e.innerHTML=[['receber','📥 Devem-me'],['pagar','📤 Eu devo']].map(x=>'<button type="button" class="chip'+(x[0]===dvT?' on':'')+'" onclick="dvSet(\''+x[0]+'\')">'+x[1]+'</button>').join('');
 $('dvLN').textContent=r?'Nome de quem lhe deve':'Nome de quem você deve';$('dvLP').textContent=r?'Prazo para ele pagar':'Prazo para você pagar';const b=$('dvFPbox');if(b)b.innerHTML=FP.map(f=>'<button type="button" class="chip'+(f[0]===dvFPv?' on':'')+'" onclick="dvFPset(\''+f[0]+'\')">'+f[1]+' '+f[2]+'</button>').join('')}
-function dvAdd(){const p=$('dvNome').value.trim(),v=n($('dvValor').value);
+function dvAdd(){if(!once())return;const p=$('dvNome').value.trim(),v=n($('dvValor').value);
 if(!p)return alert('Escreva o nome da pessoa.');if(v<=0)return alert('Indique o valor.');
 dvL().push({id:uid(),tipo:dvT,pessoa:p,desc:$('dvDesc').value.trim(),valor:v,pago:0,pagtos:[],data:td(),hora:hh(),prazo:$('dvPrazo').value||'',pess:$('dvPess').checked});
 save();['dvNome','dvDesc','dvValor','dvPrazo'].forEach(i=>$(i).value='');$('dvPess').checked=false;R()}
@@ -817,10 +825,10 @@ function dvReg(d,x){const pid=uid(),rec=d.tipo==='receber';d.pagtos=d.pagtos||[]
 D.caixa.push({id:uid(),data:td(),hora:hh(),tipo:rec?'entrada':'saida',desc:(rec?'Recebido de ':'Pago a ')+d.pessoa+(d.desc?' ('+d.desc+')':'')+' · dívida',valor:x,cat:'Dívida',forma:dvFPv,dv:pid,pess:(!rec&&!!d.pess)||undefined})}
 function dvPaga(id){const d=dvGet(id);if(!d)return;const f=dvF(d);if(!f)return;
 if(!confirm('Marcar como '+(d.tipo==='receber'?'recebido':'pago')+': '+d.pessoa+' · '+money(f)+'?\n'+(d.tipo==='receber'?'Entra':'Sai')+' da Caixa ('+fpN(dvFPv)+').'))return;
-dvReg(d,f);save();R()}
+if(d.tipo==='pagar'&&semSaldo(f,dvFPv))return;dvReg(d,f);save();R()}
 function dvParc(id){const d=dvGet(id);if(!d)return;const f=dvF(d),v=prompt((d.tipo==='receber'?'Quanto recebeu agora de ':'Quanto pagou agora a ')+d.pessoa+'? (em falta '+money(f)+')\n'+(d.tipo==='receber'?'Entra':'Sai')+' da Caixa ('+fpN(dvFPv)+').');
 if(v===null)return;const x=n(v);if(x<=0)return;if(x>f)return alert('Esse valor é maior do que o que falta ('+money(f)+').');
-dvReg(d,x);save();R()}
+if(d.tipo==='pagar'&&semSaldo(x,dvFPv))return;dvReg(d,x);save();R()}
 function dvDesf(id){const d=dvGet(id);if(!d||!d.pagtos||!d.pagtos.length)return;const u=d.pagtos[d.pagtos.length-1];
 if(!confirm('Desfazer o último pagamento de '+money(u.valor)+' ('+fmtD(u.data)+')? O movimento da Caixa também é apagado.'))return;
 d.pagtos.pop();d.pago=Math.max(0,(d.pago||0)-u.valor);if(u.id)D.caixa=D.caixa.filter(c=>c.dv!==u.id);save();R()}
@@ -852,7 +860,7 @@ const PM={dif:['📋','Falta na contagem'],est:['🗑️','Estragado'],ofe:['�
 const pdL=()=>{if(!Array.isArray(D.perdas))D.perdas=[];return D.perdas};
 const pdV=x=>x.qtd*x.custo;
 const pmN=x=>(PM[x.mot]||PM.per)[1],pmI=x=>(PM[x.mot]||PM.per)[0];
-function perder(){const p=P($('pProd').value),q=n($('pQtd').value),m=$('pMot').value;
+function perder(){if(!once())return;const p=P($('pProd').value),q=n($('pQtd').value),m=$('pMot').value;
 if(!p||q<=0)return alert('Escolha o produto e a quantidade.');
 if(q>p.stock)return alert('Só tem '+p.stock+' un. de '+p.nome+' em stock.');
 pdL().push({id:uid(),data:td(),hora:hh(),pid:p.id,nome:p.nome,qtd:q,custo:custo(p),mot:m,obs:$('pObs').value.trim()});p.stock-=q;save();$('pQtd').value='';$('pObs').value='';R()}
@@ -895,7 +903,8 @@ if(!des){$('cCap').checked=false;return}
 const jaV=D.vendas.some(v=>v.data===td()),jaD=D.caixa.some(c=>c.data===td()&&c.tipo==='saida'&&!c.ref&&!c.dv&&catOf(c)==='Despesa');
 $('cCap').checked=!jaV&&!jaD}
 function capTog(id){const c=D.caixa.find(x=>x.id===id);if(!c)return;if(c.cap)delete c.cap;else c.cap=true;save();R()}
-setInterval(check,30000);document.addEventListener('visibilitychange',()=>{if(!document.hidden)check()});
+setInterval(check,30000);let _hid=0;document.addEventListener('visibilitychange',()=>{if(document.hidden){_hid=Date.now();return}if(pinData()&&!LOCKED&&_hid&&Date.now()-_hid>300000)lockNow();check()});
+try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
 R();PN();lockNow();check();splashRun();
 if("serviceWorker" in navigator&&location.protocol.startsWith("http"))navigator.serviceWorker.register("sw.js").catch(()=>{});
 </script>
