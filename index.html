@@ -548,6 +548,7 @@ const semCard=`<div class="card"><h2>📅 Resumo semanal</h2><p class="empty" st
 +(A.top?rw('Produto mais vendido',A.top[1]+' un.',esc(A.top[0])):'')+(A.dia?rw('Melhor dia',money(A.dia[1]),dm(A.dia[0])):'')+`<button class="sec" onclick="partilharSem()">📤 Partilhar resumo</button></div>`;
 $('rBox').innerHTML=alertCard+semCard+bx('Hoje',h.n,h.r,h.l)+bx('Este mês',m.n,m.r,m.l)+relCard+`<div class="card"><h2>Situação actual</h2><div class="grid"><div class="stat"><div class="k">SALDO DA CAIXA</div><div class="v">${money(ent-sai)}</div></div><div class="stat"><div class="k">VALOR EM STOCK</div><div class="v">${money(sv)}</div></div><div class="stat" style="grid-column:1/-1"><div class="k">PRODUTOS SEM STOCK</div><div class="v ${zero?'bad':''}">${zero}</div></div></div></div>`}
 /* ===== Fecho do dia ===== */
+const descV=v=>v.qtd>0&&v.lista>v.preco?v.qtd*(v.lista-v.preco):0,dscSum=L=>L.reduce((a,v)=>a+descV(v),0);
 const fmtD=ds=>ds.slice(8)+'/'+ds.slice(5,7)+'/'+ds.slice(0,4);const agora=()=>fmtD(td())+' às '+hh();
 let fdia=td();
 const setF=v=>{fdia=v||td();F()};
@@ -619,7 +620,6 @@ function printTudo(){
 const ord=(a,b)=>a.data<b.data?-1:a.data>b.data?1:0,V=D.vendas.slice().sort(ord),C=D.caixa.slice().sort(ord),K=D.compras.slice().sort(ord);
 const sm=(l,f)=>l.reduce((s,x)=>s+f(x),0),sai=c=>c.tipo==='saida'&&!c.ref&&!c.dv&&!c.cap;
 let vManual=0;
-const descV=v=>v.qtd>0&&v.lista>v.preco?v.qtd*(v.lista-v.preco):0,dscSum=L=>L.reduce((a,v)=>a+descV(v),0);
 let _lk=0;const once=()=>{const t=Date.now();if(t-_lk<600)return false;_lk=t;return true};
 const cxSaldo=f=>D.caixa.reduce((a,c)=>(c.forma||'din')===f?a+(c.tipo==='entrada'?c.valor:-c.valor):a,0);
 const semSaldo=(v,f)=>{const a=cxSaldo(f);return v>a+0.005&&!confirm('Atenção: em '+fpN(f)+' a caixa só tem '+money(a)+' e esta saída é de '+money(v)+'. O saldo ficaria em '+money(a-v)+'.\n\nContinuar mesmo assim?\n(Se usou dinheiro seu, registe primeiro um Investimento na Caixa.)')};
