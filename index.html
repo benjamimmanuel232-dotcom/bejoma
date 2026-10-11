@@ -201,10 +201,11 @@ body.locked>*:not(#lock):not(#splash):not(#ex):not(#priv){visibility:hidden}
 <div class="panel hidden" id="p-caixa">
 <div class="card"><h2>Saldo da caixa</h2><div class="grid"><div class="stat" style="grid-column:1/-1"><div class="k">SALDO</div><div class="v" id="cSaldo"></div></div><div class="stat"><div class="k">ENTRADAS</div><div class="v good" id="cEnt"></div></div><div class="stat"><div class="k">SAÍDAS</div><div class="v bad" id="cSai"></div></div></div></div>
 <div class="card"><h2>Onde está o dinheiro</h2><div id="cForma"></div></div>
+<div class="card"><h2>🍽️ Comida e gastos pessoais</h2><p class="empty" style="margin:-6px 0 8px">Registe em Novo movimento → Comida / gasto pessoal. Não conta como despesa do negócio, fica fora do lucro e o app avisa quando passa o limite.</p><div id="limBox"></div><label>Limite diário (Kz)</label><input id="limVal" type="number" inputmode="decimal" min="0" placeholder="0 = sem limite"><button class="sec" onclick="limSet()">Guardar limite</button></div>
 <div class="card"><h2>Novo movimento</h2>
-<label>Tipo</label><select id="cTipo" onchange="capShow()"><option value="saida|Despesa">Despesa</option><option value="saida|Retirada">Retirada</option><option value="entrada|Entrada extra">Investimento (capital próprio)</option><option value="entrada|Empréstimo">Empréstimo recebido (tenho de devolver)</option></select>
+<label>Tipo</label><select id="cTipo" onchange="capShow()"><option value="saida|Despesa">Despesa</option><option value="saida|Transporte">🚌 Transporte (ida ou volta)</option><option value="saida|Comida">🍽️ Comida / gasto pessoal (fora do negócio)</option><option value="saida|Retirada">Retirada</option><option value="entrada|Entrada extra">Investimento (capital próprio)</option><option value="entrada|Empréstimo">Empréstimo recebido (tenho de devolver)</option></select>
 <label>Descrição</label><input id="cDesc">
-<label class="chk" id="cCapL" style="display:none;margin:10px 0 0;align-items:flex-start"><input type="checkbox" id="cCap" style="margin-top:3px"><span>🚌 Transporte antes de vender: sai do capital, não do lucro</span></label>
+<div id="cTrL" style="display:none;margin:10px 0 0"><label style="margin-top:0">Que transporte é?</label><div id="cTrSel" class="chips"></div><p class="empty" id="cTrDica" style="margin:6px 0 0"></p></div>
 <label>Valor (Kz)</label><input id="cValor" type="number" inputmode="decimal" min="0">
 <label>Forma de pagamento</label><div id="cFormaSel" class="chips"></div>
 <button onclick="caixaAdd()">Registar movimento</button></div>
@@ -212,7 +213,7 @@ body.locked>*:not(#lock):not(#splash):not(#ex):not(#priv){visibility:hidden}
 </div>
 
 <div class="panel hidden" id="p-dividas">
-<div id="dvSum"></div>
+<div id="dvSum"></div><div id="dvPlano"></div>
 <div class="card"><h2>Nova dívida</h2>
 <label>Tipo</label><div id="dvTipo" class="chips"></div>
 <label id="dvLN">Nome</label><input id="dvNome" autocomplete="off">
@@ -222,6 +223,13 @@ body.locked>*:not(#lock):not(#splash):not(#ex):not(#priv){visibility:hidden}
 <label id="dvLP">Prazo</label><input id="dvPrazo" type="date">
 <button onclick="dvAdd()">Guardar dívida</button></div>
 <div class="card"><h2>💳 Como foi o pagamento?</h2><p class="empty" style="margin:0 0 6px">Ao marcar uma dívida como paga, o valor entra (ou sai) da Caixa nesta forma:</p><div id="dvFPbox" class="chips"></div></div>
+<div class="card"><h2>📦 Pagar dívida com mercadoria</h2><p class="empty" style="margin:-6px 0 8px">Quando paga uma dívida com doces em vez de dinheiro. O stock baixa, a dívida desce e a Caixa não mexe. Não conta como consumo próprio e não baixa o lucro.</p>
+<label>Que dívida?</label><select id="dmDiv"></select>
+<label>Produto entregue</label><select id="dmProd" onchange="dmCalc()"></select>
+<label>Quantidade</label><input id="dmQtd" type="number" inputmode="decimal" min="0" oninput="dmCalc()">
+<label>Valor a abater da dívida (Kz)</label><input id="dmVal" type="number" inputmode="decimal" min="0">
+<p class="empty" id="dmInfo" style="margin:6px 0 0"></p>
+<button onclick="dmPagar()">Abater dívida</button></div>
 <div id="dvBox"></div>
 </div>
 
@@ -418,10 +426,13 @@ function desfazCompra(id){const p=P(id);if(!p)return;const cs=D.compras.filter(c
 if(!cs.length)return alert('Este produto não tem compras para desfazer.');
 const c=cs[cs.length-1];delCompra(c.id)}
 
-function caixaAdd(){if(!once())return;const[t,l]=$('cTipo').value.split('|'),v=n($('cValor').value);
+function caixaAdd(){if(!once())return;const[t,l0]=$('cTipo').value.split('|'),v=n($('cValor').value);
 if(v<=0)return alert('Indique o valor.');
 if(t==='saida'&&semSaldo(v,fpC))return;
-D.caixa.push(Object.assign({id:uid(),data:td(),hora:hh(),tipo:t,desc:$('cDesc').value.trim()||l,valor:v,cat:l,forma:fpC},(l==='Despesa'&&$('cCap').checked)?{cap:true}:{}));save();$('cDesc').value='';$('cValor').value='';R()}
+let l=l0,ex={},dd=l0;
+if(l0==='Transporte'){l='Despesa';const k=trV||trSug();ex=k==='ida'?{cap:true,tr:'ida'}:{tr:'volta'};dd=k==='ida'?'Transporte de ida':'Transporte de volta'}
+else if(l0==='Comida'){l='Retirada';ex={sub:'comida'};dd='Comida';const lim=limCom();if(lim>0){const g=comDia(td())+v;if(g>lim&&!confirm('⚠️ Isto passa o limite diário de '+money(lim)+'.\nHoje já gastou '+money(comDia(td()))+' e ficaria em '+money(g)+'.\n\nRegistar mesmo assim?'))return}}
+D.caixa.push(Object.assign({id:uid(),data:td(),hora:hh(),tipo:t,desc:$('cDesc').value.trim()||dd,valor:v,cat:l,forma:fpC},ex));trV='';save();$('cDesc').value='';$('cValor').value='';R()}
 function empTog(id){const c=D.caixa.find(x=>x.id==id);if(!c)return;c.cat=c.cat==='Empréstimo'?'Entrada extra':'Empréstimo';save();R()}
 function delCaixa(id){if(!confirm('Apagar este movimento?'))return;D.caixa=D.caixa.filter(c=>c.id!=id);save();R()}
 
@@ -483,10 +494,10 @@ const fpTxt=f=>FP.filter(x=>f.fp[x[0]]).map(x=>'\n'+x[2]+': '+money(f.fp[x[0]]))
 function semData(a,b){const vs=D.vendas.filter(v=>v.data>=a&&v.data<=b),cx=D.caixa.filter(c=>c.data>=a&&c.data<=b),sm=(l,f)=>l.reduce((s,x)=>s+f(x),0),by={},dia={};
 vs.forEach(v=>{by[v.nome]=(by[v.nome]||0)+v.qtd;dia[v.data]=(dia[v.data]||0)+v.qtd*v.preco});const mx=o=>Object.entries(o).sort((x,y)=>y[1]-x[1])[0],sai=c=>c.tipo==='saida'&&!c.ref&&!c.dv&&!c.cap;
 const pds=pdL().filter(x=>x.data>=a&&x.data<=b);
-return{capD:sm(cx.filter(c=>c.tipo==='saida'&&c.cap),c=>c.valor),perd:sm(pds.filter(x=>x.mot!=='con'),pdV),n:vs.length,r:sm(vs,v=>v.qtd*v.preco),l:sm(vs,v=>v.qtd*(v.preco-v.custo)),comp:sm(cx.filter(c=>c.tipo==='saida'&&c.ref),c=>c.valor),
+return{capD:sm(cx.filter(c=>c.tipo==='saida'&&c.cap),c=>c.valor),perd:sm(pds.filter(x=>x.mot!=='con'&&x.mot!=='pag'),pdV),n:vs.length,r:sm(vs,v=>v.qtd*v.preco),l:sm(vs,v=>v.qtd*(v.preco-v.custo)),comp:sm(cx.filter(c=>c.tipo==='saida'&&c.ref),c=>c.valor),
 desp:sm(cx.filter(c=>sai(c)&&catOf(c)!=='Retirada'),c=>c.valor),ret:sm(cx.filter(isRet),c=>c.valor),ext:sm(cx.filter(c=>c.tipo==='entrada'&&!c.ref&&!c.dv&&!isEmp(c)),c=>c.valor),emp:sm(cx.filter(c=>isEmp(c)&&!c.dv),c=>c.valor),top:mx(by),dia:mx(dia)}}
 const dlt=(a,b,inv)=>{if(!b)return a?'novo nesta semana':'';const p=Math.round((a-b)/Math.abs(b)*100);if(!p)return'igual à semana anterior';const up=p>0;return`<span class="${(inv?!up:up)?'good':'bad'}">${up?'▲':'▼'} ${Math.abs(p)}%</span> vs semana anterior`};
-function partilharSem(){const A=semData(dAgo(6),td()),t=`Bejoma Doces — Resumo semanal (${dm(dAgo(6))} a ${dm(td())})\nVendas: ${A.n}\nReceita: ${money(A.r)}\nLucro: ${money(A.l)}\nCompras de stock: ${money(A.comp)}\nDespesas: ${money(A.desp)}${A.perd?'\nPerdas e ofertas: '+money(A.perd):''}${A.capD?'\nTransporte (sai do capital): '+money(A.capD):''}`;
+function partilharSem(){const A=semData(dAgo(6),td()),t=`Bejoma Doces — Resumo semanal (${dm(dAgo(6))} a ${dm(td())})\nVendas: ${A.n}\nReceita: ${money(A.r)}\nLucro: ${money(A.l)}\nCompras de stock: ${money(A.comp)}\nDespesas: ${money(A.desp)}${A.perd?'\nPerdas e ofertas: '+money(A.perd):''}${A.capD?'\nTransporte de ida (sai do capital): '+money(A.capD):''}`;
 if(navigator.share)navigator.share({text:t}).catch(()=>{});else if(navigator.clipboard)navigator.clipboard.writeText(t).then(()=>alert('Resumo copiado.'));else alert(t)}
 const GT={},GM={};
 function scrub(e,id){const g=GM[id];if(!g)return;const r=e.currentTarget.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*g.W;
@@ -523,7 +534,7 @@ c4=`<div class="donut chart"><svg viewBox="0 0 120 120">${arcs}<text x="60" y="5
 const cd=(t,b)=>`<div class="card"><h2>${t}</h2>${b}</div>`;
 $('gBox').innerHTML=sel+kpis+cd('Receita e lucro por dia',c1)+cd('Evolução do saldo da caixa',c2)+cd('Produtos mais lucrativos',c3)+cd('Receita por produto',c4)}
 const empty=t=>`<div class="empty">${t}</div>`;
-function R(){D.prods.sort((a,b)=>a.nome.localeCompare(b.nome,'pt',{sensitivity:'base'}));fpDraw();G();RL();F();I();DV();capShow();PL();CNR();
+function R(){D.prods.sort((a,b)=>a.nome.localeCompare(b.nome,'pt',{sensitivity:'base'}));fpDraw();G();RL();F();I();DV();capShow();LC();PL();CNR();
 opts('vProd');opts('aProd');opts('pProd');opts('sProd');if(!$('sData').value)$('sData').value=td();$('sData').max=td();showImg();if(!$('aData').value)$('aData').value=td();$('aData').max=td();lotesDraw();E();if(!$('vPreco').value)fillPreco();if(!$('aPreco').value)fillEmb();
 const hoje=D.vendas.filter(v=>v.data===td());
 $('vLista').innerHTML=hoje.length?hoje.slice().reverse().map(v=>`<div class="item"><div class="pi">${P(v.pid)?av(P(v.pid),38):''}<div>${v.devol?'↩️ Devolução · ':''}${esc(v.nome)} ×${v.qtd}<small>${v.hora?v.hora+' · ':''}${money(v.qtd*v.preco)} · ${v.fiado?'🤝 A dever':fpI(fpK(v))+' '+fpN(fpK(v))} · lucro ${money(v.qtd*(v.preco-v.custo))}</small></div></div><button class="mini dng" onclick="delVenda('${v.id}')">✕</button></div>`).join(''):empty('Ainda sem vendas hoje.');
@@ -533,7 +544,7 @@ $('aCompras').innerHTML=D.compras.length?D.compras.slice(-15).reverse().map(c=>`
 const ent=D.caixa.filter(c=>c.tipo==='entrada').reduce((s,c)=>s+c.valor,0),sai=D.caixa.filter(c=>c.tipo==='saida').reduce((s,c)=>s+c.valor,0);
 $('cSaldo').textContent=money(ent-sai);$('cSaldo').className='v '+(ent-sai<0?'bad':'good');$('cEnt').textContent=money(ent);$('cSai').textContent=money(sai);
 $('cForma').innerHTML=FP.map(([k,i,nm])=>{const s=D.caixa.filter(c=>fpK(c)===k).reduce((a,c)=>a+(c.tipo==='entrada'?c.valor:-c.valor),0);return`<div class="item"><div>${i} ${nm}</div><b class="${s<0?'bad':''}">${money(s)}</b></div>`}).join('')+'<p class="empty" style="margin:6px 0 0">Movimentos antigos, sem forma de pagamento, contam como dinheiro.</p>';
-$('cLista').innerHTML=D.caixa.length?D.caixa.slice(-30).reverse().map(c=>`<div class="item"><div>${esc(c.desc)}<small>${c.data}${c.hora?' '+c.hora:''} · ${fpI(fpK(c))} ${fpN(fpK(c))}${c.cap?' · 🚌 sai do capital':''}${isEmp(c)?' · 🤝 empréstimo':''}</small></div><div><b class="${c.tipo==='entrada'?'good':'bad'}">${c.tipo==='entrada'?'+':'−'}${money(c.valor)}</b>${(c.tipo==='saida'&&!c.ref&&!c.dv&&catOf(c)==='Despesa')?`<button class="mini sec" onclick="capTog('${c.id}')">${c.cap?'↩️ Despesa':'🚌 Capital'}</button>`:''}${(c.tipo==='entrada'&&!c.ref&&!c.dv&&(c.cat==='Entrada extra'||c.cat==='Empréstimo'))?`<button class="mini sec" onclick="empTog('${c.id}')">${c.cat==='Empréstimo'?'↩️ Capital':'🤝 Empréstimo'}</button>`:''}${c.ref||c.dv?'':`<button class="mini dng" onclick="delCaixa('${c.id}')">✕</button>`}</div></div>`).join(''):empty('Sem movimentos.');
+$('cLista').innerHTML=D.caixa.length?D.caixa.slice(-30).reverse().map(c=>`<div class="item"><div>${esc(c.desc)}<small>${c.data}${c.hora?' '+c.hora:''} · ${fpI(fpK(c))} ${fpN(fpK(c))}${trTxt(c)}${isEmp(c)?' · 🤝 empréstimo':''}</small></div><div><b class="${c.tipo==='entrada'?'good':'bad'}">${c.tipo==='entrada'?'+':'−'}${money(c.valor)}</b>${(c.tipo==='saida'&&!c.ref&&!c.dv&&catOf(c)==='Despesa')?(isTr(c)?`<button class="mini sec" onclick="capTog('${c.id}')">${c.cap?'↔️ Passar a volta':'↔️ Passar a ida'}</button>`:`<button class="mini sec" onclick="foodTog('${c.id}')">🍽️ Pessoal</button>`):''}${(c.tipo==='saida'&&c.sub==='comida')?`<button class="mini sec" onclick="foodTog('${c.id}')">↩️ Despesa</button>`:''}${(c.tipo==='entrada'&&!c.ref&&!c.dv&&(c.cat==='Entrada extra'||c.cat==='Empréstimo'))?`<button class="mini sec" onclick="empTog('${c.id}')">${c.cat==='Empréstimo'?'↩️ Capital':'🤝 Empréstimo'}</button>`:''}${c.ref||c.dv?'':`<button class="mini dng" onclick="delCaixa('${c.id}')">✕</button>`}</div></div>`).join(''):empty('Sem movimentos.');
 const mes=td().slice(0,7),sum=l=>({r:l.reduce((s,v)=>s+v.qtd*v.preco,0),l:l.reduce((s,v)=>s+v.qtd*(v.preco-v.custo),0),n:l.length});
 const h=sum(hoje),m=sum(D.vendas.filter(v=>v.data.startsWith(mes))),sv=D.prods.reduce((s,p)=>s+p.stock*custo(p),0),zero=D.prods.filter(p=>p.stock<=0).length;
 const bx=(t,a,b,c)=>`<div class="card"><h2>${t}</h2><div class="grid"><div class="stat"><div class="k">VENDAS</div><div class="v">${a}</div></div><div class="stat"><div class="k">RECEITA</div><div class="v">${money(b)}</div></div><div class="stat" style="grid-column:1/-1"><div class="k">LUCRO</div><div class="v good">${money(c)}</div></div></div></div>`;
@@ -545,7 +556,7 @@ const rows=Object.entries(ag).sort((a,b)=>b[1].l-a[1].l).map(([k,a])=>`<div clas
 const relCard=`<div class="card"><h2>Relatório por produto</h2><select onchange="setPer(this.value)">`+[['hoje','Hoje'],['semana','Últimos 7 dias'],['mes','Este mês'],['tudo','Tudo']].map(o=>`<option value="${o[0]}"${o[0]===per?' selected':''}>${o[1]}</option>`).join('')+`</select><div style="margin-top:10px">${rows||empty('Sem vendas neste período.')}</div><div class="grid" style="margin-top:6px"><button class="sec" onclick="csvResumo()">⬇️ CSV resumo</button><button class="sec" onclick="csvVendas()">⬇️ CSV vendas</button></div><button onclick="printRel()">🖨️ Exportar PDF</button></div>`;
 const A=semData(dAgo(6),td()),B=semData(dAgo(13),dAgo(7)),rw=(t,v,d,c)=>`<div class="item"><div>${t}${d?`<small>${d}</small>`:''}</div><b class="${c||''}">${v}</b></div>`;
 const semCard=`<div class="card"><h2>📅 Resumo semanal</h2><p class="empty" style="margin:-6px 0 8px">${dm(dAgo(6))} a ${dm(td())} (últimos 7 dias)</p>`+rw('Vendas',A.n,dlt(A.n,B.n))+rw('Receita',money(A.r),dlt(A.r,B.r))+rw('Lucro',money(A.l),dlt(A.l,B.l),A.l<0?'bad':'good')+rw('Margem',(A.r?Math.round(A.l/A.r*100):0)+'%','')
-+rw('Compras de stock',money(A.comp),dlt(A.comp,B.comp,1))+rw('Despesas',money(A.desp),dlt(A.desp,B.desp,1))+(A.capD?rw('Transporte (sai do capital)',money(A.capD),''):'')+rw('Retiradas',money(A.ret),'')+rw('Investimento (capital próprio)',money(A.ext),'')+(A.emp?rw('Empréstimos recebidos',money(A.emp),''):'')+(A.perd?rw('Perdas e ofertas',money(A.perd),'',''):'')+rw('Lucro depois de despesas e perdas',money(A.l-A.desp-A.perd),'',A.l-A.desp-A.perd<0?'bad':'good')
++rw('Compras de stock',money(A.comp),dlt(A.comp,B.comp,1))+rw('Despesas',money(A.desp),dlt(A.desp,B.desp,1))+(A.capD?rw('Transporte de ida (sai do capital)',money(A.capD),''):'')+rw('Retiradas',money(A.ret),'')+rw('Investimento (capital próprio)',money(A.ext),'')+(A.emp?rw('Empréstimos recebidos',money(A.emp),''):'')+(A.perd?rw('Perdas e ofertas',money(A.perd),'',''):'')+rw('Lucro depois de despesas e perdas',money(A.l-A.desp-A.perd),'',A.l-A.desp-A.perd<0?'bad':'good')
 +(A.top?rw('Produto mais vendido',A.top[1]+' un.',esc(A.top[0])):'')+(A.dia?rw('Melhor dia',money(A.dia[1]),dm(A.dia[0])):'')+`<button class="sec" onclick="partilharSem()">📤 Partilhar resumo</button></div>`;
 $('rBox').innerHTML=alertCard+semCard+bx('Hoje',h.n,h.r,h.l)+bx('Este mês',m.n,m.r,m.l)+relCard+`<div class="card"><h2>Situação actual</h2><div class="grid"><div class="stat"><div class="k">SALDO DA CAIXA</div><div class="v">${money(ent-sai)}</div></div><div class="stat"><div class="k">VALOR EM STOCK</div><div class="v">${money(sv)}</div></div><div class="stat" style="grid-column:1/-1"><div class="k">PRODUTOS SEM STOCK</div><div class="v ${zero?'bad':''}">${zero}</div></div></div></div>`}
 /* ===== Fecho do dia ===== */
@@ -564,10 +575,10 @@ const desp=sm(cx.filter(c=>sai(c)&&catOf(c)!=='Retirada'),c=>c.valor),ret=sm(cx.
 const comp=sm(cx.filter(c=>c.tipo==='saida'&&c.ref),c=>c.valor),ext=sm(cx.filter(c=>c.tipo==='entrada'&&!c.ref&&!c.dv&&!isEmp(c)),c=>c.valor);
 const ini=D.caixa.filter(c=>c.data<ds).reduce((s,c)=>s+(c.tipo==='entrada'?c.valor:-c.valor),0);
 const ent=sm(cx.filter(c=>c.tipo==='entrada'),c=>c.valor),sa=sm(cx.filter(c=>c.tipo==='saida'),c=>c.valor);
-const pdd=pdL().filter(x=>x.data===ds),perd=sm(pdd.filter(x=>x.mot!=='con'),pdV),perdC=sm(pdd.filter(x=>x.mot==='con'),pdV);
+const pdd=pdL().filter(x=>x.data===ds),perd=sm(pdd.filter(x=>x.mot!=='con'&&x.mot!=='pag'),pdV),perdC=sm(pdd.filter(x=>x.mot==='con'),pdV);
 const fp={};vs.filter(v=>!v.fiado).forEach(v=>{const k=fpK(v);fp[k]=(fp[k]||0)+v.qtd*v.preco});
 const ag={};vs.forEach(v=>{const a=ag[v.nome]||(ag[v.nome]={q:0,r:0,l:0});a.q+=v.qtd;a.r+=v.qtd*v.preco;a.l+=v.qtd*(v.preco-v.custo)});
-return{n:vs.length,dsc:dscSum(vs),fp,dev:sm(vs.filter(v=>v.fiado),v=>v.qtd*v.preco),rec,cst,bruto,desp,ret,comp,ext,perd,perdC,capD:sm(cx.filter(c=>c.tipo==='saida'&&c.cap),c=>c.valor),liq:bruto-desp-perd,ini,ent,sa,fim:ini+ent-sa,ag,compras:D.compras.filter(c=>c.data===ds)}}
+return{n:vs.length,dsc:dscSum(vs),fp,dev:sm(vs.filter(v=>v.fiado),v=>v.qtd*v.preco),rec,cst,bruto,desp,ret,comp,ext,perd,perdC,capD:sm(cx.filter(c=>c.tipo==='saida'&&c.cap),c=>c.valor),trV:sm(cx.filter(c=>isTr(c)&&!c.cap),c=>c.valor),comi:comDia(ds),liq:bruto-desp-perd,ini,ent,sa,fim:ini+ent-sa,ag,compras:D.compras.filter(c=>c.data===ds)}}
 function F(){
 const u=$('bUlt');if(u)u.textContent=D.ultBackup?'Último backup: '+fmtD(D.ultBackup):'Ainda não fez backup neste telemóvel.';
 const f=fechoData(fdia),low=D.prods.filter(p=>p.stock<=mn(p)).sort((a,b)=>a.stock-b.stock);
@@ -577,19 +588,19 @@ const pc=f.compras.map(c=>`<div class="item"><div>${esc(c.nome)}<small>+${c2(c.u
 const pl=low.map(p=>`<div class="item"><div>${esc(p.nome)}<small>Mínimo ${mn(p)} un.</small></div><b class="${p.stock<=0?'bad':'warn'}">${p.stock} un.</b></div>`).join('');
 const cd=(t,b)=>`<div class="card"><h2>${t}</h2>${b}</div>`;
 $('fBox').innerHTML=`<div class="card"><h2>📒 Fecho do dia</h2><label>Dia</label><input type="date" value="${fdia}" max="${td()}" onchange="setF(this.value)"><button onclick="printFecho()">📄 Gerar PDF do fecho</button><button class="sec" onclick="partilharFecho()">📤 Partilhar (WhatsApp)</button></div>`
-+cd('💵 Dinheiro do dia',rw('Vendas feitas',f.n)+rw('Receita (total vendido)',money(f.rec))+(f.dsc?rw('🏷️ Descontos dados (já tirados da receita)',money(f.dsc)):'')+rw('Custo dos produtos vendidos','−'+money(f.cst))+rw('Lucro bruto',money(f.bruto),f.bruto<0?'bad':'good',1)+rw('Despesas','−'+money(f.desp))+(f.capD?rw('🚌 Transporte (sai do capital)','−'+money(f.capD)):'')+(f.perd?rw('Perdas e ofertas','−'+money(f.perd)):'')+rw('Lucro líquido',money(f.liq),f.liq<0?'bad':'good',1)+(f.liq>0?rw('Guardar para repor stock (50%)',money(f.liq*0.5)):''))
++cd('💵 Dinheiro do dia',rw('Vendas feitas',f.n)+rw('Receita (total vendido)',money(f.rec))+(f.dsc?rw('🏷️ Descontos dados (já tirados da receita)',money(f.dsc)):'')+rw('Custo dos produtos vendidos','−'+money(f.cst))+rw('Lucro bruto',money(f.bruto),f.bruto<0?'bad':'good',1)+rw('Despesas','−'+money(f.desp))+(f.trV?rw('↳ 🌙 Transporte de volta (já nas despesas)',money(f.trV),''):'')+(f.capD?rw('🌅 Transporte de ida (sai do capital)','−'+money(f.capD)):'')+(f.perd?rw('Perdas e ofertas','−'+money(f.perd)):'')+rw('Lucro líquido',money(f.liq),f.liq<0?'bad':'good',1)+(f.comi?rw('🍽️ Comida / pessoal (fora do lucro)',money(f.comi)+(limCom()?' de '+money(limCom()):''),limCom()&&f.comi>limCom()?'bad':''):'')+(f.liq>0?rw('Guardar para repor stock (50%)',money(f.liq*0.5)):''))
 +(f.n?cd('💳 Como recebeu',FP.filter(x=>f.fp[x[0]]).map(x=>rw(x[1]+' '+x[2],money(f.fp[x[0]]))).join('')+(f.dev?rw('🤝 A dever (por receber)',money(f.dev),'warn'):'')):'')
 +cd('💰 Caixa',rw('Saldo no início do dia',money(f.ini))+rw('Entradas',money(f.ent),'good')+rw('Saídas','−'+money(f.sa),'bad')+rw('Saldo no fim do dia',money(f.fim),f.fim<0?'bad':'',1)+(f.ret?rw('(inclui retirada pessoal)',money(f.ret)):''))
 +cd('🍬 Produtos vendidos',pv||empty('Sem vendas neste dia.'))
 +(pc?cd('📦 Compras de mercadoria',pc):'')
 +(low.length?cd('⚠️ Stock baixo ('+low.length+')',pl):'')}
-function partilharFecho(){const f=fechoData(fdia),t=`Bejoma Doces — Fecho do dia ${fmtD(fdia)}\nVendas: ${f.n}\nReceita: ${money(f.rec)}${f.dsc?'\nDescontos dados: '+money(f.dsc):''}\nCusto dos produtos: ${money(f.cst)}\nLucro bruto: ${money(f.bruto)}\nDespesas: ${money(f.desp)}${f.capD?'\nTransporte (sai do capital): '+money(f.capD):''}${f.perd?'\nPerdas e ofertas: '+money(f.perd):''}\nLucro líquido: ${money(f.liq)}${fpTxt(f)}\nCaixa: ${money(f.ini)} → ${money(f.fim)}`;
+function partilharFecho(){const f=fechoData(fdia),t=`Bejoma Doces — Fecho do dia ${fmtD(fdia)}\nVendas: ${f.n}\nReceita: ${money(f.rec)}${f.dsc?'\nDescontos dados: '+money(f.dsc):''}\nCusto dos produtos: ${money(f.cst)}\nLucro bruto: ${money(f.bruto)}\nDespesas: ${money(f.desp)}${f.trV?'\n(transporte de volta incluído: '+money(f.trV)+')':''}${f.capD?'\nTransporte de ida (sai do capital): '+money(f.capD):''}${f.comi?'\nComida / pessoal (fora do lucro): '+money(f.comi):''}${f.perd?'\nPerdas e ofertas: '+money(f.perd):''}\nLucro líquido: ${money(f.liq)}${fpTxt(f)}\nCaixa: ${money(f.ini)} → ${money(f.fim)}`;
 if(navigator.share)navigator.share({text:t}).catch(()=>{});else if(navigator.clipboard)navigator.clipboard.writeText(t).then(()=>alert('Fecho copiado.'));else alert(t)}
 function printFecho(){const f=fechoData(fdia),low=D.prods.filter(p=>p.stock<=mn(p)),h3=x=>`<h3 style="margin:14px 0 6px;color:#a93425">${x}</h3>`,tr=(a,b,c)=>`<tr${c?' class="t"':''}><th>${a}</th><td>${b}</td></tr>`;
 const pv=Object.entries(f.ag).sort((a,b)=>b[1].q-a[1].q).map(([k,a])=>`<tr><td>${esc(k)}</td><td>${c2(a.q)}</td><td>${money(a.r)}</td><td>${money(a.l)}</td></tr>`).join('');
 const pc=f.compras.map(c=>`<tr><td>${esc(c.nome)}</td><td>${c2(c.un)}</td><td>${money(c.total)}</td></tr>`).join('');
 $('printSheet').innerHTML=`<div class="ph"><img src="${document.querySelector('.hero img').src}"><div><h2>Bejoma Doces</h2><p>Fecho do dia · ${fmtD(fdia)} · gerado em ${agora()}</p></div></div>`
-+h3('Dinheiro do dia')+`<table>${tr('Vendas feitas',f.n)}${tr('Receita (total vendido)',money(f.rec))}${f.dsc?tr('Descontos dados aos clientes',money(f.dsc)):''}${tr('Custo dos produtos vendidos',money(f.cst))}${tr('Lucro bruto',money(f.bruto),1)}${tr('Despesas',money(f.desp))}${f.capD?tr('Transporte (sai do capital)',money(f.capD)):''}${f.perd?tr('Perdas e ofertas',money(f.perd)):''}${tr('Lucro líquido',money(f.liq),1)}${f.liq>0?tr('Guardar para repor stock (50%)',money(f.liq*0.5)):''}</table>`
++h3('Dinheiro do dia')+`<table>${tr('Vendas feitas',f.n)}${tr('Receita (total vendido)',money(f.rec))}${f.dsc?tr('Descontos dados aos clientes',money(f.dsc)):''}${tr('Custo dos produtos vendidos',money(f.cst))}${tr('Lucro bruto',money(f.bruto),1)}${tr('Despesas',money(f.desp))}${f.trV?tr('↳ Transporte de volta (já nas despesas)',money(f.trV)):''}${f.capD?tr('Transporte de ida (sai do capital)',money(f.capD)):''}${f.perd?tr('Perdas e ofertas',money(f.perd)):''}${tr('Lucro líquido',money(f.liq),1)}${f.comi?tr('Comida / gastos pessoais (fora do lucro)',money(f.comi)+(limCom()?' · limite '+money(limCom()):'')):''}${f.liq>0?tr('Guardar para repor stock (50%)',money(f.liq*0.5)):''}</table>`
 +(f.n?h3('Como recebeu')+`<table>${FP.filter(x=>f.fp[x[0]]).map(x=>tr(x[2],money(f.fp[x[0]]))).join('')}${f.dev?tr('A dever (por receber)',money(f.dev)):''}</table>`:'')
 +h3('Caixa')+`<table>${tr('Saldo no início do dia',money(f.ini))}${tr('Entradas',money(f.ent))}${tr('Saídas',money(f.sa))}${f.ret?tr('Retirada pessoal (incluída nas saídas)',money(f.ret)):''}${tr('Saldo no fim do dia',money(f.fim),1)}</table>`
 +h3('Produtos vendidos')+`<table><tr><th>Produto</th><th>Unidades</th><th>Receita</th><th>Lucro</th></tr>${pv||'<tr><td colspan="4">Sem vendas neste dia.</td></tr>'}</table>`
@@ -625,8 +636,8 @@ function printTudo(){
 const ord=(a,b)=>a.data<b.data?-1:a.data>b.data?1:0,V=D.vendas.slice().sort(ord),C=D.caixa.slice().sort(ord),K=D.compras.slice().sort(ord);
 const sm=(l,f)=>l.reduce((s,x)=>s+f(x),0),sai=c=>c.tipo==='saida'&&!c.ref&&!c.dv&&!c.cap;
 const rec=sm(V,v=>v.qtd*v.preco),cst=sm(V,v=>v.qtd*v.custo),desp=sm(C.filter(c=>sai(c)&&catOf(c)!=='Retirada'),c=>c.valor),ret=sm(C.filter(isRet),c=>c.valor);
-const PD=pdL().slice().sort(ord),perd=sm(PD.filter(x=>x.mot!=='con'),pdV),capD=sm(C.filter(c=>c.tipo==='saida'&&c.cap),c=>c.valor);
-const saldo=sm(C,c=>c.tipo==='entrada'?c.valor:-c.valor),vstock=sm(D.prods,p=>Math.max(0,p.stock)*custo(p)),zero=D.prods.filter(p=>p.stock<=0).length,baixo=D.prods.filter(p=>p.stock>0&&p.stock<=mn(p)).length;
+const PD=pdL().slice().sort(ord),perd=sm(PD.filter(x=>x.mot!=='con'&&x.mot!=='pag'),pdV),capD=sm(C.filter(c=>c.tipo==='saida'&&c.cap),c=>c.valor);
+const trVt=sm(C.filter(c=>isTr(c)&&!c.cap),c=>c.valor),comiT=sm(C.filter(c=>c.tipo==='saida'&&c.sub==='comida'),c=>c.valor);const saldo=sm(C,c=>c.tipo==='entrada'?c.valor:-c.valor),vstock=sm(D.prods,p=>Math.max(0,p.stock)*custo(p)),zero=D.prods.filter(p=>p.stock<=0).length,baixo=D.prods.filter(p=>p.stock>0&&p.stock<=mn(p)).length;
 const h3=x=>`<h3 style="margin:16px 0 6px;color:#a93425">${x}</h3>`,tr=(a,b,c)=>`<tr${c?' class="t"':''}><td>${a}</td><td>${b}</td></tr>`,pc=(a,b)=>b?Math.round(a/b*100)+'%':'0%';
 // períodos
 const per=[['Hoje',td(),td()],['Últimos 7 dias',dAgo(6),td()],['Este mês',td().slice(0,8)+'01',td()],['Desde o início','1900-01-01',td()]].map(x=>{const a=semData(x[1],x[2]);return`<tr><td class="l">${x[0]}</td><td>${a.n}</td><td>${money(a.r)}</td><td>${money(a.l)}</td><td>${money(a.desp)}</td><td>${money(a.l-a.desp-a.perd)}</td></tr>`}).join('');
@@ -634,7 +645,7 @@ const per=[['Hoje',td(),td()],['Últimos 7 dias',dAgo(6),td()],['Este mês',td()
 const ag={};V.forEach(v=>{const a=ag[v.nome]||(ag[v.nome]={q:0,r:0,l:0});a.q+=v.qtd;a.r+=v.qtd*v.preco;a.l+=v.qtd*(v.preco-v.custo)});
 const pp=Object.entries(ag).sort((a,b)=>b[1].l-a[1].l).map(([k,a])=>`<tr><td class="l">${esc(k)}</td><td>${c2(a.q)}</td><td>${money(a.r)}</td><td>${money(a.l)}</td><td>${pc(a.l,a.r)}</td></tr>`).join('');
 // despesas por categoria
-const cat={};C.filter(sai).forEach(c=>{const k=catOf(c);const a=cat[k]||(cat[k]={n:0,v:0});a.n++;a.v+=c.valor});C.filter(isPess).forEach(c=>{const a=cat['Retirada (dívida pessoal)']||(cat['Retirada (dívida pessoal)']={n:0,v:0});a.n++;a.v+=c.valor});C.filter(c=>c.tipo==='saida'&&c.cap).forEach(c=>{const a=cat['Transporte (sai do capital)']||(cat['Transporte (sai do capital)']={n:0,v:0});a.n++;a.v+=c.valor});
+const cat={};C.filter(sai).forEach(c=>{const k=(isTr(c)&&!c.cap)?'Transporte de volta (sai do lucro)':(c.sub==='comida'?'Comida e gastos pessoais':catOf(c));const a=cat[k]||(cat[k]={n:0,v:0});a.n++;a.v+=c.valor});C.filter(isPess).forEach(c=>{const a=cat['Retirada (dívida pessoal)']||(cat['Retirada (dívida pessoal)']={n:0,v:0});a.n++;a.v+=c.valor});C.filter(c=>c.tipo==='saida'&&c.cap).forEach(c=>{const a=cat['Transporte de ida (sai do capital)']||(cat['Transporte de ida (sai do capital)']={n:0,v:0});a.n++;a.v+=c.valor});
 const cats=Object.entries(cat).sort((a,b)=>b[1].v-a[1].v).map(([k,a])=>`<tr><td class="l">${esc(k)}</td><td>${a.n}</td><td>${money(a.v)}</td></tr>`).join('');
 const extra=sm(C.filter(c=>c.tipo==='entrada'&&!c.ref&&!c.dv&&!isEmp(c)),c=>c.valor),emprest=sm(C.filter(isEmp),c=>c.valor);
 // vendas por dia
@@ -647,7 +658,7 @@ let run=0;const cx=C.map(c=>{run+=c.tipo==='entrada'?c.valor:-c.valor;return`<tr
 const cp=K.map(c=>`<tr><td class="l">${fmtD(c.data)}${c.hora?' '+c.hora:''}</td><td class="l">${esc(c.nome)}</td><td>${c2(c.un)}</td><td>${money(c.total)}</td></tr>`).join('');
 const th=(a)=>'<thead><tr>'+a.map((x,i)=>{const l=i<1||x.charAt(0)==='~';return`<th${l?' class="l"':''}>${l&&i>0?x.slice(1):x}</th>`}).join('')+'</tr></thead>';
 $('printSheet').innerHTML=`<div class="ph"><img src="${document.querySelector('.hero img').src}"><div><h2>Bejoma Doces</h2><p>Relatório geral completo · gerado em ${agora()}</p></div></div>`
-+h3('Resumo geral')+`<table>${tr('Vendas registadas',V.length)}${tr('Receita total',money(rec))}${dscSum(V)?tr('Descontos dados aos clientes',money(dscSum(V))):''}${tr('Custo dos produtos vendidos',money(cst))}${tr('Lucro bruto',money(rec-cst),1)}${tr('Despesas',money(desp))}${capD?tr('Transporte (sai do capital)',money(capD)):''}${perd?tr('Perdas e ofertas',money(perd)):''}${tr('Lucro líquido',money(rec-cst-desp-perd),1)}${tr('Compras de mercadoria',money(sm(K,c=>c.total)))}${ret?tr('Retiradas pessoais',money(ret)):''}${extra?tr('Investimento (capital próprio)',money(extra)):''}${emprest?tr('Empréstimos recebidos (a devolver)',money(emprest)):''}${tr('Saldo da caixa',money(saldo),1)}${tr('Valor do stock (ao custo)',money(vstock))}${tr('Produtos cadastrados',D.prods.length)}${tr('Produtos sem stock / com stock baixo',zero+' / '+baixo)}</table>`
++h3('Resumo geral')+`<table>${tr('Vendas registadas',V.length)}${tr('Receita total',money(rec))}${dscSum(V)?tr('Descontos dados aos clientes',money(dscSum(V))):''}${tr('Custo dos produtos vendidos',money(cst))}${tr('Lucro bruto',money(rec-cst),1)}${tr('Despesas',money(desp))}${trVt?tr('↳ Transporte de volta (já nas despesas)',money(trVt)):''}${capD?tr('Transporte de ida (sai do capital)',money(capD)):''}${perd?tr('Perdas e ofertas',money(perd)):''}${tr('Lucro líquido',money(rec-cst-desp-perd),1)}${comiT?tr('Comida e gastos pessoais (fora do lucro)',money(comiT)):''}${tr('Compras de mercadoria',money(sm(K,c=>c.total)))}${ret?tr('Retiradas pessoais',money(ret)):''}${extra?tr('Investimento (capital próprio)',money(extra)):''}${emprest?tr('Empréstimos recebidos (a devolver)',money(emprest)):''}${tr('Saldo da caixa',money(saldo),1)}${tr('Valor do stock (ao custo)',money(vstock))}${tr('Produtos cadastrados',D.prods.length)}${tr('Produtos sem stock / com stock baixo',zero+' / '+baixo)}</table>`
 +h3('Resumo por período')+`<table>${th(['Período','Vendas','Receita','Lucro bruto','Despesas','Lucro líquido'])}<tbody>${per}</tbody></table>`
 +h3('Vendas e lucro por dia — últimos 30 dias')+`<div style="page-break-inside:avoid">${chartVendas()}<p style="font-size:11px;color:#555"><span style="color:#e98500">■</span> Receita &nbsp; <span style="color:#2e8b57">■</span> Lucro bruto</p></div>`
 +h3('Saldo da caixa — últimos 30 dias')+`<div style="page-break-inside:avoid">${chartCaixa()}</div>`
@@ -860,6 +871,46 @@ a.forEach(l=>{const d=new Date();for(let k=0;k<8&&!l.dias.includes(d.getDay());k
 L.push('BEGIN:VEVENT','UID:bejoma-'+l.tipo+'@bejoma.app','DTSTAMP:'+ds,'DTSTART:'+ds,'DURATION:PT15M','RRULE:FREQ=WEEKLY;BYDAY='+l.dias.map(i=>B[i]).join(','),'SUMMARY:Bejoma: '+LN[l.tipo],'BEGIN:VALARM','TRIGGER:PT0S','ACTION:DISPLAY','DESCRIPTION:Bejoma: '+LN[l.tipo],'END:VALARM','END:VEVENT')});
 L.push('END:VCALENDAR');const e=document.createElement('a');e.href=URL.createObjectURL(new Blob([L.join('\r\n')],{type:'text/calendar'}));e.download='bejoma_lembretes.ics';e.click()}
 
+/* ===== Dívidas: pagar com mercadoria ===== */
+function dmUndo(u){if(!u||!u.perda)return;const x=pdL().find(y=>y.id===u.perda);if(x){const p=(x.pid&&P(x.pid))||D.prods.find(z=>z.nome===x.nome);if(p)p.stock+=x.qtd;D.perdas=pdL().filter(y=>y.id!==u.perda)}}
+function dmDraw(){const a=$('dmDiv'),b=$('dmProd');if(!a||!b)return;const v1=a.value,v2=b.value;
+const L=dvL().filter(d=>d.tipo==='pagar'&&dvF(d)>0).sort(dvCmp);
+a.innerHTML=L.length?L.map(d=>`<option value="${d.id}">${esc(d.pessoa)} · ${money(dvF(d))}${d.desc?' · '+esc(d.desc):''}</option>`).join(''):'<option value="">Sem dívidas para pagar</option>';
+const PL_=D.prods.filter(p=>p.stock>0);
+b.innerHTML=PL_.length?PL_.map(p=>`<option value="${p.id}">${esc(p.nome)} (stock ${p.stock})</option>`).join(''):'<option value="">Sem stock</option>';
+if(v1&&L.some(d=>d.id===v1))a.value=v1;if(v2&&PL_.some(p=>p.id===v2))b.value=v2;dmInfo()}
+function dmInfo(){const p=P($('dmProd').value),e=$('dmInfo');if(e)e.textContent=p?'Custo '+money(custo(p))+' por un. · venda '+money(p.venda)+' por un.':''}
+function dmCalc(){const p=P($('dmProd').value),q=n($('dmQtd').value);dmInfo();if(p&&q>0)$('dmVal').value=Math.round(custo(p)*q*100)/100}
+function dmPagar(){if(!once())return;const d=dvGet($('dmDiv').value),p=P($('dmProd').value),q=n($('dmQtd').value),x=n($('dmVal').value);
+if(!d)return alert('Escolha a dívida.');if(!p||q<=0)return alert('Escolha o produto e a quantidade.');
+if(q>p.stock)return alert('Só tem '+p.stock+' un. de '+p.nome+' em stock.');
+const f=dvF(d);if(x<=0)return alert('Indique o valor a abater.');if(x>f)return alert('Esse valor é maior do que o que falta ('+money(f)+').');
+if(!confirm('Pagar '+d.pessoa+' com '+c2(q)+' × '+p.nome+'?\nA dívida desce '+money(x)+'. O stock baixa. A Caixa não mexe.'))return;
+const pid=uid(),pdId=uid();
+pdL().push({id:pdId,data:td(),hora:hh(),pid:p.id,nome:p.nome,qtd:q,custo:custo(p),mot:'pag',obs:'Pagamento a '+d.pessoa,dv:d.id});
+p.stock-=q;d.pagtos=d.pagtos||[];d.pagtos.push({id:pid,data:td(),hora:hh(),valor:x,forma:'merc',merc:{pid:p.id,nome:p.nome,qtd:q},perda:pdId});d.pago=(d.pago||0)+x;
+$('dmQtd').value='';$('dmVal').value='';save();R()}
+/* ===== Dívidas: plano semanal com metas de vendas ===== */
+const addD=(ds,k)=>{const d=new Date(ds+'T12:00:00');d.setDate(d.getDate()+k);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+function dvPlan(){const hoje=td(),ab=dvL().filter(d=>d.tipo==='pagar'&&dvF(d)>0),sm=(l,f)=>l.reduce((a,x)=>a+f(x),0);
+const saldo=sm(D.caixa,c=>c.tipo==='entrada'?c.valor:-c.valor);
+const vs=D.vendas.filter(v=>v.data>=addD(hoje,-29)),rec=sm(vs,v=>v.qtd*v.preco),luc=sm(vs,v=>v.qtd*(v.preco-v.custo));
+const marg=(rec>0&&luc>0)?luc/rec:0.5,dias=new Set(vs.map(v=>v.data)).size,ritmo=dias?rec/dias:0;
+const W=[0,1,2,3].map(i=>({lab:'Semana '+(i+1),a:addD(hoje,i*7),b:addD(hoje,i*7+6),v:0,pess:0,n:0,dias:7})),dep={lab:'Depois',v:0,pess:0,n:0,max:0};let semP=0;
+ab.forEach(d=>{const f=dvF(d);if(!d.prazo){semP+=f;return}const k=dvDias(d.prazo),w=k<=6?0:Math.floor(k/7),t=w<4?W[w]:dep;t.v+=f;t.n++;if(d.pess)t.pess+=f;if(w>=4)dep.max=Math.max(dep.max,k)});
+const R_=W.slice();if(dep.n){dep.a=addD(hoje,28);dep.b=addD(hoje,dep.max);dep.dias=Math.max(1,dep.max-27);R_.push(dep)}
+let cum=0,prev=0;R_.forEach(r=>{cum+=r.v;const sh=Math.max(0,cum-saldo);r.meta=(sh-prev)/marg;prev=sh;r.pd=r.meta/r.dias});
+return{R_,saldo,marg,ritmo,semP,total:cum+semP}}
+function dvPlanDraw(){const e=$('dvPlano');if(!e)return;const P_=dvPlan(),L=P_.R_.filter(r=>r.v>0);
+if(!L.length){e.innerHTML='';return}
+e.innerHTML=`<div class="card"><h2>📅 Plano semanal de dívidas</h2><p class="empty" style="margin:-6px 0 8px">Quanto tem de vender para pagar o que vence em cada semana, já a contar com a Caixa (${money(P_.saldo)}). Margem usada: ${Math.round(P_.marg*100)}%${P_.ritmo?' · ritmo atual: '+money(P_.ritmo)+' por dia':''}.</p>`
++L.map(r=>`<div class="item"><div><b>${r.lab} · ${dm(r.a)} a ${dm(r.b)}</b><small>A pagar ${money(r.v)}${r.pess?' (pessoais '+money(r.pess)+')':''}</small></div><div style="text-align:right">${r.meta>0?`<b class="${P_.ritmo&&r.pd<=P_.ritmo?'good':'warn'}">${money(Math.ceil(r.meta/10)*10)}</b><small>~${money(Math.ceil(r.pd/10)*10)} por dia</small>`:'<b class="good">Caixa chega</b>'}</div></div>`).join('')
++(P_.semP?`<p class="empty" style="margin:8px 0 0">Mais ${money(P_.semP)} em dívidas sem prazo, que não entram no plano.</p>`:'')
++`<p class="empty" style="margin:8px 0 0">Meta = vendas necessárias só para pagar a dívida. Não inclui repor stock. Atrasadas entram na semana 1.</p></div>`}
+function dvPlanPrint(){const P_=dvPlan(),L=P_.R_.filter(r=>r.v>0);if(!L.length)return'';
+return`<h3 style="margin:16px 0 6px;color:#a93425">Plano semanal de pagamentos</h3><table><tr><th class="l">Semana</th><th>A pagar</th><th>Meta de vendas</th><th>Por dia</th></tr>`
++L.map(r=>`<tr><td class="l">${r.lab} · ${dm(r.a)} a ${dm(r.b)}</td><td>${money(r.v)}</td><td>${r.meta>0?money(Math.ceil(r.meta/10)*10):'Caixa chega'}</td><td>${r.meta>0?money(Math.ceil(r.pd/10)*10):'—'}</td></tr>`).join('')
++`</table><p style="font-size:.8rem">Caixa atual: ${money(P_.saldo)} · margem usada: ${Math.round(P_.marg*100)}%. Meta só para pagar dívidas, sem repor stock.</p>`}
 /* ===== Dívidas ===== */
 let dvT='receber';
 const dvL=()=>{if(!Array.isArray(D.dividas))D.dividas=[];return D.dividas};
@@ -890,18 +941,18 @@ function dvParc(id){const d=dvGet(id);if(!d)return;const f=dvF(d),v=prompt((d.ti
 if(v===null)return;const x=n(v);if(x<=0)return;if(x>f)return alert('Esse valor é maior do que o que falta ('+money(f)+').');
 if(d.tipo==='pagar'&&semSaldo(x,dvFPv))return;dvReg(d,x);save();R()}
 function dvDesf(id){const d=dvGet(id);if(!d||!d.pagtos||!d.pagtos.length)return;const u=d.pagtos[d.pagtos.length-1];
-if(!confirm('Desfazer o último pagamento de '+money(u.valor)+' ('+fmtD(u.data)+')? O movimento da Caixa também é apagado.'))return;
-d.pagtos.pop();d.pago=Math.max(0,(d.pago||0)-u.valor);if(u.id)D.caixa=D.caixa.filter(c=>c.dv!==u.id);save();R()}
+if(!confirm('Desfazer o último pagamento de '+money(u.valor)+' ('+fmtD(u.data)+')?'+(u.perda?' A mercadoria volta ao stock.':' O movimento da Caixa também é apagado.')))return;
+d.pagtos.pop();d.pago=Math.max(0,(d.pago||0)-u.valor);if(u.id)D.caixa=D.caixa.filter(c=>c.dv!==u.id);dmUndo(u);save();R()}
 function dvDel(id){const d=dvGet(id);if(!d)return;const ids=(d.pagtos||[]).map(x=>x.id).filter(Boolean);
 if(!confirm('Apagar a dívida de '+d.pessoa+'?'+(ids.length?'\nOs pagamentos já registados na Caixa também serão apagados.':'')+(d.venda?'\nAtenção: a venda continua registada. Para a desfazer, apague-a em Vendas.':'')))return;
-if(ids.length)D.caixa=D.caixa.filter(c=>ids.indexOf(c.dv)<0);D.dividas=dvL().filter(x=>x.id!==id);save();R()}
+if(ids.length)D.caixa=D.caixa.filter(c=>ids.indexOf(c.dv)<0);(d.pagtos||[]).forEach(dmUndo);D.dividas=dvL().filter(x=>x.id!==id);save();R()}
 function dvPrazo(id,v){const d=dvGet(id);if(!d)return;d.prazo=v||'';save();R()}
 function dvRows(L,rec){
 if(!L.length)return empty(rec?'Ninguém lhe deve nada neste momento. ✅':'Não deve nada a ninguém. ✅');
 return'<table class="dvt"><tr><th>'+(rec?'QUEM ME DEVE':'A QUEM EU DEVO')+'</th><th style="text-align:right">EM FALTA</th><th>PRAZO</th></tr>'+L.map(d=>{const s=dvSt(d),f=dvF(d);
 return`<tr class="m"><td><b>${esc(d.pessoa)}</b>${d.desc?`<small>${esc(d.desc)}</small>`:''}${d.pago>0?`<small>${rec?'Já pagou':'Já paguei'} ${money(d.pago)} de ${money(d.valor)}</small>`:''}</td><td style="text-align:right"><b>${money(f)}</b></td><td>${d.prazo?fmtD(d.prazo):'—'}<small class="${s.c}"><b>${s.t}</b></small></td></tr>`
 +`<tr><td colspan="3" class="dva"><div class="acts"><input type="date" value="${d.prazo||''}" onchange="dvPrazo('${d.id}',this.value)" aria-label="Prazo"><button class="mini" onclick="dvPaga('${d.id}')">✅ ${rec?'Recebi tudo':'Paguei tudo'}</button><button class="mini sec" onclick="dvParc('${d.id}')">💵 Parte</button><button class="mini dng" onclick="dvDel('${d.id}')">✕</button></div></td></tr>`}).join('')+'</table>'}
-function DV(){if(!$('dvSum'))return;dvDraw();const ab=dvL().filter(d=>dvF(d)>0),rc=ab.filter(d=>d.tipo==='receber').sort(dvCmp),pg=ab.filter(d=>d.tipo==='pagar').sort(dvCmp),
+function DV(){if(!$('dvSum'))return;dvDraw();dmDraw();dvPlanDraw();const ab=dvL().filter(d=>dvF(d)>0),rc=ab.filter(d=>d.tipo==='receber').sort(dvCmp),pg=ab.filter(d=>d.tipo==='pagar').sort(dvCmp),
 sm=l=>l.reduce((s,d)=>s+dvF(d),0),sr=sm(rc),sp=sm(pg),at=l=>l.filter(d=>d.prazo&&dvDias(d.prazo)<0).length,ar=at(rc),ap=at(pg),
 ph=dvL().filter(d=>dvF(d)<=0).sort((a,b)=>dvUlt(b)<dvUlt(a)?-1:dvUlt(b)>dvUlt(a)?1:0).slice(0,15),cd=(t,b)=>`<div class="card"><h2>${t}</h2>${b}</div>`;
 $('dvSum').innerHTML=cd('🤝 Dívidas',`<div class="grid"><div class="stat"><div class="k">DEVEM-ME</div><div class="v good">${money(sr)}</div></div><div class="stat"><div class="k">EU DEVO</div><div class="v bad">${money(sp)}</div></div></div>`
@@ -912,11 +963,11 @@ $('dvBox').innerHTML=cd('📥 Quem me deve ('+rc.length+')',dvRows(rc,true))+cd(
 function dvIni(){const u=dvUrg();if(!u.length)return'';return`<div class="card" style="border-color:#e4bd7d;background:var(--soft)"><h2>🤝 Dívidas a tratar (${u.length})</h2>`+u.slice(0,5).map(d=>{const s=dvSt(d);return`<div class="item"><div>${d.tipo==='receber'?'📥 Cobrar a':'📤 Pagar a'} <b>${esc(d.pessoa)}</b><small class="${s.c}">${s.t}</small></div><b>${money(dvF(d))}</b></div>`}).join('')+`<button class="sec" onclick="goTab('dividas')">Abrir Dívidas</button></div>`}
 function dvPrintTbl(rec){const L=dvL().filter(d=>d.tipo===(rec?'receber':'pagar')&&dvF(d)>0).sort(dvCmp);if(!L.length)return'<p>Nenhum registo.</p>';
 return'<table><tr><th>'+(rec?'Quem me deve':'A quem eu devo')+'</th><th class="l">Descrição</th><th>Total</th><th>Em falta</th><th class="l">Prazo</th><th class="l">Estado</th></tr>'+L.map(d=>`<tr><td>${esc(d.pessoa)}</td><td class="l">${esc(d.desc||'')}</td><td>${money(d.valor)}</td><td>${money(dvF(d))}</td><td class="l">${d.prazo?fmtD(d.prazo):'—'}</td><td class="l">${dvSt(d).t}</td></tr>`).join('')+`<tr class="t"><td colspan="3">Total em falta</td><td>${money(L.reduce((s,d)=>s+dvF(d),0))}</td><td colspan="2"></td></tr></table>`}
-function dvPrintSec(){if(!dvL().some(d=>dvF(d)>0))return'';const h3=x=>`<h3 style="margin:16px 0 6px;color:#a93425">${x}</h3>`;return h3('Dívidas — quem me deve')+dvPrintTbl(true)+h3('Dívidas — o que eu devo')+dvPrintTbl(false)}
+function dvPrintSec(){if(!dvL().some(d=>dvF(d)>0))return'';const h3=x=>`<h3 style="margin:16px 0 6px;color:#a93425">${x}</h3>`;return h3('Dívidas — quem me deve')+dvPrintTbl(true)+h3('Dívidas — o que eu devo')+dvPrintTbl(false)+dvPlanPrint()}
 function printDiv(){$('printSheet').innerHTML=`<div class="ph"><img src="${document.querySelector('.hero img').src}"><div><h2>Bejoma Doces</h2><p>Dívidas e prazos · gerado em ${agora()}</p></div></div>`+(dvPrintSec()||'<p>Sem dívidas por pagar ou receber.</p>');assina();window.print()}
 
 /* ===== Perdas, estragos e ofertas ===== */
-const PM={dif:['📋','Falta na contagem'],est:['🗑️','Estragado'],ofe:['🎁','Oferta'],per:['❓','Perdido ou roubado'],con:['🏠','Consumo próprio']};
+const PM={dif:['📋','Falta na contagem'],est:['🗑️','Estragado'],ofe:['🎁','Oferta'],per:['❓','Perdido ou roubado'],con:['🏠','Consumo próprio'],pag:['📦','Dívida paga com mercadoria']};
 const pdL=()=>{if(!Array.isArray(D.perdas))D.perdas=[];return D.perdas};
 const pdV=x=>x.qtd*x.custo;
 const pmN=x=>(PM[x.mot]||PM.per)[1],pmI=x=>(PM[x.mot]||PM.per)[0];
@@ -924,11 +975,11 @@ function perder(){if(!once())return;const p=P($('pProd').value),q=n($('pQtd').va
 if(!p||q<=0)return alert('Escolha o produto e a quantidade.');
 if(q>p.stock)return alert('Só tem '+p.stock+' un. de '+p.nome+' em stock.');
 pdL().push({id:uid(),data:td(),hora:hh(),pid:p.id,nome:p.nome,qtd:q,custo:custo(p),mot:m,obs:$('pObs').value.trim()});p.stock-=q;save();$('pQtd').value='';$('pObs').value='';R()}
-function delPerda(id){const x=pdL().find(y=>y.id===id);if(!x)return;const p=(x.pid&&P(x.pid))||D.prods.find(z=>z.nome===x.nome);
+function delPerda(id){const x=pdL().find(y=>y.id===id);if(!x)return;if(x.mot==='pag')return alert('Esta saída foi um pagamento de dívida com mercadoria.\nPara desfazer, vá a Dívidas e use ↩️ Desfazer.');const p=(x.pid&&P(x.pid))||D.prods.find(z=>z.nome===x.nome);
 if(!confirm('Desfazer este registo ('+x.nome+' ×'+x.qtd+', '+pmN(x)+')?'+(p?' O stock volta.':'')))return;if(p)p.stock+=x.qtd;D.perdas=pdL().filter(y=>y.id!==id);save();R()}
 function PL(){if(!$('pLista'))return;const L=pdL().slice(-15).reverse();
 $('pLista').innerHTML=L.length?'<b style="font-size:.85rem">Últimos registos</b>'+L.map(x=>`<div class="item"><div>${pmI(x)} ${esc(x.nome)} ×${c2(x.qtd)}<small>${fmtD(x.data)}${x.hora?' '+x.hora:''} · ${pmN(x)} · custo ${money(pdV(x))}${x.obs?' · '+esc(x.obs):''}</small></div><button class="mini dng" onclick="delPerda('${x.id}')">✕</button></div>`).join(''):empty('Ainda sem perdas, estragos ou ofertas.')}
-function pdPrintSec(L){if(!L.length)return'';const t=L.filter(x=>x.mot!=='con').reduce((s,x)=>s+pdV(x),0);return`<h3 style="margin:16px 0 6px;color:#a93425">Perdas, estragos e ofertas (${L.length})</h3><table><tr><th>Data</th><th class="l">Produto</th><th>Qtd</th><th class="l">Motivo</th><th>Custo</th></tr>`+L.map(x=>`<tr><td class="l">${fmtD(x.data)}${x.hora?' '+x.hora:''}</td><td class="l">${esc(x.nome)}</td><td>${c2(x.qtd)}</td><td class="l">${pmN(x)}</td><td>${money(pdV(x))}</td></tr>`).join('')+`<tr class="t"><td class="l" colspan="4">Total que desconta do lucro (sem consumo próprio)</td><td>${money(t)}</td></tr></table>`}
+function pdPrintSec(L){if(!L.length)return'';const t=L.filter(x=>x.mot!=='con'&&x.mot!=='pag').reduce((s,x)=>s+pdV(x),0);return`<h3 style="margin:16px 0 6px;color:#a93425">Perdas, estragos e ofertas (${L.length})</h3><table><tr><th>Data</th><th class="l">Produto</th><th>Qtd</th><th class="l">Motivo</th><th>Custo</th></tr>`+L.map(x=>`<tr><td class="l">${fmtD(x.data)}${x.hora?' '+x.hora:''}</td><td class="l">${esc(x.nome)}</td><td>${c2(x.qtd)}</td><td class="l">${pmN(x)}</td><td>${money(pdV(x))}</td></tr>`).join('')+`<tr class="t"><td class="l" colspan="4">Total que desconta do lucro (sem consumo próprio nem dívidas pagas com mercadoria)</td><td>${money(t)}</td></tr></table>`}
 
 /* ===== Contagem de stock ===== */
 let CN={};
@@ -958,11 +1009,25 @@ function cnPrintSec(){const A=[];cnL().forEach(h=>h.itens.filter(x=>x.dif!==0).f
 return`<h3 style="margin:16px 0 6px;color:#a93425">Contagens de stock — diferenças</h3><table><tr><th>Data</th><th class="l">Produto</th><th>No app</th><th>Contado</th><th>Diferença</th></tr>`+A.slice(-30).map(a=>`<tr><td class="l">${fmtD(a[0])}</td><td class="l">${esc(a[1].nome)}</td><td>${c2(a[1].app)}</td><td>${c2(a[1].real)}</td><td>${(a[1].dif>0?'+':'')+c2(a[1].dif)}</td></tr>`).join('')+'</table>'}
 
 /* ===== Transporte: sai do capital ===== */
-function capShow(){const l=$('cCapL');if(!l)return;const des=$('cTipo').value==='saida|Despesa';l.style.display=des?'flex':'none';
-if(!des){$('cCap').checked=false;return}
-const jaV=D.vendas.some(v=>v.data===td()),jaD=D.caixa.some(c=>c.data===td()&&c.tipo==='saida'&&!c.ref&&!c.dv&&catOf(c)==='Despesa');
-$('cCap').checked=!jaV&&!jaD}
-function capTog(id){const c=D.caixa.find(x=>x.id===id);if(!c)return;if(c.cap)delete c.cap;else c.cap=true;save();R()}
+let trV='';
+const isTr=c=>c.tipo==='saida'&&!c.ref&&!c.dv&&catOf(c)==='Despesa'&&(!!c.tr||!!c.cap||/taxi|t[áa]xi|transporte|candongueiro/i.test(c.desc||''));
+const trK=c=>c.tr||(c.cap?'ida':'volta');
+const trTxt=c=>isTr(c)?(trK(c)==='ida'?' · 🌅 transporte de ida · sai do capital':' · 🌙 transporte de volta · sai do lucro'):((c.tipo==='saida'&&c.sub==='comida')?' · 🍽️ pessoal, fora do lucro':'');
+function trSug(){const jaV=D.vendas.some(v=>v.data===td()),jaI=D.caixa.some(c=>c.data===td()&&c.tipo==='saida'&&c.tr==='ida');return(!jaV&&!jaI)?'ida':'volta'}
+function trSet(k){trV=k;capShow()}
+function capShow(){const e=$('cTrL');if(!e)return;const t=$('cTipo').value==='saida|Transporte';e.style.display=t?'block':'none';if(!t){trV='';return}
+if(!trV)trV=trSug();
+$('cTrSel').innerHTML=[['ida','🌅 Ida · sai do capital'],['volta','🌙 Volta · sai do lucro']].map(x=>'<button type="button" class="chip'+(x[0]===trV?' on':'')+'" onclick="trSet(\''+x[0]+'\')">'+x[1]+'</button>').join('');
+$('cTrDica').textContent=trV==='ida'?'Antes de vender: não conta como despesa, sai do capital.':'Depois de vender: conta como despesa e baixa o lucro líquido.'}
+function capTog(id){const c=D.caixa.find(x=>x.id===id);if(!c)return;if(c.cap){delete c.cap;c.tr='volta'}else{c.cap=true;c.tr='ida'}save();R()}
+function foodTog(id){const c=D.caixa.find(x=>x.id===id);if(!c)return;if(c.sub==='comida'){c.cat='Despesa';delete c.sub}else{c.cat='Retirada';c.sub='comida';delete c.cap;delete c.tr}save();R()}
+/* ===== Comida e gastos pessoais: limite diário ===== */
+const limCom=()=>Number(D.limComida)||0;
+const comDia=ds=>D.caixa.filter(c=>c.data===ds&&c.tipo==='saida'&&c.sub==='comida').reduce((a,c)=>a+c.valor,0);
+function limSet(){const v=$('limVal').value.trim();D.limComida=v===''?0:Math.max(0,n(v));save();R()}
+function LC(){const e=$('limBox');if(!e)return;const lim=limCom(),g=comDia(td()),r=lim-g,inp=$('limVal');
+if(inp&&document.activeElement!==inp)inp.value=lim||'';
+e.innerHTML=`<div class="grid"><div class="stat"><div class="k">GASTO HOJE</div><div class="v ${lim&&g>lim?'bad':''}">${money(g)}</div></div><div class="stat"><div class="k">${lim?(r>=0?'AINDA PODE GASTAR':'PASSOU O LIMITE'):'LIMITE'}</div><div class="v ${lim?(r<0?'bad':'good'):''}">${lim?money(Math.abs(r)):'sem limite'}</div></div></div>`+(lim?`<div style="height:10px;background:#f1e4cd;border-radius:6px;margin:10px 0 0;overflow:hidden"><div style="height:100%;width:${Math.min(100,g/lim*100)}%;background:${g>lim?'var(--bad)':g>lim*.8?'var(--accent)':'var(--good)'}"></div></div>`:'')}
 setInterval(check,30000);let _hid=0;document.addEventListener('visibilitychange',()=>{if(document.hidden){_hid=Date.now();return}if(pinData()&&!LOCKED&&_hid&&Date.now()-_hid>300000)lockNow();check()});
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
 R();PN();lockNow();check();splashRun();
