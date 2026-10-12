@@ -210,6 +210,7 @@ body.locked>*:not(#lock):not(#splash):not(#ex):not(#priv){visibility:hidden}
 <label>Forma de pagamento</label><div id="cFormaSel" class="chips"></div>
 <button onclick="caixaAdd()">Registar movimento</button></div>
 <div class="card"><h2>Movimentos recentes</h2><div id="cLista"></div></div>
+<div class="card"><h2>🗑️ Apagados</h2><p class="empty" style="margin:-6px 0 8px">O que apagar na Caixa ou nas Dívidas fica aqui e pode ser restaurado.</p><div id="apBox"></div></div>
 </div>
 
 <div class="panel hidden" id="p-dividas">
@@ -434,7 +435,11 @@ if(l0==='Transporte'){l='Despesa';const k=trV||trSug();ex=k==='ida'?{cap:true,tr
 else if(l0==='Comida'){l='Retirada';ex={sub:'comida'};dd='Comida';const lim=limCom();if(lim>0){const g=comDia(td())+v;if(g>lim&&!confirm('⚠️ Isto passa o limite diário de '+money(lim)+'.\nHoje já gastou '+money(comDia(td()))+' e ficaria em '+money(g)+'.\n\nRegistar mesmo assim?'))return}}
 D.caixa.push(Object.assign({id:uid(),data:td(),hora:hh(),tipo:t,desc:$('cDesc').value.trim()||dd,valor:v,cat:l,forma:fpC},ex));trV='';save();$('cDesc').value='';$('cValor').value='';R()}
 function empTog(id){const c=D.caixa.find(x=>x.id==id);if(!c)return;c.cat=c.cat==='Empréstimo'?'Entrada extra':'Empréstimo';save();R()}
-function delCaixa(id){if(!confirm('Apagar este movimento?'))return;D.caixa=D.caixa.filter(c=>c.id!=id);save();R()}
+function delCaixa(id){const c=D.caixa.find(x=>x.id==id);if(!c)return;
+let m='Apagar este movimento?\n'+c.desc+' · '+(c.tipo==='entrada'?'+':'−')+money(c.valor)+'\nO saldo da caixa '+(c.tipo==='entrada'?'desce ':'sobe ')+money(c.valor)+'.';
+if(isEmp(c)||/d[ií]vida|emprest/i.test(c.desc||''))m+='\n\n⚠️ Este movimento parece ligado a uma dívida. Apagar aqui só tira o dinheiro da Caixa: a dívida continua em Dívidas.';
+m+='\n\nFica guardado em "Apagados" e pode ser restaurado.';
+if(!confirm(m))return;apLog({t:'caixa',mov:JSON.parse(JSON.stringify(c))});D.caixa=D.caixa.filter(x=>x.id!=id);save();R()}
 
 async function backupMake(){D.ultBackup=td();save();let txt,nm='bejoma_backup_'+td();
 if(ENC){const d=pinData();txt=JSON.stringify({bjmEnc:1,it:d.it,ri:d.ri,s:d.s,rs:d.rs,ws:d.ws,wr:d.wr,data:await encBlob(JSON.stringify(D),DEK)});nm+='_cifrado'}else txt=JSON.stringify(D);
@@ -534,7 +539,7 @@ c4=`<div class="donut chart"><svg viewBox="0 0 120 120">${arcs}<text x="60" y="5
 const cd=(t,b)=>`<div class="card"><h2>${t}</h2>${b}</div>`;
 $('gBox').innerHTML=sel+kpis+cd('Receita e lucro por dia',c1)+cd('Evolução do saldo da caixa',c2)+cd('Produtos mais lucrativos',c3)+cd('Receita por produto',c4)}
 const empty=t=>`<div class="empty">${t}</div>`;
-function R(){D.prods.sort((a,b)=>a.nome.localeCompare(b.nome,'pt',{sensitivity:'base'}));fpDraw();G();RL();F();I();DV();capShow();LC();PL();CNR();
+function R(){D.prods.sort((a,b)=>a.nome.localeCompare(b.nome,'pt',{sensitivity:'base'}));fpDraw();G();RL();F();I();DV();capShow();LC();AP();PL();CNR();
 opts('vProd');opts('aProd');opts('pProd');opts('sProd');if(!$('sData').value)$('sData').value=td();$('sData').max=td();showImg();if(!$('aData').value)$('aData').value=td();$('aData').max=td();lotesDraw();E();if(!$('vPreco').value)fillPreco();if(!$('aPreco').value)fillEmb();
 const hoje=D.vendas.filter(v=>v.data===td());
 $('vLista').innerHTML=hoje.length?hoje.slice().reverse().map(v=>`<div class="item"><div class="pi">${P(v.pid)?av(P(v.pid),38):''}<div>${v.devol?'↩️ Devolução · ':''}${esc(v.nome)} ×${v.qtd}<small>${v.hora?v.hora+' · ':''}${money(v.qtd*v.preco)} · ${v.fiado?'🤝 A dever':fpI(fpK(v))+' '+fpN(fpK(v))} · lucro ${money(v.qtd*(v.preco-v.custo))}</small></div></div><button class="mini dng" onclick="delVenda('${v.id}')">✕</button></div>`).join(''):empty('Ainda sem vendas hoje.');
@@ -944,7 +949,10 @@ function dvDesf(id){const d=dvGet(id);if(!d||!d.pagtos||!d.pagtos.length)return;
 if(!confirm('Desfazer o último pagamento de '+money(u.valor)+' ('+fmtD(u.data)+')?'+(u.perda?' A mercadoria volta ao stock.':' O movimento da Caixa também é apagado.')))return;
 d.pagtos.pop();d.pago=Math.max(0,(d.pago||0)-u.valor);if(u.id)D.caixa=D.caixa.filter(c=>c.dv!==u.id);dmUndo(u);save();R()}
 function dvDel(id){const d=dvGet(id);if(!d)return;const ids=(d.pagtos||[]).map(x=>x.id).filter(Boolean);
-if(!confirm('Apagar a dívida de '+d.pessoa+'?'+(ids.length?'\nOs pagamentos já registados na Caixa também serão apagados.':'')+(d.venda?'\nAtenção: a venda continua registada. Para a desfazer, apague-a em Vendas.':'')))return;
+if(!confirm('Apagar a dívida de '+d.pessoa+'?'+(ids.length?'\nOs pagamentos já registados na Caixa também serão apagados.':'')+(d.venda?'\nAtenção: a venda continua registada. Para a desfazer, apague-a em Vendas.':'')+'\n\nFica guardada em "Apagados" (na Caixa) e pode ser restaurada.'))return;
+const cx=ids.length?D.caixa.filter(c=>ids.indexOf(c.dv)>=0):[];
+const pd=(d.pagtos||[]).filter(u=>u.perda).map(u=>pdL().find(y=>y.id===u.perda)).filter(Boolean);
+apLog({t:'divida',d:JSON.parse(JSON.stringify(d)),cx:JSON.parse(JSON.stringify(cx)),pd:JSON.parse(JSON.stringify(pd))});
 if(ids.length)D.caixa=D.caixa.filter(c=>ids.indexOf(c.dv)<0);(d.pagtos||[]).forEach(dmUndo);D.dividas=dvL().filter(x=>x.id!==id);save();R()}
 function dvPrazo(id,v){const d=dvGet(id);if(!d)return;d.prazo=v||'';save();R()}
 function dvRows(L,rec){
@@ -1021,6 +1029,22 @@ $('cTrSel').innerHTML=[['ida','🌅 Ida · sai do capital'],['volta','🌙 Volta
 $('cTrDica').textContent=trV==='ida'?'Antes de vender: não conta como despesa, sai do capital.':'Depois de vender: conta como despesa e baixa o lucro líquido.'}
 function capTog(id){const c=D.caixa.find(x=>x.id===id);if(!c)return;if(c.cap){delete c.cap;c.tr='volta'}else{c.cap=true;c.tr='ida'}save();R()}
 function foodTog(id){const c=D.caixa.find(x=>x.id===id);if(!c)return;if(c.sub==='comida'){c.cat='Despesa';delete c.sub}else{c.cat='Retirada';c.sub='comida';delete c.cap;delete c.tr}save();R()}
+/* ===== Apagados: lista para restaurar ===== */
+const apL=()=>{if(!Array.isArray(D.apagados))D.apagados=[];return D.apagados};
+function apLog(o){const l=apL();l.unshift(Object.assign({id:uid(),qd:td(),qh:hh()},o));if(l.length>60)l.length=60}
+function apIns(c){let i=D.caixa.length;const k=(c.data||'')+(c.hora||'');while(i>0&&((D.caixa[i-1].data||'')+(D.caixa[i-1].hora||''))>k)i--;D.caixa.splice(i,0,c)}
+function apRest(id){const l=apL(),i=l.findIndex(x=>x.id===id);if(i<0)return;const a=l[i];
+if(a.t==='caixa'){if(D.caixa.some(c=>c.id===a.mov.id)){l.splice(i,1);save();return R()}
+if(!confirm('Restaurar "'+a.mov.desc+'" ('+(a.mov.tipo==='entrada'?'+':'−')+money(a.mov.valor)+')?\nO saldo da caixa '+(a.mov.tipo==='entrada'?'sobe ':'desce ')+money(a.mov.valor)+'.'))return;
+apIns(a.mov)}
+else{if(dvGet(a.d.id)){l.splice(i,1);save();return R()}
+if(!confirm('Restaurar a dívida de '+a.d.pessoa+' ('+money(dvF(a.d))+' em falta)?'+(a.cx.length?'\n'+a.cx.length+' pagamento(s) voltam à Caixa.':'')+(a.pd.length?'\nA mercadoria dada em pagamento volta a sair do stock.':'')))return;
+dvL().push(a.d);a.cx.forEach(apIns);
+a.pd.forEach(x=>{const p=(x.pid&&P(x.pid))||D.prods.find(z=>z.nome===x.nome);if(p)p.stock=Math.max(0,p.stock-x.qtd);pdL().push(x)})}
+l.splice(i,1);save();R()}
+function apClear(){if(!apL().length)return;if(!confirm('Limpar a lista de apagados? Já não poderá restaurar nada.'))return;D.apagados=[];save();R()}
+function AP(){const e=$('apBox');if(!e)return;const l=apL();
+e.innerHTML=l.length?l.slice(0,20).map(a=>{const m=a.t==='caixa';return`<div class="item"><div>${m?esc(a.mov.desc):'🤝 Dívida: '+esc(a.d.pessoa)+(a.d.desc?' · '+esc(a.d.desc):'')}<small>${m?'Movimento':'Dívida'} · apagado em ${fmtD(a.qd)}${a.qh?' '+a.qh:''}</small></div><div><b class="${m?(a.mov.tipo==='entrada'?'good':'bad'):''}">${m?(a.mov.tipo==='entrada'?'+':'−')+money(a.mov.valor):money(a.d.valor)}</b> <button class="mini sec" onclick="apRest('${a.id}')">↩️ Restaurar</button></div></div>`}).join('')+'<button class="sec" onclick="apClear()" style="margin-top:10px">Limpar lista</button>':empty('Nada apagado.')}
 /* ===== Comida e gastos pessoais: limite diário ===== */
 const limCom=()=>Number(D.limComida)||0;
 const comDia=ds=>D.caixa.filter(c=>c.data===ds&&c.tipo==='saida'&&c.sub==='comida').reduce((a,c)=>a+c.valor,0);
