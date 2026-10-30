@@ -6,6 +6,7 @@
 <title>Bejoma Gestão</title>
 <link rel="manifest" href="manifest.webmanifest">
 <meta name="theme-color" content="#9e2630">
+<script>(function(){try{var t=localStorage.getItem('bejoma_tema')||'claro',dk=t==='noturno'||(t==='auto'&&window.matchMedia&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.t=dk?'dark':'light';var m=document.querySelector('meta[name=theme-color]');if(m)m.content=dk?'#14110f':'#9e2630'}catch(e){}})()</script>
 <meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes">
 <link rel="icon" href="icon-192.png"><link rel="apple-touch-icon" href="icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Pacifico&display=swap" rel="stylesheet">
@@ -117,6 +118,31 @@ button.sec{background:var(--soft);color:var(--text);border:1px solid var(--line)
 .stat{background:var(--soft);border:0;border-radius:11px}.stat .k{font-weight:600}
 .item{border-bottom-color:var(--line)}.tipb{background:var(--soft)}
 .chip.on{background:var(--pri);border-color:var(--pri);color:#fff}
+.pasta{border:1px solid var(--line);border-radius:14px;margin:10px 0;background:var(--card);overflow:hidden}
+.pasta>summary{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:12px 14px;font-weight:700;cursor:pointer;list-style:none;background:var(--soft)}
+.pasta>summary::-webkit-details-marker{display:none}
+.pasta>summary small{font-weight:500;color:var(--sub);font-size:.78rem;text-align:right;margin-left:auto}
+.pasta>summary::after{content:"▾";color:var(--sub)}
+.pasta:not([open])>summary::after{content:"▸"}
+.pasta>*:not(summary){margin-left:12px;margin-right:12px}
+.pasta>:last-child{margin-bottom:6px}
+.dia{font-size:.78rem;font-weight:700;color:var(--sub);padding:10px 0 2px}
+html[data-t=dark]{--bg:#14110f;--card:#1e1916;--text:#f1e9df;--sub:#b3a89b;--line:#352d27;--soft:#2a221c;--accent:#e0a030;--pri:#c2323d;--good:#3ecf86;--bad:#ff7066;color-scheme:dark}
+html[data-t=dark] body{background:var(--bg)}
+html[data-t=dark] input,html[data-t=dark] select,html[data-t=dark] textarea{background:#14110f;color:var(--text)}
+html[data-t=dark] .stat,html[data-t=dark] .day,html[data-t=dark] .tipb,html[data-t=dark] #lock .lk,html[data-t=dark] #ex .exb{background:var(--soft);color:var(--text)}
+html[data-t=dark] .hbr{background:#352d27}
+html[data-t=dark] button.sec{color:#f0b867;border-color:#4a3a2a}
+html[data-t=dark] button.dng{background:rgba(255,112,102,.12);border-color:rgba(255,112,102,.35)}
+html[data-t=dark] .chip{background:var(--soft);color:var(--text);border-color:var(--line)}
+html[data-t=dark] .chip.on{background:var(--pri);border-color:var(--pri);color:#fff}
+html[data-t=dark] .tab.active{background:var(--pri);border-color:var(--pri)}
+html[data-t=dark] [style*="background:#fffaf3"],html[data-t=dark] [style*="background:#fff;"],html[data-t=dark] [style$="background:#fff"]{background:var(--soft)!important;color:var(--text)!important}
+html[data-t=dark] [style*="background:#fff0ef"],html[data-t=dark] [style*="background:#fdeceb"]{background:rgba(255,112,102,.12)!important}
+html[data-t=dark] [style*="color:#a93425"],html[data-t=dark] [style*="color:#9e2630"]{color:#ff8a82!important}
+html[data-t=dark] [style*="color:#4a3524"],html[data-t=dark] [style*="color:#555"],html[data-t=dark] [style*="color:#000"]{color:var(--text)!important}
+html[data-t=dark] [style*="border-color:#e4bd7d"]{border-color:#6b5230!important}
+@media print{html[data-t=dark]{--bg:#fff;--card:#fff;--text:#000;--sub:#555;--line:#ccc;--soft:#fff0d9}html[data-t=dark] body{background:#fff}}
 </style>
 </head>
 <body>
@@ -137,7 +163,7 @@ button.sec{background:var(--soft);color:var(--text);border:1px solid var(--line)
 <div id="lemb"></div>
 <div class="sn" id="sn"></div>
 
-<div class="panel" id="p-inicio"><div id="pgTop"></div><div id="pedTop"></div><div id="rinTop"></div><div id="iBox"></div></div>
+<div class="panel" id="p-inicio"><div id="boasV"></div><div id="pgTop"></div><div id="pedTop"></div><div id="rinTop"></div><div id="iBox"></div></div>
 
 <div class="panel hidden" id="p-vendas">
 <div id="vAlert"></div>
@@ -149,6 +175,7 @@ button.sec{background:var(--soft);color:var(--text);border:1px solid var(--line)
 <div id="vDev" style="display:none;background:#fffaf3;border:1px dashed var(--line);border-radius:14px;padding:4px 12px 12px;margin-top:8px"><p class="empty" style="margin:8px 0 0">Venda a dever: o stock baixa e a venda conta, mas o dinheiro só entra na Caixa quando o cliente pagar. Fica registada em Dívidas.</p><label>Nome do cliente</label><input id="vDevNome" autocomplete="off"><label>Prazo para ele pagar</label><input id="vDevPrazo" type="date"></div>
 <button onclick="vender()">Registar venda</button> <button class="sec" onclick="devolver()">↩️ Devolução de cliente</button><p class="empty" style="margin:6px 0 0">Cliente devolveu? Escolha o produto, a quantidade e o preço que ele pagou, e toque em Devolução. O dinheiro sai da caixa na forma escolhida em "Pago com".</p></div>
 <div class="card"><h2>Vendas de hoje</h2><div id="vLista"></div></div>
+<div class="card"><h2>Histórico de vendas</h2><p class="empty" style="margin:-6px 0 8px">Todas as vendas, por mês e por dia. Só para consultar: para corrigir uma venda de hoje use a lista acima.</p><div id="vHist"></div></div>
 </div>
 
 <div class="panel hidden" id="p-armazem">
@@ -194,7 +221,7 @@ button.sec{background:var(--soft);color:var(--text);border:1px solid var(--line)
 <label>Data de entrada (lote)</label><input id="sData" type="date">
 <label>Validade deste lote (opcional)</label><input id="sVal" type="date">
 <button onclick="stockExistente()">Registar stock existente</button></div>
-<div class="card"><h2>Últimas compras</h2><p class="empty" style="margin:-6px 0 6px">Enganou-se? Toque no ✏️ para corrigir a quantidade ou o preço, ou no ✕ para desfazer a entrada.</p><div id="aCompras"></div></div>
+<div class="card"><h2>Entradas por produto</h2><p class="empty" style="margin:-6px 0 6px">Enganou-se? Toque no ✏️ para corrigir a quantidade ou o preço, ou no ✕ para desfazer a entrada.</p><div id="aCompras"></div></div>
 </div>
 <div class="sx" data-sx="perd">
 <div class="card"><h2>Perdas, estragos e ofertas</h2>
@@ -213,6 +240,10 @@ button.sec{background:var(--soft);color:var(--text);border:1px solid var(--line)
 <button class="sec" onclick="cnLimpar()">Limpar números</button>
 <div id="cnHist" style="margin-top:12px"></div></div>
 </div>
+<div class="sx" data-sx="hist">
+<div class="card"><h2>📥 Entradas de stock (saldo positivo)</h2><p class="empty" style="margin:-6px 0 8px">Unidades que entraram, por mês e por dia: compras e devoluções que voltaram ao stock.</p><div id="armHistE"></div></div>
+<div class="card"><h2>📤 Saídas de stock (saldo negativo)</h2><p class="empty" style="margin:-6px 0 8px">Unidades que saíram, por mês e por dia: vendas, perdas, ofertas, consumo próprio e dívidas pagas com mercadoria.</p><div id="armHistS"></div></div>
+</div>
 </div>
 
 <div class="panel hidden" id="p-caixa">
@@ -227,7 +258,8 @@ button.sec{background:var(--soft);color:var(--text);border:1px solid var(--line)
 <label>Valor (Kz)</label><input id="cValor" type="number" inputmode="decimal" min="0">
 <label>Forma de pagamento</label><div id="cFormaSel" class="chips"></div>
 <button onclick="caixaAdd()">Registar movimento</button></div>
-<div class="card"><h2>Movimentos recentes</h2><div id="cLista"></div></div>
+<div class="card"><h2>📥 Entradas (movimentos positivos)</h2><div id="cListaE"></div></div>
+<div class="card"><h2>📤 Saídas (movimentos negativos)</h2><div id="cListaS"></div></div>
 <div class="card"><h2>Apagados</h2><p class="empty" style="margin:-6px 0 8px">O que apagar na Caixa ou nas Dívidas fica aqui e pode ser restaurado.</p><div id="apBox"></div></div>
 </div>
 <div class="sx" data-sx="bp">
@@ -268,6 +300,10 @@ button.sec{background:var(--soft);color:var(--text);border:1px solid var(--line)
 <div id="dvBox"></div>
 </div>
 
+<div class="panel hidden" id="p-definicoes">
+<div class="card"><h2>🌙 Aspeto</h2><label>Modo</label><select id="tmS" onchange="setTema(this.value)"><option value="claro">☀️ Claro</option><option value="noturno">🌙 Noturno</option><option value="auto">Automático (como o telemóvel)</option></select><p class="empty" style="margin:8px 0 0">O modo noturno deixa o fundo escuro, bom para usar à noite ou com pouca luz. A escolha fica guardada neste telemóvel.</p></div>
+<div class="card"><h2>💬 Mensagem de boas-vindas</h2><label>No Início</label><select id="bvS" onchange="bvSet(this.value)"><option value="1">Mostrar todos os dias</option><option value="0">Não mostrar</option></select><p class="empty" style="margin:8px 0 0">Aparece no Início, depois de entrar com o PIN: uma saudação e uma frase para a manhã, a tarde ou a noite, mais 2 alertas importantes (🎯 Foco agora). Muda ao longo do dia e fica sempre visível no Início. Para a esconder, escolha “Não mostrar”.</p></div>
+</div>
 <div class="panel hidden" id="p-fecho"><div id="fBox"></div></div>
 
 <div class="panel hidden" id="p-resumo"><div id="rBox"></div></div>
@@ -578,17 +614,17 @@ c4=`<div class="donut chart"><svg viewBox="0 0 120 120">${arcs}<text x="60" y="5
 const cd=(t,b)=>`<div class="card"><h2>${t}</h2>${b}</div>`;
 $('gBox').innerHTML=sel+kpis+cd('Receita e lucro por dia',c1)+cd('Evolução do saldo da caixa',c2)+cd('Produtos mais lucrativos',c3)+cd('Receita por produto',c4)}
 const empty=t=>`<div class="empty">${t}</div>`;
-function R(){D.prods.sort((a,b)=>a.nome.localeCompare(b.nome,'pt',{sensitivity:'base'}));fpDraw();G();RL();F();I();DV();capShow();LC();AP();PL();CNR();ROT();RIN();PED();HASHIN();PG();UP();
+function R(){D.prods.sort((a,b)=>a.nome.localeCompare(b.nome,'pt',{sensitivity:'base'}));fpDraw();G();RL();F();I();DV();capShow();LC();AP();PL();VH();AH();BV();CNR();ROT();RIN();PED();HASHIN();PG();UP();
 opts('vProd');opts('aProd');opts('pProd');opts('sProd');if(!$('sData').value)$('sData').value=td();$('sData').max=td();showImg();if(!$('aData').value)$('aData').value=td();$('aData').max=td();lotesDraw();E();if(!$('vPreco').value)fillPreco();if(!$('aPreco').value)fillEmb();
 const hoje=D.vendas.filter(v=>v.data===td());
 $('vLista').innerHTML=hoje.length?hoje.slice().reverse().map(v=>`<div class="item"><div class="pi">${P(v.pid)?av(P(v.pid),38):''}<div>${v.devol?'↩️ Devolução · ':''}${esc(v.nome)} ×${v.qtd}<small>${v.hora?v.hora+' · ':''}${money(v.qtd*v.preco)} · ${v.fiado?'🤝 A dever':fpI(fpK(v))+' '+fpN(fpK(v))} · lucro ${money(v.qtd*(v.preco-v.custo))}</small></div></div><button class="mini dng" onclick="delVenda('${v.id}')">✕</button></div>`).join(''):empty('Ainda sem vendas hoje.');
 const bq=($('aBusca').value||'').trim().toLowerCase(),lista=D.prods.filter(p=>!bq||p.nome.toLowerCase().indexOf(bq)>=0);
 $('aLista').innerHTML=lista.length?lista.map(p=>`<div class="item wr"><div class="pi" style="flex:1">${av(p)}<div><b>${esc(p.nome)}</b><small>Custo${p.cm>0?' médio':''} ${money(custo(p))} · Venda ${money(p.venda)}/un.</small><small class="${p.venda-custo(p)<0?'bad':'good'}">Lucro ${money(p.venda-custo(p))}/un. (${p.venda>0?Math.round((p.venda-custo(p))/p.venda*100):0}%)</small>${p.promoQ>=2?`<small>🏷️ Promoção: ${p.promoQ} por ${money(p.promoP)}</small>`:''}${p.val?`<small class="${valSt(p).c}">Validade ${fmtD(p.val)}${valSt(p).t?' · '+valSt(p).t:''}</small>`:''}</div></div><b class="${p.stock<=0?'bad':p.stock<=mn(p)?'warn':''}">${p.stock} un.</b><div class="acts"><button class="mini sec ab" title="Desfazer compra" aria-label="Desfazer compra" onclick="desfazCompra('${p.id}')">↩️</button><button class="mini sec ab" title="Editar" aria-label="Editar" onclick="editProd('${p.id}')">✏️</button><button class="mini dng ab" title="Apagar" aria-label="Apagar" onclick="delProd('${p.id}')">✕</button></div></div>`).join(''):empty(bq?'Nenhum produto encontrado.':'Sem produtos.');
-$('aCompras').innerHTML=D.compras.length?D.compras.slice(-15).reverse().map(c=>`<div class="item"><div>${esc(c.nome)} ${c.sem?'🧺 stock que já tinha':'×'+c.emb+' emb.'}<small>Entrada ${fmtD(c.ent||c.data)}${c.hora&&(!c.ent||c.ent===c.data)?' '+c.hora:''} · +${c.un} un.</small></div><div><b>${c.sem?'sem custo':money(c.total)}</b> ${c.sem?'':`<button class="mini sec" onclick="editCompra('${c.id}')">✏️</button> `}<button class="mini dng" onclick="delCompra('${c.id}')">✕</button></div></div>`).join(''):empty('Ainda sem compras.');
+$('aCompras').innerHTML=D.compras.length?pastasProd(D.compras.slice().reverse(),c=>c.pid||c.nome,c=>c.nome,c=>`<div class="item"><div>${esc(c.nome)} ${c.sem?'🧺 stock que já tinha':'×'+c.emb+' emb.'}<small>Entrada ${fmtD(c.ent||c.data)}${c.hora&&(!c.ent||c.ent===c.data)?' '+c.hora:''} · +${c.un} un.</small></div><div><b>${c.sem?'sem custo':money(c.total)}</b> ${c.sem?'':`<button class="mini sec" onclick="editCompra('${c.id}')">✏️</button> `}<button class="mini dng" onclick="delCompra('${c.id}')">✕</button></div></div>`,l=>'+'+c2(l.reduce((s,c)=>s+c.un,0))+' un. · '+money(l.reduce((s,c)=>s+(c.total||0),0)),c=>c.ent||c.data):empty('Ainda sem compras.');
 const ent=D.caixa.filter(c=>c.tipo==='entrada'&&!c.troca).reduce((s,c)=>s+c.valor,0),sai=D.caixa.filter(c=>c.tipo==='saida'&&!c.troca).reduce((s,c)=>s+c.valor,0);
 $('cSaldo').textContent=money(ent-sai);$('cSaldo').className='v '+(ent-sai<0?'bad':'good');$('cEnt').textContent=money(ent);$('cSai').textContent=money(sai);
 $('cForma').innerHTML=FP.map(([k,i,nm])=>{const s=D.caixa.filter(c=>fpK(c)===k).reduce((a,c)=>a+(c.tipo==='entrada'?c.valor:-c.valor),0);return`<div class="item"><div>${i} ${nm}</div><b class="${s<0?'bad':''}">${money(s)}</b></div>`}).join('')+'<p class="empty" style="margin:6px 0 0">Movimentos antigos, sem forma de pagamento, contam como dinheiro.</p>';
-$('cLista').innerHTML=D.caixa.length?D.caixa.slice(-30).reverse().map(c=>`<div class="item"><div>${esc(c.desc)}<small>${c.data}${c.hora?' '+c.hora:''} · ${fpI(fpK(c))} ${fpN(fpK(c))}${trTxt(c)}${isEmp(c)?' · 🤝 empréstimo':''}</small></div><div><b class="${c.tipo==='entrada'?'good':'bad'}">${c.tipo==='entrada'?'+':'−'}${money(c.valor)}</b>${(c.tipo==='saida'&&!c.ref&&!c.dv&&catOf(c)==='Despesa')?(isTr(c)?`<button class="mini sec" onclick="capTog('${c.id}')">${c.cap?'↔️ Passar a volta':'↔️ Passar a ida'}</button>`:`<button class="mini sec" onclick="foodTog('${c.id}')">🍽️ Pessoal</button>`):''}${(c.tipo==='saida'&&c.sub==='comida')?`<button class="mini sec" onclick="foodTog('${c.id}')">↩️ Despesa</button>`:''}${(c.tipo==='entrada'&&!c.ref&&!c.dv&&(c.cat==='Entrada extra'||c.cat==='Empréstimo'))?`<button class="mini sec" onclick="empTog('${c.id}')">${c.cat==='Empréstimo'?'↩️ Capital':'🤝 Empréstimo'}</button>`:''}${c.ref||c.dv?'':`<button class="mini dng" onclick="delCaixa('${c.id}')">✕</button>`}</div></div>`).join(''):empty('Sem movimentos.');
+const cxRow=c=>`<div class="item"><div>${esc(c.desc)}<small>${c.data}${c.hora?' '+c.hora:''} · ${fpI(fpK(c))} ${fpN(fpK(c))}${trTxt(c)}${isEmp(c)?' · 🤝 empréstimo':''}</small></div><div><b class="${c.tipo==='entrada'?'good':'bad'}">${c.tipo==='entrada'?'+':'−'}${money(c.valor)}</b>${(c.tipo==='saida'&&!c.ref&&!c.dv&&catOf(c)==='Despesa')?(isTr(c)?`<button class="mini sec" onclick="capTog('${c.id}')">${c.cap?'↔️ Passar a volta':'↔️ Passar a ida'}</button>`:`<button class="mini sec" onclick="foodTog('${c.id}')">🍽️ Pessoal</button>`):''}${(c.tipo==='saida'&&c.sub==='comida')?`<button class="mini sec" onclick="foodTog('${c.id}')">↩️ Despesa</button>`:''}${(c.tipo==='entrada'&&!c.ref&&!c.dv&&(c.cat==='Entrada extra'||c.cat==='Empréstimo'))?`<button class="mini sec" onclick="empTog('${c.id}')">${c.cat==='Empréstimo'?'↩️ Capital':'🤝 Empréstimo'}</button>`:''}${c.ref||c.dv?'':`<button class="mini dng" onclick="delCaixa('${c.id}')">✕</button>`}</div></div>`;{const E=D.caixa.filter(c=>c.tipo==='entrada').reverse(),S=D.caixa.filter(c=>c.tipo==='saida').reverse();$('cListaE').innerHTML=E.length?pastas(E,c=>c.data,cxRow,sumE):empty('Ainda sem entradas.');$('cListaS').innerHTML=S.length?pastas(S,c=>c.data,cxRow,sumS):empty('Ainda sem saídas.')};
 const mes=td().slice(0,7),sum=l=>({r:l.reduce((s,v)=>s+v.qtd*v.preco,0),l:l.reduce((s,v)=>s+v.qtd*(v.preco-v.custo),0),n:l.length});
 const h=sum(hoje),m=sum(D.vendas.filter(v=>v.data.startsWith(mes))),sv=D.prods.reduce((s,p)=>s+p.stock*custo(p),0),zero=D.prods.filter(p=>p.stock<=0).length;
 const bx=(t,a,b,c)=>`<div class="card"><h2>${t}</h2><div class="grid"><div class="stat"><div class="k">VENDAS</div><div class="v">${a}</div></div><div class="stat"><div class="k">RECEITA</div><div class="v">${money(b)}</div></div><div class="stat" style="grid-column:1/-1"><div class="k">LUCRO</div><div class="v good">${money(c)}</div></div></div></div>`;
@@ -643,9 +679,10 @@ $('fBox').innerHTML=`<div class="card"><h2>Fecho do dia</h2><label>Dia</label><i
 +cd('🍬 Produtos vendidos',pv||empty('Sem vendas neste dia.'))
 +(pc?cd('📦 Compras de mercadoria',pc):'')
 +(low.length?cd('⚠️ Stock baixo ('+low.length+')',pl):'')}
-function partilharFecho(){const f=fechoData(fdia),t=`Bejoma Doces — Fecho do dia ${fmtD(fdia)}\nVendas: ${f.n}\nReceita: ${money(f.rec)}${f.dsc?'\nDescontos dados: '+money(f.dsc):''}\nCusto dos produtos: ${money(f.cst)}\nLucro bruto: ${money(f.bruto)}\nDespesas: ${money(f.desp)}${f.trV?'\n(transporte de volta incluído: '+money(f.trV)+')':''}${f.capD?'\nTransporte de ida (sai do capital): '+money(f.capD):''}${f.comi?'\nComida / pessoal (fora do lucro): '+money(f.comi):''}${f.perd?'\nPerdas e ofertas: '+money(f.perd):''}\nLucro líquido: ${money(f.liq)}${fpTxt(f)}\nCaixa: ${money(f.ini)} → ${money(f.fim)}`;
+function fechoFeito(){if(fdia===td()&&D.ultFecho!==td()){D.ultFecho=td();save()}}
+function partilharFecho(){fechoFeito();const f=fechoData(fdia),t=`Bejoma Doces — Fecho do dia ${fmtD(fdia)}\nVendas: ${f.n}\nReceita: ${money(f.rec)}${f.dsc?'\nDescontos dados: '+money(f.dsc):''}\nCusto dos produtos: ${money(f.cst)}\nLucro bruto: ${money(f.bruto)}\nDespesas: ${money(f.desp)}${f.trV?'\n(transporte de volta incluído: '+money(f.trV)+')':''}${f.capD?'\nTransporte de ida (sai do capital): '+money(f.capD):''}${f.comi?'\nComida / pessoal (fora do lucro): '+money(f.comi):''}${f.perd?'\nPerdas e ofertas: '+money(f.perd):''}\nLucro líquido: ${money(f.liq)}${fpTxt(f)}\nCaixa: ${money(f.ini)} → ${money(f.fim)}`;
 if(navigator.share)navigator.share({text:t}).catch(()=>{});else if(navigator.clipboard)navigator.clipboard.writeText(t).then(()=>alert('Fecho copiado.'));else alert(t)}
-function printFecho(){const f=fechoData(fdia),low=D.prods.filter(p=>p.stock<=mn(p)),h3=x=>`<h3 style="margin:14px 0 6px;color:#a93425">${x}</h3>`,tr=(a,b,c)=>`<tr${c?' class="t"':''}><th>${a}</th><td>${b}</td></tr>`;
+function printFecho(){fechoFeito();const f=fechoData(fdia),low=D.prods.filter(p=>p.stock<=mn(p)),h3=x=>`<h3 style="margin:14px 0 6px;color:#a93425">${x}</h3>`,tr=(a,b,c)=>`<tr${c?' class="t"':''}><th>${a}</th><td>${b}</td></tr>`;
 const pv=Object.entries(f.ag).sort((a,b)=>b[1].q-a[1].q).map(([k,a])=>`<tr><td>${esc(k)}</td><td>${c2(a.q)}</td><td>${money(a.r)}</td><td>${money(a.l)}</td></tr>`).join('');
 const pc=f.compras.map(c=>`<tr><td>${esc(c.nome)}</td><td>${c2(c.un)}</td><td>${money(c.total)}</td></tr>`).join('');
 $('printSheet').innerHTML=`<div class="ph"><img src="${document.querySelector('.hero img').src}"><div><h2>Bejoma Doces</h2><p>Fecho do dia · ${fmtD(fdia)} · gerado em ${agora()}</p></div></div>`
@@ -884,7 +921,28 @@ $('iBox').innerHTML=storCard()+reporCard()+bk+dvIni()+focoCard()+valCard()
 +cd('🏠 Hoje · '+fmtD(td()),`<div class="grid">${st('VENDAS',f.n)}${st('RECEITA',money(f.rec))}${st('LUCRO BRUTO',money(f.bruto),f.bruto<0?'bad':'good')}${st('SALDO DA CAIXA',money(tot),tot<0?'bad':'')}</div><div class="two" style="margin-top:12px"><button onclick="goTab('vendas')">🛍️ Registar venda</button><button class="sec" onclick="goTab('fecho')">📒 Fecho do dia</button></div>`)
 +cd('🏆 Mais vendidos hoje',top||empty('Ainda sem vendas hoje.'))
 +(low.length?cd('⚠️ Repor stock ('+low.length+')',lw+(low.length>5?`<small style="display:block;color:var(--sub);margin-top:6px">e mais ${low.length-5}… veja no Armazém</small>`:'')):'')}
-const NAVB=[["inicio", "Início", "<path d=\"M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z\"/>", [["inicio", "", "Início"]]], ["vendas", "Vendas", "<path d=\"M6 2l-2 4v14a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6l-2-4z\"/><path d=\"M4 6h16M16 10a4 4 0 0 1-8 0\"/>", [["vendas", "", "Vendas"]]], ["armazem", "Armazém", "<path d=\"M21 8l-9-5-9 5v8l9 5 9-5z\"/><path d=\"M3 8l9 5 9-5M12 13v9\"/>", [["armazem", "prod", "Produtos"], ["armazem", "ent", "Entradas"], ["armazem", "perd", "Contagem e perdas"]]], ["din", "Dinheiro", "<path d=\"M3 7a2 2 0 0 1 2-2h13v4\"/><path d=\"M3 7v11a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1H5a2 2 0 0 1-2-2z\"/><circle cx=\"16.5\" cy=\"14.5\" r=\"1.2\"/>", [["caixa", "mov", "Caixa"], ["caixa", "bp", "Bejoma Pessoal"], ["dividas", "", "Dívidas"], ["fecho", "", "Fecho do dia"]]], ["mais", "Mais", "<circle cx=\"5\" cy=\"12\" r=\"1.4\"/><circle cx=\"12\" cy=\"12\" r=\"1.4\"/><circle cx=\"19\" cy=\"12\" r=\"1.4\"/>", [["resumo", "", "Resumo"], ["graficos", "", "Gráficos"], ["lembretes", "", "Lembretes"], ["backup", "", "Backup e segurança"]]]];
+function VH(){const b=$('vHist');if(!b)return;const L=D.vendas.slice().reverse();
+b.innerHTML=L.length?pastas(L,v=>v.data,v=>`<div class="item"><div>${v.devol?'↩️ Devolução · ':''}${esc(v.nome)} ×${v.qtd}<small>${v.hora?v.hora+' · ':''}${v.fiado?'🤝 A dever':fpI(fpK(v))+' '+fpN(fpK(v))} · lucro ${money(v.qtd*(v.preco-v.custo))}</small></div><b>${money(v.qtd*v.preco)}</b></div>`,l=>money(l.reduce((s,v)=>s+v.qtd*v.preco,0))+' · lucro '+money(l.reduce((s,v)=>s+v.qtd*(v.preco-v.custo),0))):empty('Ainda sem vendas.')}
+function AH(){const bE=$('armHistE'),bS=$('armHistS');if(!bE||!bS)return;const lig=new Set(D.vendas.map(v=>v.perda).filter(Boolean)),M=[];
+D.compras.forEach(c=>M.push({d:c.ent||c.data,h:c.hora||'',i:'📥',t:'Entrada',n:c.nome,q:c.un,x:c.sem?'stock que já tinha':'×'+c.emb+' emb. · '+money(c.total)}));
+D.vendas.forEach(v=>{if(v.estr)return;M.push({d:v.data,h:v.hora||'',i:v.devol?'↩️':'🛍️',t:v.devol?'Devolução':'Venda',n:v.nome,q:-v.qtd,x:money(v.qtd*v.preco)})});
+pdL().forEach(x=>{if(lig.has(x.id))return;M.push({d:x.data,h:x.hora||'',i:pmI(x),t:pmN(x),n:x.nome,q:-x.qtd,x:'custo '+money(pdV(x))})});
+M.sort((a,b)=>a.d<b.d?1:a.d>b.d?-1:a.h<b.h?1:a.h>b.h?-1:0);
+const rw=m=>`<div class="item"><div>${m.i} ${esc(m.n)}<small>${esc(m.t)}${m.h?' · '+m.h:''} · ${esc(m.x)}</small></div><b class="${m.q>=0?'good':'bad'}">${m.q>0?'+':''}${c2(m.q)} un.</b></div>`,E=M.filter(m=>m.q>0),S=M.filter(m=>m.q<0);
+bE.innerHTML=E.length?pastas(E,m=>m.d,rw,l=>'+'+c2(l.reduce((s,m)=>s+m.q,0))+' un.'):empty('Ainda sem entradas de stock.');
+bS.innerHTML=S.length?pastas(S,m=>m.d,rw,l=>'−'+c2(l.reduce((s,m)=>s-m.q,0))+' un.'):empty('Ainda sem saídas de stock.')}
+function pastasProd(L,kf,nf,rd,sm,df){const g=[],ix={};L.forEach(x=>{const k=kf(x);if(!(k in ix)){ix[k]=g.length;g.push({k:k,n:String(nf(x)||''),l:[]})}g[ix[k]].l.push(x)});
+g.forEach(q=>q.l.sort((a,b)=>{const x=String(df(a)||''),y=String(df(b)||'');return x<y?1:x>y?-1:0}));
+g.sort((a,b)=>a.n.localeCompare(b.n,'pt',{sensitivity:'base'}));
+return g.map(q=>'<details class="pasta"><summary><span>📁 '+esc(q.n)+'</span><small>'+q.l.length+' entrada(s)'+(sm?' · '+sm(q.l):'')+'</small></summary>'+q.l.map(rd).join('')+'</details>').join('')}
+const MESN=['Janeiro','Fevereiro','Março','Abril','Maio','Junho','Julho','Agosto','Setembro','Outubro','Novembro','Dezembro'];
+function pastas(L,dt,rd,sm,aberto){L=L.slice().sort((a,b)=>{const x=String(dt(a)||''),y=String(dt(b)||'');return x<y?1:x>y?-1:0});const g=[],ix={};L.forEach(x=>{const k=String(dt(x)||'').slice(0,7)||'0000-00';if(!(k in ix)){ix[k]=g.length;g.push({k:k,l:[]})}g[ix[k]].l.push(x)});
+return g.map((q,i)=>{const a=q.k.slice(0,4),m=+q.k.slice(5,7),nm=m>=1&&m<=12?MESN[m-1]+' '+a:'Sem data';let dia=null,h='';
+q.l.forEach(x=>{const d=String(dt(x)||'').slice(0,10);if(d!==dia){dia=d;h+='<div class="dia">'+(d?fmtD(d):'Sem data')+'</div>'}h+=rd(x)});
+return '<details class="pasta"'+((aberto===true||(aberto!==false&&i===0))?' open':'')+'><summary><span>📁 '+nm+'</span><small>'+q.l.length+' registo(s)'+(sm?' · '+sm(q.l):'')+'</small></summary>'+h+'</details>'}).join('')}
+const sumE=l=>'+'+money(l.filter(c=>!c.troca).reduce((s,c)=>s+c.valor,0)),sumS=l=>'−'+money(l.filter(c=>!c.troca).reduce((s,c)=>s+c.valor,0));
+const sumCx=l=>{const e=l.filter(c=>c.tipo==='entrada'&&!c.troca).reduce((s,c)=>s+c.valor,0),x=l.filter(c=>c.tipo==='saida'&&!c.troca).reduce((s,c)=>s+c.valor,0);return '+'+money(e)+' · −'+money(x)};
+const NAVB=[["hoje","Hoje","<path d=\"M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z\"/>",[["inicio","","Início"],["vendas","","Vendas"],["fecho","","Fecho do dia"]]],["armazem","Armazém","<path d=\"M21 8l-9-5-9 5v8l9 5 9-5z\"/><path d=\"M3 8l9 5 9-5M12 13v9\"/>",[["armazem","prod","Produtos"],["armazem","ent","Entradas"],["armazem","perd","Contagem e perdas"],["armazem","hist","Histórico"]]],["din","Dinheiro","<path d=\"M3 7a2 2 0 0 1 2-2h13v4\"/><path d=\"M3 7v11a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1H5a2 2 0 0 1-2-2z\"/><circle cx=\"16.5\" cy=\"14.5\" r=\"1.2\"/>",[["caixa","mov","Caixa"],["dividas","","Dívidas"],["caixa","bp","Bejoma Pessoal"]]],["ana","Análise","<path d=\"M4 20V10M10 20V4M16 20v-7M22 20H2\"/>",[["resumo","","Resumo"],["graficos","","Gráficos"]]],["mais","Mais","<circle cx=\"5\" cy=\"12\" r=\"1.4\"/><circle cx=\"12\" cy=\"12\" r=\"1.4\"/><circle cx=\"19\" cy=\"12\" r=\"1.4\"/>",[["lembretes","","Lembretes"],["backup","","Dados e segurança"],["definicoes","","Definições"]]]];
 const SXD={armazem:'prod',caixa:'mov'},SXC={};
 function goTab(n,s){const g=NAVB.find(x=>x[3].some(i=>i[0]===n&&(!s||i[1]===s)))||NAVB.find(x=>x[3].some(i=>i[0]===n))||NAVB[0];
 if(SXD[n]){s=s||SXC[n]||SXD[n];SXC[n]=s}else s='';
@@ -895,6 +953,42 @@ sn.innerHTML=g[3].map(i=>`<button class="${i[0]===n&&i[1]===s?'on':''}" onclick=
 document.querySelectorAll('#tb button').forEach(b=>b.classList.toggle('on',b.dataset.g===g[0]));window.scrollTo(0,0)}
 document.getElementById('tb').innerHTML=NAVB.map(g=>`<button data-g="${g[0]}" onclick="goTab('${g[3][0][0]}'${g[3][0][1]?`,'${g[3][0][1]}'`:''})"><svg viewBox="0 0 24 24">${g[2]}</svg>${g[1]}</button>`).join('');
 goTab('inicio');
+const BVM=['Bom começo: respira fundo e dá o primeiro passo do dia.','Hoje é um bom dia para dar um passo, mesmo que pequeno.','Começa o dia com calma e planeia o que é mais importante.','Cada manhã é uma nova oportunidade de fazer melhor.','Coragem não é não ter medo. É avançar com ele.','Primeiro o mais importante: o resto encaixa depois.','Um bom plano de manhã poupa muito esforço à tarde.','Tudo o que é grande começou pequeno. Começa hoje.','Não compares o teu começo com o meio de ninguém.','Quem planeia o dia não é apanhado de surpresa.','Hoje podes ser um pouco melhor do que ontem. Isso chega.','O teu esforço silencioso de hoje será visível amanhã.','Começa a vender com um sorriso: o cliente sente.','Metas grandes, passos pequenos, todos os dias.','Vê o stock e as contas antes de começar: o dia corre melhor.','Tens mais força do que pensas. Avança.','A disciplina de hoje paga a liberdade de amanhã.','Um dia de cada vez, uma venda de cada vez.','Faz primeiro o que mais te custa. O resto fica leve.','Hoje, escolhe fazer bem feito o que está à tua frente.','Quem acorda com um objetivo já está a meio do caminho.','A confiança constrói-se cumprindo, dia após dia.','Fé no caminho, atenção aos detalhes e coragem para continuar.','Ontem já passou. Hoje é a tua folha em branco.','Não esperes pelo momento perfeito: começa com o que tens.','Organização de manhã, tranquilidade à noite.','Os teus clientes confiam em ti. Honra essa confiança.','Quando o caminho apertar, lembra-te de por que começaste.','Pequenos passos feitos todos os dias levam longe.','Respira, planeia e avança: o dia é teu.'],BVT=['Mantém o foco: o dia ainda tem muito para dar.','Continua. A constância vence o cansaço.','Cada venda de hoje é um tijolo no teu negócio de amanhã.','Um cliente bem tratado volta e traz outros.','Se a manhã correu mal, a tarde é uma nova chance.','Não pares agora: o esforço de hoje paga amanhã.','Regista cada venda assim que acontece: as contas agradecem.','Trabalha com calma, mas não pares.','Um sorriso ao cliente não custa nada e vale muito.','Errar faz parte. O que conta é corrigir e seguir.','Devagar também é caminho. O importante é não parar.','A pressa estraga contas. A calma acerta-as.','Cuida do teu stock como cuidas do teu dinheiro: ele também é dinheiro.','Quem cumpre prazos ganha respeito.','A meio do dia, respira fundo e volta ao essencial.','Cada Kz bem registado é um Kz bem guardado.','Pequenos lucros, somados com paciência, tornam-se grandes resultados.','Tens trabalho, tens vontade, tens capacidade. Avança.','O que registas, controlas. O que controlas, melhoras.','Um negócio cresce com paciência, honestidade e constância.','A tua coragem de hoje abre portas que o medo mantém fechadas.','Paga o que deves a tempo e cobra o que te devem com educação.','Quem aprende todos os dias nunca fica parado.','Se o cansaço apertar, lembra-te do que já conseguiste hoje.','Atenção aos detalhes: é neles que o lucro se esconde.','Contas claras mantêm o negócio forte.','Um problema de cada vez: assim todos se resolvem.','A honestidade com os números é a base de qualquer negócio.','Ninguém constrói um negócio sem cair e levantar-se algumas vezes.','Ainda há tempo de fazer a tarde valer a pena.'],BVN=['O dia está a acabar: fecha as contas e descansa de consciência tranquila.','Valoriza o que já conseguiste hoje. Foi preciso coragem.','Se hoje foi pouco, amanhã podes fazer mais. O que importa é voltares.','Organizar as contas hoje é dormir descansado amanhã.','Um dia difícil não apaga o teu esforço.','Fizeste o teu melhor? Então já ganhaste o dia.','Descansar também faz parte do trabalho.','Regista o que falta e fecha o dia em paz.','Amanhã é uma nova oportunidade. Descansa para a agarrar.','Quem poupa um pouco todos os dias constrói muito ao fim do ano.','Termina o dia com as contas em dia e a cabeça leve.','Não deixes para amanhã a conta que podes registar hoje.','Reconhece o teu esforço: poucos aguentam o que tu aguentas.','Aprende com o dia, mas não o leves contigo para a cama.','O sucesso é feito de dias comuns bem vividos.','Hoje semeaste: dá tempo ao tempo para colher.','Faz um balanço simples: o que correu bem e o que melhorar.','Recomeçar também é uma forma de vencer.','A tua história ainda está a ser escrita. Amanhã há mais um capítulo.','Tens mais força do que pensas. Descansa e volta amanhã.','Um backup feito hoje é sossego amanhã.','Quem sabe onde gasta sabe onde pode poupar.','Agradece o dia, mesmo o difícil: ele ensinou-te algo.','Fecha o dia com o que aprendeste e abre o amanhã com coragem.','Hoje ficou feito. Amanhã faz-se o resto.','A disciplina de hoje paga a liberdade de amanhã.','Ninguém constrói tudo num só dia. Fizeste a tua parte.','O que fazes todos os dias vale mais do que o que prometes um dia.','Descansa a mente: amanhã tens energia nova.','Boa noite: o teu esforço de hoje já está a trabalhar por ti.'];
+function bvOn(){try{return localStorage.getItem('bejoma_bv')!=='0'}catch(e){return true}}
+function bvSet(v){try{localStorage.setItem('bejoma_bv',v)}catch(e){}BV()}
+function bvAl(per){const hj=td(),ur=dvUrg(),atr=ur.filter(d=>dvDias(d.prazo)<0).length,ven=ur.filter(d=>dvDias(d.prazo)>=0).length,z=D.prods.filter(p=>p.stock<=0).length,bx=D.prods.filter(p=>p.stock>0&&p.stock<=mn(p)).length,vl=valAl().length,vh=D.vendas.some(v=>v.data===hj),
+dias=D.ultBackup?Math.floor((new Date(hj+'T12:00:00')-new Date(D.ultBackup+'T12:00:00'))/864e5):null,tn=per==='t'||per==='n',nt=per==='n';
+const A=[
+(atr||ven)?{t:'🤝 Dívidas: '+(atr?atr+' em atraso':'')+(atr&&ven?' e ':'')+(ven?ven+' a vencer em breve':''),b:''}:null,
+(z||bx)?{t:'📦 Stock: '+(z?z+' sem stock':'')+(z&&bx?' e ':'')+(bx?bx+' a acabar':''),b:''}:null,
+vl?{t:'⏳ '+vl+' produto(s) com validade a chegar',b:'Validades',g:"goTab('armazem','prod')"}:null,
+(tn&&!vh)?{t:'🛍️ Ainda não registou vendas hoje',b:'Vendas',g:"goTab('vendas')"}:null,
+(nt&&vh&&D.ultFecho!==hj)?{t:'📒 Fecho do dia por fazer',b:'Fecho',g:"goTab('fecho')"}:null,
+(nt&&(dias===null||dias>=1))?{t:'💾 '+(dias===null?'Ainda não fez backup':'Backup por fazer (último há '+dias+' dia'+(dias>1?'s':'')+')'),b:'Backup',g:"goTab('backup')"}:null];
+return A.filter(Boolean).slice(0,2)}
+function bvDia(){const hj=td(),M={};D.vendas.forEach(v=>{const m=M[v.data]||(M[v.data]={r:0,c:0,n:0});m.r+=v.qtd*v.preco;m.c+=v.qtd*v.custo;m.n++});
+const dd=n=>{const d=new Date(hj+'T12:00:00');d.setDate(d.getDate()-n);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const t=M[hj];if(!t)return{sem:1};
+const ant=Object.keys(M).filter(k=>k<hj&&M[k].r>0),mx=ant.reduce((x,k)=>Math.max(x,M[k].r),0),sem=[1,2,3,4,5,6,7].map(n=>M[dd(n)]).filter(x=>x&&x.r>0),mxS=sem.reduce((x,m)=>Math.max(x,m.r),0),med=sem.length?sem.reduce((x,m)=>x+m.r,0)/sem.length:0,ont=M[dd(1)]&&M[dd(1)].r>0?M[dd(1)].r:0;
+let msg;
+if(!ant.length)msg='🌱 Primeiro dia com vendas registadas: um bom começo!';
+else if(t.r>mx&&ant.length>=3)msg='🏆 O teu melhor dia de sempre! Parabéns.';
+else if(sem.length>=2&&t.r>mxS)msg='🏆 O teu melhor dia desta semana. Parabéns!';
+else if(ont&&t.r>ont)msg='📈 Vendeste mais '+money(t.r-ont)+' do que ontem (+'+Math.round((t.r-ont)/ont*100)+'%).';
+else if(sem.length>=2&&t.r>=med)msg='👍 Dia acima da tua média dos últimos 7 dias.';
+else if(ont&&t.r<ont)msg='Hoje ficou '+money(ont-t.r)+' abaixo de ontem. Há dias assim: amanhã recomeças.';
+else msg='Dia registado. Amanhã continuas a construir.';
+return{r:t.r,l:t.r-t.c,n:t.n,msg}}
+function BV(){const b=$('boasV');if(!b)return;if(typeof LOCKED!=='undefined'&&LOCKED)return;
+if(!bvOn()){b.innerHTML='';delete b.dataset.h;return}
+const h=new Date().getHours(),per=h<12?'m':h<18?'t':'n',sd=per==='m'?'☀️ Bom dia!':per==='t'?'🌤️ Boa tarde!':'🌙 Boa noite!',L=per==='m'?BVM:per==='t'?BVT:BVN,dn=Math.floor(new Date(td()+'T12:00:00').getTime()/864e5),fr=L[((dn%L.length)+L.length)%L.length],al=bvAl(per);
+let bal='';if(per==='n'){const x=bvDia();if(!x.sem)bal='<div style="font-size:.64rem;font-weight:700;color:var(--sub);margin-bottom:2px">📊 Balanço do dia</div><div style="font-size:.7rem;line-height:1.35;margin-bottom:8px">'+x.n+' venda(s) · '+money(x.r)+' · lucro bruto '+money(x.l)+'<br>'+x.msg+'</div>'}
+const html='<div class="card" style="border-color:#e4bd7d;background:var(--soft);padding:11px 13px"><b style="font-size:.8rem">'+sd+'</b><p style="margin:4px 0 8px;font-size:.72rem;line-height:1.35">“'+fr+'”</p>'+bal+'<div style="font-size:.64rem;font-weight:700;color:var(--sub);margin-bottom:2px">🎯 Foco agora</div>'+(al.length?al.map(a=>'<div class="item" style="font-size:.7rem;padding:6px 0"><div>'+esc(a.t)+'</div>'+(a.b?'<button class="mini sec" style="margin:0;width:auto;font-size:.62rem;padding:3px 7px" onclick="'+a.g+'">Abrir '+a.b+'</button>':'')+'</div>').join(''):'<div class="item" style="font-size:.7rem;padding:6px 0"><div>Tudo em ordem. Bom trabalho!</div></div>')+'</div>';if(b.dataset.h!==html){b.dataset.h=html;b.innerHTML=html}}
+function temaGet(){try{return localStorage.getItem('bejoma_tema')||'claro'}catch(e){return'claro'}}
+function tema(){const t=temaGet(),dk=t==='noturno'||(t==='auto'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.t=dk?'dark':'light';const m=document.querySelector('meta[name=theme-color]');if(m)m.content=dk?'#14110f':'#9e2630'}
+function setTema(v){try{localStorage.setItem('bejoma_tema',v)}catch(e){}tema()}
+if($('tmS'))$('tmS').value=temaGet();if($('bvS'))$('bvS').value=bvOn()?'1':'0';setInterval(()=>{try{BV()}catch(e){}},60000);
+try{window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(temaGet()==='auto')tema()})}catch(e){}
 /* ===== Lembretes ===== */
 function defL(){return[{id:'venda',tipo:'venda',hora:'18:00',dias:[1,2,3,4,5,6],ativo:true},{id:'relatorio',tipo:'relatorio',hora:'20:00',dias:[0,1,2,3,4,5,6],ativo:true},{id:'compra',tipo:'compra',hora:'08:00',dias:[6],ativo:true},{id:'backup',tipo:'backup',hora:'20:30',dias:[0,1,2,3,4,5,6],ativo:true}]}
 const LN={venda:'Registar vendas',relatorio:'Fecho do dia',compra:'Compras / repor stock',backup:'Fazer backup',dividas:'Dívidas e prazos',foco:'Onde focar'},LI={venda:'🛍️',relatorio:'📒',compra:'📦',backup:'💾',dividas:'🤝',foco:'🎯'},LT={venda:'vendas',relatorio:'fecho',compra:'armazem',backup:'backup',dividas:'dividas',foco:'inicio'},DL=['D','S','T','Q','Q','S','S'];
@@ -1037,13 +1131,15 @@ if(!L.length)return empty(rec?'Ninguém lhe deve nada neste momento. ✅':'Não 
 return'<table class="dvt"><tr><th>'+(rec?'QUEM ME DEVE':'A QUEM EU DEVO')+'</th><th style="text-align:right">EM FALTA</th><th>PRAZO</th></tr>'+L.map(d=>{const s=dvSt(d),f=dvF(d);
 return`<tr class="m"><td><b>${esc(d.pessoa)}</b>${d.desc?`<small>${esc(d.desc)}</small>`:''}${d.pago>0?`<small>${rec?'Já pagou':'Já paguei'} ${money(d.pago)} de ${money(d.valor)}</small>`:''}</td><td style="text-align:right"><b>${money(f)}</b></td><td>${d.prazo?fmtD(d.prazo):'—'}<small class="${s.c}"><b>${s.t}</b></small></td></tr>`
 +`<tr><td colspan="3" class="dva"><div class="acts"><input type="date" value="${d.prazo||''}" onchange="dvPrazo('${d.id}',this.value)" aria-label="Prazo"><button class="mini" onclick="dvPaga('${d.id}')">✅ ${rec?'Recebi tudo':'Paguei tudo'}</button><button class="mini sec" onclick="dvParc('${d.id}')">💵 Parte</button><button class="mini sec" onclick="dvEditar('${d.id}')">✏️ Refazer</button><button class="mini dng" onclick="dvDel('${d.id}')">✕</button></div></td></tr>`}).join('')+'</table>'}
+const dvPast=(t,sm,b)=>'<details class="pasta" open><summary><span>'+t+'</span><small>em falta '+sm+'</small></summary><div>'+b+'</div></details>';
+const dvPagas=t=>{const rec=t==='receber',l=dvL().filter(d=>d.tipo===t&&dvF(d)<=0).sort((a,b)=>dvUlt(b)<dvUlt(a)?-1:dvUlt(b)>dvUlt(a)?1:0),tot=money(l.reduce((q,d)=>q+d.valor,0));
+return '<details class="pasta"><summary><span>'+(rec?'✔ Já pagaram':'✔ Já paguei')+' ('+l.length+')</span><small>'+tot+'</small></summary>'+(l.length?pastas(l,dvUlt,d=>`<div class="item wr"><div><b>${esc(d.pessoa)}</b><small>${money(d.valor)} · ${rec?'recebido':'pago'} em ${fmtD(dvUlt(d))}</small></div><div class="acts"><button class="mini sec" onclick="dvDesf('${d.id}')">↩️ Desfazer</button><button class="mini sec" onclick="dvEditar('${d.id}')">✏️ Refazer</button><button class="mini dng" onclick="dvDel('${d.id}')">✕</button></div></div>`,x=>money(x.reduce((q,d)=>q+d.valor,0))):empty(rec?'Ainda ninguém pagou.':'Ainda não pagou nenhuma dívida.'))+'</details>'};
 function DV(){if(!$('dvSum'))return;dvDraw();dmDraw();dvPlanDraw();dvEditDraw();const ab=dvL().filter(d=>dvF(d)>0),rc=ab.filter(d=>d.tipo==='receber').sort(dvCmp),pg=ab.filter(d=>d.tipo==='pagar').sort(dvCmp),
 sm=l=>l.reduce((s,d)=>s+dvF(d),0),sr=sm(rc),sp=sm(pg),at=l=>l.filter(d=>d.prazo&&dvDias(d.prazo)<0).length,ar=at(rc),ap=at(pg),
 ph=dvL().filter(d=>dvF(d)<=0).sort((a,b)=>dvUlt(b)<dvUlt(a)?-1:dvUlt(b)>dvUlt(a)?1:0).slice(0,15),cd=(t,b)=>`<div class="card"><h2>${t}</h2>${b}</div>`;
 $('dvSum').innerHTML=cd('🤝 Dívidas',`<div class="grid"><div class="stat"><div class="k">DEVEM-ME</div><div class="v good">${money(sr)}</div></div><div class="stat"><div class="k">EU DEVO</div><div class="v bad">${money(sp)}</div></div></div>`
 +(ar||ap?`<p class="bad" style="margin:10px 0 0;font-size:.88rem;font-weight:bold">⚠️ ${ar?ar+' cliente(s) com pagamento atrasado. ':''}${ap?ap+' dívida(s) minha(s) em atraso.':''}</p>`:''));
-$('dvBox').innerHTML=cd('📥 Quem me deve ('+rc.length+')',dvRows(rc,true))+cd('📤 O que eu devo ('+pg.length+')',dvRows(pg,false))
-+cd('✔ Já pagas',ph.length?ph.map(d=>`<div class="item wr"><div>${d.tipo==='receber'?'📥':'📤'} <b>${esc(d.pessoa)}</b><small>${money(d.valor)} · ${d.tipo==='receber'?'recebido':'pago'} em ${fmtD(dvUlt(d))}</small></div><div class="acts"><button class="mini sec" onclick="dvDesf('${d.id}')">↩️ Desfazer</button><button class="mini sec" onclick="dvEditar('${d.id}')">✏️ Refazer</button><button class="mini dng" onclick="dvDel('${d.id}')">✕</button></div></div>`).join(''):empty('Ainda não há dívidas pagas.'))
+$('dvBox').innerHTML=cd('📤 Eu devo',dvPast('👥 Quem eu devo ('+pg.length+')',money(sp),dvRows(pg,false))+dvPagas('pagar'))+cd('📥 Devem-me',dvPast('👥 Quem me deve ('+rc.length+')',money(sr),dvRows(rc,true))+dvPagas('receber'))
 +(dvL().length?'<button onclick="printDiv()">📄 Guardar dívidas em PDF</button>':'')}
 function dvIni(){const u=dvUrg();if(!u.length)return'';return`<div class="card" style="border-color:#e4bd7d;background:var(--soft)"><h2>Dívidas a tratar (${u.length})</h2>`+u.slice(0,5).map(d=>{const s=dvSt(d);return`<div class="item"><div>${d.tipo==='receber'?'📥 Cobrar a':'📤 Pagar a'} <b>${esc(d.pessoa)}</b><small class="${s.c}">${s.t}</small></div><b>${money(dvF(d))}</b></div>`}).join('')+`<button class="sec" onclick="goTab('dividas')">Abrir Dívidas</button></div>`}
 function dvPrintTbl(rec){const L=dvL().filter(d=>d.tipo===(rec?'receber':'pagar')&&dvF(d)>0).sort(dvCmp);if(!L.length)return'<p>Nenhum registo.</p>';
@@ -1062,8 +1158,8 @@ if(q>p.stock)return alert('Só tem '+p.stock+' un. de '+p.nome+' em stock.');
 pdL().push({id:uid(),data:td(),hora:hh(),pid:p.id,nome:p.nome,qtd:q,custo:custo(p),mot:m,obs:$('pObs').value.trim()});p.stock-=q;save();$('pQtd').value='';$('pObs').value='';R()}
 function delPerda(id){const x=pdL().find(y=>y.id===id);if(!x)return;if(x.mot==='pag')return alert('Esta saída foi um pagamento de dívida com mercadoria.\nPara desfazer, vá a Dívidas e use ↩️ Desfazer.');const p=(x.pid&&P(x.pid))||D.prods.find(z=>z.nome===x.nome);
 if(!confirm('Desfazer este registo ('+x.nome+' ×'+x.qtd+', '+pmN(x)+')?'+(p?' O stock volta.':'')))return;if(p)p.stock+=x.qtd;D.perdas=pdL().filter(y=>y.id!==id);save();R()}
-function PL(){if(!$('pLista'))return;const L=pdL().slice(-15).reverse();
-$('pLista').innerHTML=L.length?'<b style="font-size:.85rem">Últimos registos</b>'+L.map(x=>`<div class="item"><div>${pmI(x)} ${esc(x.nome)} ×${c2(x.qtd)}<small>${fmtD(x.data)}${x.hora?' '+x.hora:''} · ${pmN(x)} · custo ${money(pdV(x))}${x.obs?' · '+esc(x.obs):''}</small></div><button class="mini dng" onclick="delPerda('${x.id}')">✕</button></div>`).join(''):empty('Ainda sem perdas, estragos ou ofertas.')}
+function PL(){if(!$('pLista'))return;const L=pdL().slice().reverse();
+$('pLista').innerHTML=L.length?'<b style="font-size:.85rem">Registos</b>'+pastas(L,x=>x.data,x=>`<div class="item"><div>${pmI(x)} ${esc(x.nome)} ×${c2(x.qtd)}<small>${fmtD(x.data)}${x.hora?' '+x.hora:''} · ${pmN(x)} · custo ${money(pdV(x))}${x.obs?' · '+esc(x.obs):''}</small></div><button class="mini dng" onclick="delPerda('${x.id}')">✕</button></div>`):empty('Ainda sem perdas, estragos ou ofertas.')}
 function pdPrintSec(L){if(!L.length)return'';const t=L.filter(x=>x.mot!=='con'&&x.mot!=='pag').reduce((s,x)=>s+pdV(x),0);return`<h3 style="margin:16px 0 6px;color:#a93425">Perdas, estragos e ofertas (${L.length})</h3><table><tr><th>Data</th><th class="l">Produto</th><th>Qtd</th><th class="l">Motivo</th><th>Custo</th></tr>`+L.map(x=>`<tr><td class="l">${fmtD(x.data)}${x.hora?' '+x.hora:''}</td><td class="l">${esc(x.nome)}</td><td>${c2(x.qtd)}</td><td class="l">${pmN(x)}</td><td>${money(pdV(x))}</td></tr>`).join('')+`<tr class="t"><td class="l" colspan="4">Total que desconta do lucro (sem consumo próprio nem dívidas pagas com mercadoria)</td><td>${money(t)}</td></tr></table>`}
 
 /* ===== Contagem de stock ===== */
@@ -1074,9 +1170,9 @@ function cnSet(id,v){CN[id]=v;const p=P(id),e=$('cnd_'+id);if(p&&e){const r=cnTx
 function cnLimpar(){CN={};CNR()}
 function CNR(){const e=$('cnLista');if(!e)return;const q=($('cnBusca').value||'').trim().toLowerCase(),L=D.prods.filter(p=>!q||p.nome.toLowerCase().indexOf(q)>=0);
 e.innerHTML=L.length?L.map(p=>{const v=CN[p.id],r=cnTxt(p,v);return`<div class="item"><div><b>${esc(p.nome)}</b><small>No app: ${c2(p.stock)} un.</small></div><div style="text-align:right"><input type="number" inputmode="decimal" min="0" value="${v===undefined?'':esc(v)}" oninput="cnSet('${p.id}',this.value)" aria-label="Quantidade contada" style="width:96px;padding:9px;text-align:center"><span id="cnd_${p.id}" class="${r.c}" style="display:block;font-size:.8rem;margin-top:3px;min-height:1em">${r.t}</span></div></div>`}).join(''):empty(q?'Nenhum produto encontrado.':'Sem produtos.');
-const H=cnL().slice(-5).reverse();
-$('cnHist').innerHTML=H.length?'<b style="font-size:.85rem">Últimas contagens</b>'+H.map(h=>{const dif=h.itens.filter(x=>x.dif!==0),fv=dif.filter(x=>x.dif<0).reduce((s,x)=>s-x.dif*x.custo,0),so=dif.filter(x=>x.dif>0).reduce((s,x)=>s+x.dif,0);
-return`<div class="item"><div>${fmtD(h.data)} · ${h.itens.length} produto(s)<small>${dif.length?dif.length+' com diferença'+(fv?' · faltas custaram '+money(fv):'')+(so?' · sobraram '+c2(so)+' un.':''):'tudo certo ✅'}</small></div></div>`}).join(''):''}
+const H=cnL().slice().reverse();
+$('cnHist').innerHTML=H.length?'<b style="font-size:.85rem">Contagens</b>'+pastas(H,h=>h.data,h=>{const dif=h.itens.filter(x=>x.dif!==0),fv=dif.filter(x=>x.dif<0).reduce((s,x)=>s-x.dif*x.custo,0),so=dif.filter(x=>x.dif>0).reduce((s,x)=>s+x.dif,0);
+return`<div class="item"><div>${fmtD(h.data)} · ${h.itens.length} produto(s)<small>${dif.length?dif.length+' com diferença'+(fv?' · faltas custaram '+money(fv):'')+(so?' · sobraram '+c2(so)+' un.':''):'tudo certo ✅'}</small></div></div>`}):''}
 function cnAplicar(){const L=D.prods.filter(p=>CN[p.id]!==undefined&&CN[p.id]!=='').map(p=>{const real=n(CN[p.id]);return{p,real,dif:Math.round((real-p.stock)*1000)/1000,app:p.stock}});
 if(!L.length)return alert('Escreva a quantidade contada em pelo menos um produto.');
 if(L.some(x=>x.real<0))return alert('A quantidade contada não pode ser negativa.');
@@ -1143,7 +1239,8 @@ var ROTL=[];
 function rotPend(){const e=D.rotEnv||[];return D.caixa.filter(c=>isRet(c)&&c.valor>0&&!c.rin&&e.indexOf(String(c.id))<0)}
 function rotComida(c){return c.sub==='comida'||isPess(c)}
 function ROT(){const b=$('rotBox');if(!b)return;ROTL=rotPend().slice(-30).reverse();const env=(D.rotEnv||[]).length;
-b.innerHTML=ROTL.length?ROTL.map((c,k)=>`<div class="item"><label class="chk" style="flex:1;font-size:1rem"><input type="checkbox" id="rq${k}"${rotComida(c)?'':' checked'}><span>${esc(c.desc)}<small>${c.data} · ${fpI(fpK(c))} ${fpN(fpK(c))}${isPess(c)?' · dívida pessoal':c.sub==='comida'?' · comida / gasto pessoal':''}</small></span></label><b>${money(c.valor)}</b></div>`).join('')+'<button onclick="rotEnviar()">📤 Enviar selecionadas</button><p class="empty" style="margin:6px 0 0">Comida e dívidas pessoais vêm desmarcadas: saíram da caixa do negócio, mas não são dinheiro que recebeu na mão.'+(env?' · '+env+' já enviada(s).':'')+'</p>':'<div class="empty">Sem retiradas por enviar.'+(env?' ('+env+' já enviada(s))':'')+'</div>'}
+b.innerHTML=ROTL.length?pastas(ROTL.map((c,k)=>({c:c,k:k})),x=>x.c.data,({c,k})=>`<div class="item"><label class="chk" style="flex:1;font-size:1rem"><input type="checkbox" id="rq${k}"${rotComida(c)?'':' checked'}><span>${esc(c.desc)}<small>${c.data} · ${fpI(fpK(c))} ${fpN(fpK(c))}${isPess(c)?' · dívida pessoal':c.sub==='comida'?' · comida / gasto pessoal':''}</small></span></label><b>${money(c.valor)}</b></div>`,sumRot,true)+'<button onclick="rotEnviar()">📤 Enviar selecionadas</button><p class="empty" style="margin:6px 0 0">Comida e dívidas pessoais vêm desmarcadas: saíram da caixa do negócio, mas não são dinheiro que recebeu na mão.'+(env?' · '+env+' já enviada(s).':'')+'</p>':'<div class="empty">Sem retiradas por enviar.'+(env?' ('+env+' já enviada(s))':'')+'</div>'}
+const sumRot=l=>'−'+money(l.reduce((s,x)=>s+x.c.valor,0));
 async function rotEnviar(){if(LOCKED)return;const sel=ROTL.filter((c,k)=>{const e=$('rq'+k);return e&&e.checked});if(!sel.length)return alert('Marque pelo menos uma retirada.');
 const itens=sel.map(c=>({id:String(c.id),data:c.data,desc:String(c.desc||'Retirada').slice(0,60),valor:c.valor,forma:fpK(c),comida:rotComida(c)})),tot=itens.reduce((q,i)=>q+i.valor,0),nm='retiradas-bejoma-'+td()+'.json',j=JSON.stringify({rotTransfer:1,de:'bejoma',criado:td(),itens});
 /* 1) caixa de entrada partilhada: só chega à Bejoma Pessoal se as duas apps estiverem no mesmo endereço */
