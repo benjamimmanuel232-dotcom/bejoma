@@ -143,6 +143,7 @@ html[data-t=dark] [style*="color:#a93425"],html[data-t=dark] [style*="color:#9e2
 html[data-t=dark] [style*="color:#4a3524"],html[data-t=dark] [style*="color:#555"],html[data-t=dark] [style*="color:#000"]{color:var(--text)!important}
 html[data-t=dark] [style*="border-color:#e4bd7d"]{border-color:#6b5230!important}
 @media print{html[data-t=dark]{--bg:#fff;--card:#fff;--text:#000;--sub:#555;--line:#ccc;--soft:#fff0d9}html[data-t=dark] body{background:#fff}}
+#lemb,#pgTop,#pedTop,#rinTop{display:none!important}
 </style>
 </head>
 <body>
@@ -163,7 +164,7 @@ html[data-t=dark] [style*="border-color:#e4bd7d"]{border-color:#6b5230!important
 <div id="lemb"></div>
 <div class="sn" id="sn"></div>
 
-<div class="panel" id="p-inicio"><div id="boasV"></div><div id="pgTop"></div><div id="pedTop"></div><div id="rinTop"></div><div id="iBox"></div></div>
+<div class="panel" id="p-inicio"><div id="boasV"></div><div id="ctlG"></div><div id="pgTop"></div><div id="pedTop"></div><div id="rinTop"></div><div id="iBox"></div></div>
 
 <div class="panel hidden" id="p-vendas">
 <div id="vAlert"></div>
@@ -302,7 +303,7 @@ html[data-t=dark] [style*="border-color:#e4bd7d"]{border-color:#6b5230!important
 
 <div class="panel hidden" id="p-definicoes">
 <div class="card"><h2>🌙 Aspeto</h2><label>Modo</label><select id="tmS" onchange="setTema(this.value)"><option value="claro">☀️ Claro</option><option value="noturno">🌙 Noturno</option><option value="auto">Automático (como o telemóvel)</option></select><p class="empty" style="margin:8px 0 0">O modo noturno deixa o fundo escuro, bom para usar à noite ou com pouca luz. A escolha fica guardada neste telemóvel.</p></div>
-<div class="card"><h2>💬 Mensagem de boas-vindas</h2><label>No Início</label><select id="bvS" onchange="bvSet(this.value)"><option value="1">Mostrar todos os dias</option><option value="0">Não mostrar</option></select><p class="empty" style="margin:8px 0 0">Aparece no Início, depois de entrar com o PIN: uma saudação e uma frase para a manhã, a tarde ou a noite, mais 2 alertas importantes (🎯 Foco agora). Muda ao longo do dia e fica sempre visível no Início. Para a esconder, escolha “Não mostrar”.</p></div>
+<div class="card"><h2>💬 Mensagem de boas-vindas</h2><label>No Início</label><select id="bvS" onchange="bvSet(this.value)"><option value="1">Mostrar todos os dias</option><option value="0">Não mostrar</option></select><p class="empty" style="margin:8px 0 0">Aparece no Início, depois de entrar com o PIN: uma saudação e uma frase para a manhã, a tarde ou a noite. Muda ao longo do dia. Os avisos importantes ficam no painel 🛡️ Controlo. Para a esconder, escolha “Não mostrar”.</p></div>
 </div>
 <div class="panel hidden" id="p-fecho"><div id="fBox"></div></div>
 
@@ -315,7 +316,7 @@ html[data-t=dark] [style*="border-color:#e4bd7d"]{border-color:#6b5230!important
 <p class="empty" id="nStat" style="margin:0 0 4px"></p>
 <button onclick="ativarNotif()">🔔 Ativar notificações</button>
 <button class="sec" onclick="ics()">📅 Adicionar ao calendário do telemóvel</button>
-<p class="empty" style="margin:10px 0 0">As notificações aparecem com a app aberta ou em segundo plano, mas o Android pode suspendê-la. Para o telemóvel avisar mesmo com a app fechada, use o botão do calendário: cria os alertas semanais na hora certa.</p></div>
+<p class="empty" style="margin:10px 0 0">Estes lembretes só enviam notificação: dentro da app, o painel 🛡️ Controlo (no Início) mostra sempre o que está pendente. As notificações aparecem com a app aberta ou em segundo plano, mas o Android pode suspendê-la. Para o telemóvel avisar mesmo com a app fechada, use o botão do calendário: cria os alertas semanais na hora certa.</p></div>
 <div id="lList"></div>
 </div>
 
@@ -614,7 +615,7 @@ c4=`<div class="donut chart"><svg viewBox="0 0 120 120">${arcs}<text x="60" y="5
 const cd=(t,b)=>`<div class="card"><h2>${t}</h2>${b}</div>`;
 $('gBox').innerHTML=sel+kpis+cd('Receita e lucro por dia',c1)+cd('Evolução do saldo da caixa',c2)+cd('Produtos mais lucrativos',c3)+cd('Receita por produto',c4)}
 const empty=t=>`<div class="empty">${t}</div>`;
-function R(){D.prods.sort((a,b)=>a.nome.localeCompare(b.nome,'pt',{sensitivity:'base'}));fpDraw();G();RL();F();I();DV();capShow();LC();AP();PL();VH();AH();BV();CNR();ROT();RIN();PED();HASHIN();PG();UP();
+function R(){D.prods.sort((a,b)=>a.nome.localeCompare(b.nome,'pt',{sensitivity:'base'}));fpDraw();G();RL();F();I();DV();capShow();LC();AP();PL();VH();AH();BV();CTG();CNR();ROT();RIN();PED();HASHIN();PG();UP();
 opts('vProd');opts('aProd');opts('pProd');opts('sProd');if(!$('sData').value)$('sData').value=td();$('sData').max=td();showImg();if(!$('aData').value)$('aData').value=td();$('aData').max=td();lotesDraw();E();if(!$('vPreco').value)fillPreco();if(!$('aPreco').value)fillEmb();
 const hoje=D.vendas.filter(v=>v.data===td());
 $('vLista').innerHTML=hoje.length?hoje.slice().reverse().map(v=>`<div class="item"><div class="pi">${P(v.pid)?av(P(v.pid),38):''}<div>${v.devol?'↩️ Devolução · ':''}${esc(v.nome)} ×${v.qtd}<small>${v.hora?v.hora+' · ':''}${money(v.qtd*v.preco)} · ${v.fiado?'🤝 A dever':fpI(fpK(v))+' '+fpN(fpK(v))} · lucro ${money(v.qtd*(v.preco-v.custo))}</small></div></div><button class="mini dng" onclick="delVenda('${v.id}')">✕</button></div>`).join(''):empty('Ainda sem vendas hoje.');
@@ -955,26 +956,58 @@ goTab('inicio');
 const BVM=['Bom começo: respira fundo e dá o primeiro passo do dia.','Hoje é um bom dia para dar um passo, mesmo que pequeno.','Começa o dia com calma e planeia o que é mais importante.','Cada manhã é uma nova oportunidade de fazer melhor.','Coragem não é não ter medo. É avançar com ele.','Primeiro o mais importante: o resto encaixa depois.','Um bom plano de manhã poupa muito esforço à tarde.','Tudo o que é grande começou pequeno. Começa hoje.','Não compares o teu começo com o meio de ninguém.','Quem planeia o dia não é apanhado de surpresa.','Hoje podes ser um pouco melhor do que ontem. Isso chega.','O teu esforço silencioso de hoje será visível amanhã.','Começa a vender com um sorriso: o cliente sente.','Metas grandes, passos pequenos, todos os dias.','Vê o stock e as contas antes de começar: o dia corre melhor.','Tens mais força do que pensas. Avança.','A disciplina de hoje paga a liberdade de amanhã.','Um dia de cada vez, uma venda de cada vez.','Faz primeiro o que mais te custa. O resto fica leve.','Hoje, escolhe fazer bem feito o que está à tua frente.','Quem acorda com um objetivo já está a meio do caminho.','A confiança constrói-se cumprindo, dia após dia.','Fé no caminho, atenção aos detalhes e coragem para continuar.','Ontem já passou. Hoje é a tua folha em branco.','Não esperes pelo momento perfeito: começa com o que tens.','Organização de manhã, tranquilidade à noite.','Os teus clientes confiam em ti. Honra essa confiança.','Quando o caminho apertar, lembra-te de por que começaste.','Pequenos passos feitos todos os dias levam longe.','Respira, planeia e avança: o dia é teu.'],BVT=['Mantém o foco: o dia ainda tem muito para dar.','Continua. A constância vence o cansaço.','Cada venda de hoje é um tijolo no teu negócio de amanhã.','Um cliente bem tratado volta e traz outros.','Se a manhã correu mal, a tarde é uma nova chance.','Não pares agora: o esforço de hoje paga amanhã.','Regista cada venda assim que acontece: as contas agradecem.','Trabalha com calma, mas não pares.','Um sorriso ao cliente não custa nada e vale muito.','Errar faz parte. O que conta é corrigir e seguir.','Devagar também é caminho. O importante é não parar.','A pressa estraga contas. A calma acerta-as.','Cuida do teu stock como cuidas do teu dinheiro: ele também é dinheiro.','Quem cumpre prazos ganha respeito.','A meio do dia, respira fundo e volta ao essencial.','Cada Kz bem registado é um Kz bem guardado.','Pequenos lucros, somados com paciência, tornam-se grandes resultados.','Tens trabalho, tens vontade, tens capacidade. Avança.','O que registas, controlas. O que controlas, melhoras.','Um negócio cresce com paciência, honestidade e constância.','A tua coragem de hoje abre portas que o medo mantém fechadas.','Paga o que deves a tempo e cobra o que te devem com educação.','Quem aprende todos os dias nunca fica parado.','Se o cansaço apertar, lembra-te do que já conseguiste hoje.','Atenção aos detalhes: é neles que o lucro se esconde.','Contas claras mantêm o negócio forte.','Um problema de cada vez: assim todos se resolvem.','A honestidade com os números é a base de qualquer negócio.','Ninguém constrói um negócio sem cair e levantar-se algumas vezes.','Ainda há tempo de fazer a tarde valer a pena.'],BVN=['O dia está a acabar: fecha as contas e descansa de consciência tranquila.','Valoriza o que já conseguiste hoje. Foi preciso coragem.','Se hoje foi pouco, amanhã podes fazer mais. O que importa é voltares.','Organizar as contas hoje é dormir descansado amanhã.','Um dia difícil não apaga o teu esforço.','Fizeste o teu melhor? Então já ganhaste o dia.','Descansar também faz parte do trabalho.','Regista o que falta e fecha o dia em paz.','Amanhã é uma nova oportunidade. Descansa para a agarrar.','Quem poupa um pouco todos os dias constrói muito ao fim do ano.','Termina o dia com as contas em dia e a cabeça leve.','Não deixes para amanhã a conta que podes registar hoje.','Reconhece o teu esforço: poucos aguentam o que tu aguentas.','Aprende com o dia, mas não o leves contigo para a cama.','O sucesso é feito de dias comuns bem vividos.','Hoje semeaste: dá tempo ao tempo para colher.','Faz um balanço simples: o que correu bem e o que melhorar.','Recomeçar também é uma forma de vencer.','A tua história ainda está a ser escrita. Amanhã há mais um capítulo.','Tens mais força do que pensas. Descansa e volta amanhã.','Um backup feito hoje é sossego amanhã.','Quem sabe onde gasta sabe onde pode poupar.','Agradece o dia, mesmo o difícil: ele ensinou-te algo.','Fecha o dia com o que aprendeste e abre o amanhã com coragem.','Hoje ficou feito. Amanhã faz-se o resto.','A disciplina de hoje paga a liberdade de amanhã.','Ninguém constrói tudo num só dia. Fizeste a tua parte.','O que fazes todos os dias vale mais do que o que prometes um dia.','Descansa a mente: amanhã tens energia nova.','Boa noite: o teu esforço de hoje já está a trabalhar por ti.'];
 function bvOn(){try{return localStorage.getItem('bejoma_bv')!=='0'}catch(e){return true}}
 function bvSet(v){try{localStorage.setItem('bejoma_bv',v)}catch(e){}BV()}
-function bvAl(per){const hj=td(),ur=dvUrg(),atr=ur.filter(d=>dvDias(d.prazo)<0),ven=ur.filter(d=>dvDias(d.prazo)>=0),z=D.prods.filter(p=>p.stock<=0),bx=D.prods.filter(p=>p.stock>0&&p.stock<=mn(p)),vl=valAl(),vh=D.vendas.some(v=>v.data===hj),
-dias=D.ultBackup?Math.floor((new Date(hj+'T12:00:00')-new Date(D.ultBackup+'T12:00:00'))/864e5):null;
-const A={dvA:atr.length?{t:'⚠️ '+atr.length+' dívida(s) em atraso',g:"goTab('dividas')"}:null,
-dvV:ven.length?{t:'🤝 '+ven.length+' dívida(s) a vencer em breve',g:"goTab('dividas')"}:null,
-stZ:z.length?{t:'📦 '+z.length+' produto(s) sem stock',g:"goTab('armazem','prod')"}:null,
-stB:bx.length?{t:'📦 '+bx.length+' produto(s) a repor',g:"goTab('armazem','prod')"}:null,
-val:vl.length?{t:'⏳ '+vl.length+' produto(s) com validade a controlar',g:"goTab('armazem','prod')"}:null,
-sv:!vh?{t:'🛍️ Ainda não registou vendas hoje',g:"goTab('vendas')"}:null,
-fe:vh?{t:'📒 Faça o fecho do dia',g:"goTab('fecho')"}:null,
-bk:(dias===null||dias>=2)?{t:'💾 '+(dias===null?'Ainda não fez backup':'Sem backup há '+dias+' dias'),g:"goTab('backup')"}:null};
-const O={m:['dvA','dvV','stZ','stB','val','bk'],t:['dvA','sv','stZ','dvV','stB','val'],n:['fe','bk','dvA','dvV','stZ','stB']}[per];
-return O.map(k=>A[k]).filter(Boolean).slice(0,2)}
 function BV(){const b=$('boasV');if(!b)return;if(typeof LOCKED!=='undefined'&&LOCKED)return;
 if(!bvOn()){b.innerHTML='';return}
-const h=new Date().getHours(),per=h<12?'m':h<18?'t':'n',sd=per==='m'?'☀️ Bom dia!':per==='t'?'🌤️ Boa tarde!':'🌙 Boa noite!',L=per==='m'?BVM:per==='t'?BVT:BVN,dn=Math.floor(new Date(td()+'T12:00:00').getTime()/864e5),fr=L[((dn%L.length)+L.length)%L.length],al=bvAl(per);
-b.innerHTML='<div class="card" style="border-color:#e4bd7d;background:var(--soft)"><b style="font-size:1.05rem">'+sd+'</b><p style="margin:8px 0 10px;font-size:1rem;line-height:1.45">“'+fr+'”</p><div style="font-size:.78rem;font-weight:700;color:var(--sub);margin-bottom:2px">🎯 Foco agora</div>'+(al.length?al.map(a=>'<div class="item"><div>'+esc(a.t)+'</div><button class="mini sec" style="margin:0;width:auto" onclick="'+a.g+'">Abrir</button></div>').join(''):'<div class="item"><div>Tudo em ordem. Bom trabalho!</div></div>')+'</div>'}
+const h=new Date().getHours(),per=h<12?'m':h<18?'t':'n',sd=per==='m'?'☀️ Bom dia!':per==='t'?'🌤️ Boa tarde!':'🌙 Boa noite!',L=per==='m'?BVM:per==='t'?BVT:BVN,dn=Math.floor(new Date(td()+'T12:00:00').getTime()/864e5),fr=L[((dn%L.length)+L.length)%L.length];
+b.innerHTML='<div class="card" style="border-color:#e4bd7d;background:var(--soft)"><b style="font-size:1.05rem">'+sd+'</b><p style="margin:8px 0 2px;font-size:1rem;line-height:1.45">“'+fr+'”</p></div>'}
+const adD=(ds,n)=>{const d=new Date(ds+'T12:00:00');d.setDate(d.getDate()+n);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
+const sdForma=f=>(D.caixa||[]).reduce((q,c)=>fpK(c)===f?q+(c.tipo==='entrada'?c.valor:-c.valor):q,0);
+function svHoje(){const h=td();if(confirm('Hoje não vendeu nada?\n\nOK = Sim, hoje não houve vendas\nCancelar = Não, vou registar uma venda')){D.sv=D.sv||{};D.sv[h]=1;save();R();toast('Anotado: hoje sem vendas.')}else goTab('vendas')}
+function confSaldo(){const h=td(),rs=[];for(const f of FP){const t=prompt(f[2]+': quanto tem agora?\n(a app diz '+money(sdForma(f[0]))+')\n\nDeixe vazio para saltar.');if(t===null)return;const q=String(t).replace(/\s/g,'').replace(',','.');if(q==='')continue;const n=parseFloat(q);if(isNaN(n)||n<0)return alert('Valor inválido.');rs.push([f,n-sdForma(f[0])])}
+if(!rs.length)return;const dif=rs.filter(x=>Math.abs(x[1])>0.005);D.confCx=h;save();R();alert(dif.length?dif.map(x=>x[0][2]+': tem '+(x[1]>0?'mais ':'menos ')+money(Math.abs(x[1]))+' do que a app diz.').join('\n')+'\n\nProcure o movimento que falta ou registe a diferença na Caixa.':'Os saldos estão certos. ✅')}
+{const _g=goTab;goTab=function(n,s){if(n==='fecho'){try{D.fv=td();save()}catch(e){}}return _g.apply(this,arguments)}}
+const stockAl=()=>{const h=td(),P=D.prods,ativo=p=>D.vendas.some(v=>v.pid===p.id&&Math.round((new Date(h+'T12:00:00')-new Date(v.data+'T12:00:00'))/864e5)<=30),ng=P.filter(p=>p.stock<0),z=P.filter(p=>p.stock===0&&ativo(p)),bx=P.filter(p=>p.stock>0&&p.stock<=mn(p));return{ng:ng,z:z,bx:bx,rep:z.concat(bx)}};
+function CTG(){const b=$('ctlG');if(!b)return;if(typeof LOCKED!=='undefined'&&LOCKED)return;
+const h=td(),hr=new Date().getHours(),dd=(a,c)=>Math.round((new Date(c+'T12:00:00')-new Date(a+'T12:00:00'))/864e5),dias=n=>n===1?'1 dia':n+' dias',quando=n=>n===0?'hoje':n===1?'amanhã':'em '+n+' dias',nomes=L=>L.slice(0,3).map(p=>esc(p.nome)).join(', ')+(L.length>3?'…':''),S=[];
+{const R=[],ab=dvL().filter(d=>dvF(d)>0),nm=d=>d.tipo==='receber'?esc(d.pessoa)+' deve-lhe '+money(dvF(d)):'Deve a '+esc(d.pessoa)+': '+money(dvF(d));
+const grp=(L,sev,fim)=>['pagar','receber'].forEach(tp=>{const A=L.filter(d=>d.tipo===tp).sort((x,y)=>x.prazo<y.prazo?-1:1);if(!A.length)return;
+if(A.length<=2){A.forEach(d=>R.push([sev,nm(d)+fim(d),sev===2?dd(d.prazo,h):0]));return}
+const tot=A.reduce((q,d)=>q+dvF(d),0),o=A[0];R.push([sev,A.length+' dívida(s) '+(tp==='pagar'?'por pagar':'por cobrar')+(sev===2?' em atraso':' a vencer em 3 dias')+': '+money(tot)+' · '+(sev===2?'a mais antiga: '+esc(o.pessoa)+', há '+dias(dd(o.prazo,h)):'a primeira: '+esc(o.pessoa)+', '+quando(dd(h,o.prazo))),sev===2?dd(o.prazo,h):0])});
+grp(ab.filter(d=>d.prazo&&d.prazo<h),2,d=>' · atrasada há '+dias(dd(d.prazo,h)));
+grp(ab.filter(d=>d.prazo&&d.prazo>=h&&d.prazo<=adD(h,3)),1,d=>' · vence '+quando(dd(h,d.prazo)));
+const sp=ab.filter(d=>!d.prazo).length;if(sp)R.push([1,sp+' dívida(s) sem prazo: sem prazo não há controlo',0]);
+S.push({ic:'🤝',n:'Dívidas',g:"goTab('dividas')",ok:'Tudo em dia',R})}
+{const R=[],P=D.prods,sa=stockAl(),ng=sa.ng;
+if(ng.length)R.push([2,ng.length+' produto(s) com stock negativo: '+nomes(ng)+' · erro de registo',0]);
+const z=sa.z;if(z.length)R.push([2,z.length+' produto(s) sem stock: '+nomes(z),0]);
+const bx=sa.bx;if(bx.length)R.push([1,bx.length+' produto(s) com stock baixo: '+nomes(bx),0]);
+valAl().forEach(p=>{const d=dvDias(p.val);if(d<0)R.push([2,esc(p.nome)+' · validade passou há '+dias(-d)+' (stock '+c2(p.stock)+')',-d]);else R.push([d<=7?2:1,esc(p.nome)+' · validade '+quando(d)+' (stock '+c2(p.stock)+')',0])});
+const pc=P.filter(p=>p.venda>0&&custo(p)>0&&p.venda<custo(p));if(pc.length)R.push([2,pc.length+' produto(s) com preço de venda abaixo do custo: '+nomes(pc),0]);
+if(P.length){const cs=cnL().map(c=>c.data).sort(),uc=cs.length?cs[cs.length-1]:null,dc=uc?dd(uc,h):null;if(dc===null||dc>=14)R.push([dc===null||dc>=30?2:1,dc===null?'Ainda não contou o stock · toque aqui':'Há '+dias(dc)+' que não conta o stock · toque aqui',0,"goTab('armazem','perd')"])}
+S.push({ic:'📦',n:'Stock e validade',g:"goTab('armazem','prod')",ok:'Stock em ordem',R})}
+{const R=[],vh=D.vendas.some(v=>v.data===h);
+if(!vh&&!(D.sv&&D.sv[h])&&hr>=12)R.push([hr>=21?2:hr>=18?1:0,'Ainda não registou nenhuma venda hoje · toque aqui para registar ou dizer que não vendeu',0,'svHoje()']);
+if(vh&&hr>=18&&D.fv!==h)R.push([hr>=21?2:1,'Ainda não abriu o fecho do dia · toque aqui',0,"goTab('fecho')"]);
+S.push({ic:'🛍️',n:'Vendas do dia',g:"goTab('vendas')",ok:'Vendas registadas',R})}
+{const R=[];FP.forEach(f=>{const v=sdForma(f[0]);if(v<-0.005)R.push([2,'Saldo negativo em '+f[2]+': '+money(v)+' · falta registar uma entrada ou há uma saída a mais',0])});
+const cf=D.confCx,dc=cf?dd(cf,h):null;if(dc===null||dc>=7)R.push([1,dc===null?'Ainda não conferiu o saldo da app com o dinheiro que tem na mão · toque aqui':'Há '+dias(dc)+' que não confere o saldo com o dinheiro que tem na mão · toque aqui',0,'confSaldo()']);
+S.push({ic:'💰',n:'Caixa',g:"goTab('caixa','mov')",ok:'Saldos certos',R})}
+{const R=[],pp=(D.pedP||[]).filter(p=>p.estado==='pendente'),pd=(D.pedidos||[]).filter(p=>p.estado==='pendente'),ap=pd.filter(aprOf);let nr=0,vr=0;try{const r=rinPend();nr=r.length;vr=r.reduce((q,i)=>q+i.valor,0)}catch(e){}
+if(pp.length)R.push([2,pp.length+' pedido(s) de dinheiro da Bejoma Pessoal por aprovar: '+money(pp.reduce((q,p)=>q+p.valor,0)),0]);
+if(ap.length)R.push([2,'A Bejoma Pessoal aprovou '+ap.length+' pedido(s): escreva o código para o dinheiro entrar na Caixa',0]);
+if(pd.length>ap.length)R.push([1,(pd.length-ap.length)+' pedido(s) seu(s) ainda aguardam a aprovação da Bejoma Pessoal',0]);
+if(nr)R.push([1,nr+' retirada(s) da Bejoma Pessoal por importar: '+money(vr),0]);
+S.push({ic:'🔗',n:'Bejoma Pessoal',g:"goTab('caixa','bp')",ok:'Nada pendente',R})}
+{const R=[],dias_=D.ultBackup?dd(D.ultBackup,h):null;if(dias_===null||dias_>=2)R.push([dias_===null||dias_>=7?2:1,dias_===null?'Ainda não fez backup neste telemóvel':'Sem backup há '+dias(dias_),0]);
+S.push({ic:'💾',n:'Cópia de segurança',g:"goTab('backup')",ok:'Backup recente',R})}
+let u=0,a=0;S.forEach(x=>{x.R.sort((p,q)=>q[0]-p[0]||q[2]-p[2]);x.R.forEach(r=>{if(r[0]===2)u++;else if(r[0]===1)a++})});
+const col=sv=>sv===2?'var(--bad)':sv===1?'#e0a000':'var(--sub)',ic=sv=>sv===2?'🔴':sv===1?'🟡':'⚪';
+const html='<div class="card"><h2>🛡️ Controlo</h2><p class="empty" style="margin:-6px 0 6px">'+(u||a?(u?'<b style="color:var(--bad)">'+u+' urgente(s)</b>':'')+(u&&a?' · ':'')+(a?'<b style="color:#e0a000">'+a+' a precisar de atenção</b>':''):'✅ Tudo em ordem.')+'</p>'+S.map(x=>{const pr=x.R.filter(r=>r[0]>0).length,top=x.R.slice(0,4);return '<div style="margin-top:10px;cursor:pointer" onclick="'+x.g+'"><b>'+x.ic+' '+x.n+'</b> <span style="font-size:.8rem;color:'+(pr?col(x.R[0][0]):'var(--good)')+'">'+(pr?'':'✅ '+x.ok)+'</span></div>'+top.map(r=>'<div class="item" style="padding:6px 0;cursor:pointer" onclick="'+(r[3]||x.g)+'"><div style="font-size:.88rem;color:'+col(r[0])+'">'+ic(r[0])+' '+r[1]+'</div></div>').join('')+(x.R.length>4?'<div class="empty" style="margin:2px 0 0">+ '+(x.R.length-4)+' mais…</div>':'')}).join('')+'</div>';
+if(b.dataset.h!==html){b.dataset.h=html;b.innerHTML=html}}
 function temaGet(){try{return localStorage.getItem('bejoma_tema')||'claro'}catch(e){return'claro'}}
 function tema(){const t=temaGet(),dk=t==='noturno'||(t==='auto'&&window.matchMedia&&window.matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.t=dk?'dark':'light';const m=document.querySelector('meta[name=theme-color]');if(m)m.content=dk?'#14110f':'#9e2630'}
 function setTema(v){try{localStorage.setItem('bejoma_tema',v)}catch(e){}tema()}
-if($('tmS'))$('tmS').value=temaGet();if($('bvS'))$('bvS').value=bvOn()?'1':'0';setInterval(()=>{try{BV()}catch(e){}},60000);
+if($('tmS'))$('tmS').value=temaGet();if($('bvS'))$('bvS').value=bvOn()?'1':'0';setInterval(()=>{try{BV();CTG()}catch(e){}},60000);
 try{window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change',()=>{if(temaGet()==='auto')tema()})}catch(e){}
 /* ===== Lembretes ===== */
 function defL(){return[{id:'venda',tipo:'venda',hora:'18:00',dias:[1,2,3,4,5,6],ativo:true},{id:'relatorio',tipo:'relatorio',hora:'20:00',dias:[0,1,2,3,4,5,6],ativo:true},{id:'compra',tipo:'compra',hora:'08:00',dias:[6],ativo:true},{id:'backup',tipo:'backup',hora:'20:30',dias:[0,1,2,3,4,5,6],ativo:true}]}
@@ -984,7 +1017,7 @@ function msgL(t){const h=D.vendas.filter(v=>v.data===td()),r=h.reduce((s,v)=>s+v
 if(t==='venda')return h.length?`Hoje já registou ${h.length} venda(s), ${money(r)}. Falta alguma?`:'Ainda não registou nenhuma venda hoje. Registe agora para o stock e a caixa ficarem certos.';
 if(t==='relatorio')return`Feche o dia: receita ${money(r)} · lucro ${money(h.reduce((s,v)=>s+v.qtd*(v.preco-v.custo),0))}. Abra o Fecho do dia e gere o PDF.`;
 if(t==='dividas'){const u=dvUrg();if(!u.length)return'';const at=u.filter(d=>dvDias(d.prazo)<0).length;return(at?at+' em atraso. ':'')+u.slice(0,3).map(d=>(d.tipo==='receber'?'Cobrar a ':'Pagar a ')+d.pessoa+' '+money(dvF(d))).join(' · ')+(u.length>3?'…':'')+'.'}
-if(t==='foco')return focoMsg();if(t==='backup')return D.ultBackup?`Último backup: ${fmtD(D.ultBackup)}. Faça um novo e envie para o WhatsApp ou email.`:'Ainda não fez backup. Faça agora e envie para o WhatsApp ou email.';const low=D.prods.filter(p=>p.stock<=mn(p));return low.length?`Repor stock (${low.length}): ${low.slice(0,4).map(p=>p.nome).join(', ')}${low.length>4?'…':''}.`:'Hora de planear as compras. O stock está em ordem.'}
+if(t==='foco')return focoMsg();if(t==='backup')return D.ultBackup?`Último backup: ${fmtD(D.ultBackup)}. Faça um novo e envie para o WhatsApp ou email.`:'Ainda não fez backup. Faça agora e envie para o WhatsApp ou email.';const low=stockAl().rep;return low.length?`Repor stock (${low.length}): ${low.slice(0,4).map(p=>p.nome).join(', ')}${low.length>4?'…':''}.`:'Hora de planear as compras. O stock está em ordem.'}
 async function notif(t,b,tag){try{if(!('Notification' in window)||Notification.permission!=='granted')return;const r=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration(),o={body:b,icon:'icon-192.png',badge:'icon-192.png',tag,vibrate:[200,100,200]};if(r&&r.showNotification)r.showNotification(t,o);else new Notification(t,o)}catch(e){}}
 function mostra(l,atraso){const m0=msgL(l.tipo);if(!m0)return;const txt=m0+(atraso>10?` (programado para ${l.hora})`:'');pend=pend.filter(p=>p.tipo!==l.tipo);pend.push({tipo:l.tipo,txt});rl();if(atraso<=15)notif(LI[l.tipo]+' '+LN[l.tipo],txt,'bj-'+l.tipo)}
 function remMirror(){if(!ENC)return;try{localStorage.setItem('bejoma_rem',JSON.stringify(D.lembretes.map(l=>({tipo:l.tipo,hora:l.hora,dias:l.dias,ativo:l.ativo,ult:l.ult||''}))))}catch(e){}}
