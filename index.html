@@ -175,12 +175,13 @@ html[data-t=dark] [style*="border-color:#e4bd7d"]{border-color:#6b5230!important
 <label>Produto</label><div class="sel"><span id="vImg"></span><select id="vProd" onchange="fillPreco()"></select></div>
 <label>Quantidade (unidades)</label><input id="vQtd" type="number" inputmode="decimal" min="0" oninput="vAuto()">
 <label>Preço por unidade (Kz)</label><input id="vPreco" type="number" inputmode="decimal" min="0" oninput="vManual=1"><div id="vPromo" class="empty" style="margin:4px 0 0"></div>
+<label>Data da venda (opcional)</label><input id="vData" type="date" oninput="vDataSet()"><div id="vDataInfo" class="empty" style="margin:4px 0 0">Deixe vazio para registar hoje. Use só se esqueceu de registar uma venda de outro dia.</div>
 <label>Forma de pagamento</label><div id="vForma" class="chips"></div>
 <div id="vDev" style="display:none;background:#fffaf3;border:1px dashed var(--line);border-radius:14px;padding:4px 12px 12px;margin-top:8px"><p class="empty" style="margin:8px 0 0">Venda a dever: o stock baixa e a venda conta, mas o dinheiro só entra na Caixa quando o cliente pagar. Fica registada em Dívidas.</p><label>Nome do cliente</label><input id="vDevNome" autocomplete="off"><label>Prazo para ele pagar</label><input id="vDevPrazo" type="date"></div>
 <button onclick="vender()">Registar venda</button> <button class="sec" onclick="devolver()">↩️ Devolução de cliente</button><p class="empty" style="margin:6px 0 0">Cliente devolveu? Escolha o produto, a quantidade e o preço que ele pagou, e toque em Devolução. O dinheiro sai da caixa na forma escolhida em "Pago com".</p></div>
 <div id="mtDia"></div>
 <div class="card"><h2>Vendas de hoje</h2><div id="vLista"></div></div>
-<div class="card"><h2>Histórico de vendas</h2><p class="empty" style="margin:-6px 0 8px">Todas as vendas, por mês e por dia. Só para consultar: para corrigir uma venda de hoje use a lista acima.</p><div id="vHist"></div></div>
+<div class="card"><h2>Histórico de vendas</h2><p class="empty" style="margin:-6px 0 8px">Todas as vendas, por mês e por dia. Só para consultar: para corrigir uma venda de hoje (ou uma venda antiga registada hoje) use a lista acima.</p><div id="vHist"></div></div>
 </div>
 
 <div class="panel hidden" id="p-armazem">
@@ -265,7 +266,7 @@ html[data-t=dark] [style*="border-color:#e4bd7d"]{border-color:#6b5230!important
 <div class="card"><h2>Onde está o dinheiro</h2><div id="cForma"></div></div>
 <div class="card"><h2>Comida e gastos pessoais</h2><p class="empty" style="margin:-6px 0 8px">Registe em Novo movimento → Comida / gasto pessoal. Não conta como despesa do negócio, fica fora do lucro e o app avisa quando passa o limite.</p><div id="limBox"></div><label>Limite diário (Kz)</label><input id="limVal" type="number" inputmode="decimal" min="0" placeholder="0 = sem limite"><button class="sec" onclick="limSet()">Guardar limite</button></div>
 <div class="card"><h2>Novo movimento</h2>
-<label>Tipo</label><select id="cTipo" onchange="capShow()"><option value="saida|Despesa">Despesa</option><option value="saida|Transporte">🚌 Transporte (ida ou volta)</option><option value="saida|Comida">🍽️ Comida / gasto pessoal (fora do negócio)</option><option value="saida|Retirada">Retirada</option><option value="troca|Troca">🔄 Troca (Express ↔ Dinheiro)</option><option value="entrada|Entrada extra">Investimento (capital próprio)</option><option value="entrada|Empréstimo">Empréstimo recebido (tenho de devolver)</option></select>
+<label>Tipo</label><select id="cTipo" onchange="capShow()"><option value="saida|Despesa">Despesa</option><option value="saida|Transporte">🚌 Transporte (ida ou volta)</option><option value="saida|Comida">🍽️ Comida / gasto pessoal (fora do negócio)</option><option value="saida|Retirada">Retirada</option><option value="troca|Troca">🔄 Troca (Express ↔ Dinheiro)</option><option value="entrada|Entrada extra">Investimento (capital próprio)</option><option value="entrada|Empréstimo">Empréstimo recebido (tenho de devolver)</option></select><div id="cDcL" style="display:none"><label>Categoria da despesa (para o orçamento)</label><select id="cDc"></select></div>
 <label>Descrição</label><input id="cDesc">
 <p class="empty" id="cTcDica" style="display:none;margin:8px 0 0"></p><div id="cTrL" style="display:none;margin:10px 0 0"><label style="margin-top:0">Que transporte é?</label><div id="cTrSel" class="chips"></div><p class="empty" id="cTrDica" style="margin:6px 0 0"></p></div>
 <label>Valor (Kz)</label><input id="cValor" type="number" inputmode="decimal" min="0">
@@ -273,7 +274,24 @@ html[data-t=dark] [style*="border-color:#e4bd7d"]{border-color:#6b5230!important
 <button onclick="caixaAdd()">Registar movimento</button></div>
 <div class="card"><h2>📥 Entradas (movimentos positivos)</h2><div id="cListaE"></div></div>
 <div class="card"><h2>📤 Saídas (movimentos negativos)</h2><div id="cListaS"></div></div>
-<div class="card"><h2>Apagados</h2><p class="empty" style="margin:-6px 0 8px">O que apagar na Caixa ou nas Dívidas fica aqui e pode ser restaurado.</p><div id="apBox"></div></div>
+<div class="card"><h2>Apagados</h2><p class="empty" style="margin:-6px 0 8px">O que apagar na Caixa, nas Dívidas, nas Vendas, nos Produtos ou nas Perdas fica aqui e pode ser restaurado.</p><div id="apBox"></div></div>
+</div>
+<div class="sx" data-sx="orc">
+<div class="card"><h2>💸 Orçamento de despesas do mês</h2><div id="orB"></div></div>
+<div class="card"><h2>Definir orçamento</h2><p class="empty" style="margin:-6px 0 8px">Quanto quer gastar por mês em despesas do negócio. Deixe vazio para não ter limite. Não contam compras de stock, retiradas nem a reserva.</p><div id="orE"></div><button onclick="orSave()">Guardar orçamento</button></div>
+<div class="card" id="orSC" style="display:none"><h2>Despesas por categorizar</h2><p class="empty" style="margin:-6px 0 8px">Escolha a categoria de cada uma para entrar no orçamento da categoria. Já contam no total.</p><div id="orS"></div></div>
+<div class="card"><h2>Categorias de despesa</h2><div id="dcB"></div><label>Nova categoria</label><input id="dcN" placeholder="ex.: Água e luz"><button class="sec" onclick="dcAdd()">Adicionar categoria</button></div>
+</div>
+<div class="sx" data-sx="res">
+<div class="card"><h2>🔄 Reserva para repor stock</h2><div id="rsBox"></div></div>
+<div class="card"><h2>Guardar ou usar</h2>
+<label>Valor (Kz)</label><input id="rsV" type="number" inputmode="decimal" min="0" placeholder="ex.: 5000">
+<label>Forma de pagamento</label><select id="rsF"></select>
+<label>Mexer na Caixa?</label><select id="rsC"><option value="1">Sim (a Caixa desce ao guardar e sobe ao usar)</option><option value="0">Não, só acompanhar</option></select>
+<button onclick="rsMov(1)">＋ Guardar na reserva</button><button class="sec" onclick="rsMov(-1)">− Usar da reserva</button>
+<p class="empty" style="margin:8px 0 0">O dinheiro guardado não conta como despesa nem como retirada. Para corrigir um engano, faça o movimento contrário.</p></div>
+<div class="card"><h2>Meta da reserva</h2><label>Quanto quer ter para a próxima reposição (Kz)</label><input id="rsM" type="number" inputmode="decimal" min="0" placeholder="0 = sem meta"><button class="sec" onclick="rsMeta()">Guardar meta</button></div>
+<div class="card"><h2>Movimentos da reserva</h2><div id="rsH"></div></div>
 </div>
 <div class="sx" data-sx="bp">
 <div class="card"><h2>Pedidos da Bejoma Pessoal</h2><p class="empty" style="margin:-6px 0 8px">Quando pede dinheiro na Bejoma Pessoal, ela abre esta app. Aqui você aprova: a retirada sai da Caixa e aparece um código para escrever na Bejoma Pessoal.</p><div id="pgBox"></div>
@@ -423,12 +441,14 @@ if(q>p.stock)return alert('Stock insuficiente: restam '+p.stock+' un. de '+p.nom
 const dev=fpV==='dev',cli=$('vDevNome').value.trim(),pz=$('vDevPrazo').value;
 if(dev&&!cli)return alert('Venda a dever: escreva o nome do cliente.');
 if(dev&&!pz)return alert('Venda a dever: escolha o prazo para ele pagar.');
-const id=uid(),did=dev?uid():null;D.vendas.push({id,data:td(),hora:hh(),pid:p.id,nome:p.nome,qtd:q,preco:pr,lista:p.venda,custo:custo(p),forma:dev?'din':fpV,fiado:did});p.stock-=q;
-if(dev)dvL().push({id:did,tipo:'receber',pessoa:cli,desc:p.nome+' ×'+q+' (venda a dever)',valor:q*pr,pago:0,pagtos:[],data:td(),hora:hh(),prazo:pz,venda:id});
-else D.caixa.push({id:uid(),data:td(),hora:hh(),tipo:'entrada',desc:'Venda: '+p.nome+' ×'+q,valor:q*pr,ref:id,forma:fpV});
-save();$('vQtd').value='';if(dev){fpV='din';$('vDevNome').value='';$('vDevPrazo').value=''}R();vManual=0;fillPreco();if(pr<custo(p))alert('Atenção: vendeu '+p.nome+' a '+money(pr)+', abaixo do custo ('+money(custo(p))+'). A venda foi registada. Se foi engano, apague-a na lista de vendas de hoje.')}
+const dt=$('vData').value||td(),past=dt<td();if(dt>td())return alert('A data da venda não pode ser no futuro.');if(dev&&pz<dt)return alert('Venda a dever: o prazo não pode ser antes da data da venda.');
+const id=uid(),did=dev?uid():null;{const nv={id,data:dt,hora:past?'':hh(),reg:past?td():undefined,pid:p.id,nome:p.nome,qtd:q,preco:pr,lista:p.venda,custo:custo(p),forma:dev?'din':fpV,fiado:did};let j=D.vendas.length;const kk=(nv.data||'')+(nv.hora||'');while(j>0&&((D.vendas[j-1].data||'')+(D.vendas[j-1].hora||''))>kk)j--;D.vendas.splice(j,0,nv)}p.stock-=q;
+if(dev)dvL().push({id:did,tipo:'receber',pessoa:cli,desc:p.nome+' ×'+q+' (venda a dever)',valor:q*pr,pago:0,pagtos:[],data:dt,hora:past?'':hh(),prazo:pz,venda:id});
+else apIns({id:uid(),data:dt,hora:past?'':hh(),tipo:'entrada',desc:'Venda: '+p.nome+' ×'+q,valor:q*pr,ref:id,forma:fpV});
+save();$('vQtd').value='';if(dev){fpV='din';$('vDevNome').value='';$('vDevPrazo').value=''}R();vManual=0;fillPreco();if(past)toast('Venda registada com a data de '+fmtD(dt)+'.');if(pr<custo(p))alert('Atenção: vendeu '+p.nome+' a '+money(pr)+', abaixo do custo ('+money(custo(p))+'). A venda foi registada. Se foi engano, apague-a na lista de vendas de hoje.')}
 function devolver(){if(!once())return;const p=P($('vProd').value),q=n($('vQtd').value),pr=n($('vPreco').value);
 if(!p||q<=0)return alert('Escolha o produto e a quantidade devolvida.');
+if($('vData').value&&$('vData').value<td())return alert('A devolução é sempre registada com a data de hoje. Primeiro toque em "Voltar a hoje" na data da venda.');
 if(pr<=0)return alert('Indique o preço a que o cliente pagou (por unidade).');
 if(fpV==='dev')return alert('Para devolver dinheiro, escolha Dinheiro ou Multicaixa Express em "Pago com". Se a venda era a dever, apague-a na lista de vendas.');
 const vend=D.vendas.filter(v=>v.pid===p.id).reduce((a,v)=>a+v.qtd,0);
@@ -441,8 +461,11 @@ D.vendas.push({id,data:td(),hora:hh(),pid:p.id,nome:p.nome,qtd:-q,preco:pr,custo
 if(volta)p.stock+=q;else pdL().push({id:pdId,data:td(),hora:hh(),pid:p.id,nome:p.nome,qtd:q,custo:cu,mot:'est',obs:'Devolução de cliente'});
 D.caixa.push({id:uid(),data:td(),hora:hh(),tipo:'saida',desc:'Devolução: '+p.nome+' ×'+c2(q),valor:tot,cat:'Devolução',forma:fpV,dv:'dev-'+id});
 save();$('vQtd').value='';R()}
-function delVenda(id){const v=D.vendas.find(x=>x.id==id);if(!v||!confirm((v.devol?'Apagar esta devolução? O stock e a caixa voltam ao que eram antes dela.':'Apagar esta venda? O stock volta.')+(v.fiado?' A dívida do cliente também é apagada (e o que ele já pagou sai da Caixa).':'')))return;
-const p=P(v.pid);if(p&&!v.estr)p.stock+=v.qtd;if(v.perda)D.perdas=pdL().filter(x=>x.id!==v.perda);D.caixa=D.caixa.filter(c=>c.dv!=='dev-'+id);const dv=dvL().find(x=>x.venda===id);if(dv){const ids=(dv.pagtos||[]).map(x=>x.id).filter(Boolean);D.caixa=D.caixa.filter(c=>ids.indexOf(c.dv)<0);D.dividas=dvL().filter(x=>x.id!==dv.id)}D.vendas=D.vendas.filter(x=>x.id!=id);D.caixa=D.caixa.filter(c=>c.ref!=id);save();R()}
+function delVenda(id){const v=D.vendas.find(x=>x.id==id);if(!v||!confirm((v.devol?'Apagar esta devolução? O stock e a caixa voltam ao que eram antes dela.':'Apagar esta venda? O stock volta.')+(v.fiado?' A dívida do cliente também é apagada (e o que ele já pagou sai da Caixa).':'')+'\n\nFica guardada em "Apagados" (Dinheiro → Caixa) e pode ser restaurada.'))return;
+const cl=o=>o?JSON.parse(JSON.stringify(o)):null,p=P(v.pid),dv=dvL().find(x=>x.venda===id),ids=dv?(dv.pagtos||[]).map(x=>x.id).filter(Boolean):[],cxs=[];
+D.caixa.filter(c=>c.dv==='dev-'+id||c.ref==id||(ids.length&&ids.indexOf(c.dv)>=0)).forEach(c=>{if(!cxs.some(x=>x.id===c.id))cxs.push(cl(c))});
+apLog({t:'venda',v:cl(v),pid:v.pid,ds:(p&&!v.estr)?v.qtd:0,pd:v.perda?cl(pdL().find(x=>x.id===v.perda)):null,dv:cl(dv),cx:cxs});
+if(p&&!v.estr)p.stock+=v.qtd;if(v.perda)D.perdas=pdL().filter(x=>x.id!==v.perda);D.caixa=D.caixa.filter(c=>c.dv!=='dev-'+id);if(dv){D.caixa=D.caixa.filter(c=>ids.indexOf(c.dv)<0);D.dividas=dvL().filter(x=>x.id!==dv.id)}D.vendas=D.vendas.filter(x=>x.id!=id);D.caixa=D.caixa.filter(c=>c.ref!=id);save();R()}
 
 function entrada(){if(!once())return;const p=P($('aProd').value),e=n($('aEmb').value),pr=n($('aPreco').value);
 if(!p||e<=0)return alert('Escolha o produto e as embalagens.');
@@ -527,7 +550,7 @@ function csvVendas(){const{vp}=relData();dl('bejoma_vendas_'+per+'_'+td()+'.csv'
 function printRel(){const{ag}=relData(),t={q:0,r:0,c:0,l:0};
 const r=Object.entries(ag).sort((a,b)=>b[1].l-a[1].l).map(([k,a])=>{for(const x in t)t[x]+=a[x];return`<tr><td>${esc(k)}</td><td>${c2(a.q)}</td><td>${money(a.r)}</td><td>${money(a.c)}</td><td>${money(a.l)}</td></tr>`}).join('');
 $('printSheet').innerHTML=`<div class="ph"><img src="${document.querySelector('.hero img').src}"><div><h2>Bejoma Doces</h2><p>Relatório por produto · ${perLabel[per]} · gerado em ${agora()}</p></div></div><table><tr><th>Produto</th><th>Unidades</th><th>Receita</th><th>Custo</th><th>Lucro</th></tr>${r||'<tr><td colspan="5">Sem vendas neste período.</td></tr>'}<tr class="t"><td>TOTAL</td><td>${c2(t.q)}</td><td>${money(t.r)}</td><td>${money(t.c)}</td><td>${money(t.l)}</td></tr></table>`;assina();window.print()}
-function delProd(id){const p=P(id);if(!p||!confirm('Apagar '+p.nome+'?\n\nSe só quer desfazer uma compra errada, cancele e use o botão "Desfazer compra". O dinheiro só volta à caixa ao desfazer a compra.'))return;D.prods=D.prods.filter(x=>x.id!=id);save();R()}
+function delProd(id){const p=P(id);if(!p||!confirm('Apagar '+p.nome+'?\n\nSe só quer desfazer uma compra errada, cancele e use o botão "Desfazer compra". O dinheiro só volta à caixa ao desfazer a compra.\n\nFica guardado em "Apagados" (Dinheiro → Caixa) e pode ser restaurado.'))return;apLog({t:'prod',p:JSON.parse(JSON.stringify(p))});D.prods=D.prods.filter(x=>x.id!=id);save();R()}
 function desfazCompra(id){const p=P(id);if(!p)return;const cs=D.compras.filter(c=>c.pid==id||(!c.pid&&c.nome===p.nome));
 if(!cs.length)return alert('Este produto não tem compras para desfazer.');
 const c=cs[cs.length-1];delCompra(c.id)}
@@ -537,9 +560,10 @@ if(v<=0)return alert('Indique o valor.');
 if(t==='troca'){const de=fpC,pa=(FP.find(f=>f[0]!==de)||[de])[0];if(pa===de)return;const a=cxSaldo(de);if(v>a+0.005)return alert('Em '+fpN(de)+' só tem '+money(a)+'. Não dá para trocar '+money(v)+'.');fazTroca(v,de,pa);$('cValor').value='';R();return}
 if(t==='saida'&&semSaldo(v,fpC))return;
 let l=l0,ex={},dd=l0;
-if(l0==='Transporte'){l='Despesa';const k=trV||trSug();ex=k==='ida'?{cap:true,tr:'ida'}:{tr:'volta'};dd=k==='ida'?'Transporte de ida':'Transporte de volta'}
+if(l0==='Despesa'&&$('cDc')&&$('cDc').value)ex.dc=$('cDc').value;
+if(l0==='Transporte'){l='Despesa';const k=trV||trSug();ex=k==='ida'?{cap:true,tr:'ida'}:{tr:'volta'};dd=k==='ida'?'Transporte de ida':'Transporte de volta';ex.dc='Transporte'}
 else if(l0==='Comida'){l='Retirada';ex={sub:'comida'};dd='Comida';const lim=limCom();if(lim>0){const g=comDia(td())+v;if(g>lim&&!confirm('⚠️ Isto passa o limite diário de '+money(lim)+'.\nHoje já gastou '+money(comDia(td()))+' e ficaria em '+money(g)+'.\n\nRegistar mesmo assim?'))return}}
-D.caixa.push(Object.assign({id:uid(),data:td(),hora:hh(),tipo:t,desc:$('cDesc').value.trim()||dd,valor:v,cat:l,forma:fpC},ex));trV='';save();$('cDesc').value='';$('cValor').value='';R()}
+D.caixa.push(Object.assign({id:uid(),data:td(),hora:hh(),tipo:t,desc:$('cDesc').value.trim()||dd,valor:v,cat:l,forma:fpC},ex));trV='';save();$('cDesc').value='';$('cValor').value='';R();try{orAviso(D.caixa[D.caixa.length-1])}catch(e){}}
 function empTog(id){const c=D.caixa.find(x=>x.id==id);if(!c)return;c.cat=c.cat==='Empréstimo'?'Entrada extra':'Empréstimo';save();R()}
 function delCaixa(id){const c=D.caixa.find(x=>x.id==id);if(!c)return;
 if(c.troca){if(!confirm('Apagar esta troca de '+money(c.valor)+'?\nAs duas linhas (saída e entrada) são apagadas e o dinheiro volta a ficar como estava antes.\nSe já gastou o dinheiro trocado, a forma de pagamento pode ficar negativa.\n\nFica guardado em "Apagados".'))return;apLog({t:'troca',movs:JSON.parse(JSON.stringify(D.caixa.filter(x=>x.troca===c.troca)))});D.caixa=D.caixa.filter(x=>x.troca!==c.troca);save();return R()}
@@ -646,10 +670,10 @@ c4=`<div class="donut chart"><svg viewBox="0 0 120 120">${arcs}<text x="60" y="5
 const cd=(t,b)=>`<div class="card"><h2>${t}</h2>${b}</div>`;
 $('gBox').innerHTML=sel+kpis+cd('Receita e lucro por dia',c1)+cd('Evolução do saldo da caixa',c2)+cd('Produtos mais lucrativos',c3)+cd('Receita por produto',c4)}
 const empty=t=>`<div class="empty">${t}</div>`;
-function R(){D.prods.sort((a,b)=>a.nome.localeCompare(b.nome,'pt',{sensitivity:'base'}));fpDraw();G();RL();F();I();DV();capShow();LC();AP();PL();VH();AH();BV();CTG();MT();MD();RP();CNR();ROT();RIN();PED();HASHIN();PG();UP();
-opts('vProd');opts('aProd');opts('pProd');opts('sProd');if(!$('sData').value)$('sData').value=td();$('sData').max=td();showImg();if(!$('aData').value)$('aData').value=td();$('aData').max=td();lotesDraw();E();if(!$('vPreco').value)fillPreco();if(!$('aPreco').value)fillEmb();
-const hoje=D.vendas.filter(v=>v.data===td());
-$('vLista').innerHTML=hoje.length?hoje.slice().reverse().map(v=>`<div class="item"><div class="pi">${P(v.pid)?av(P(v.pid),38):''}<div>${v.devol?'↩️ Devolução · ':''}${esc(v.nome)} ×${v.qtd}<small>${v.hora?v.hora+' · ':''}${money(v.qtd*v.preco)} · ${v.fiado?'🤝 A dever':fpI(fpK(v))+' '+fpN(fpK(v))} · lucro ${money(v.qtd*(v.preco-v.custo))}</small></div></div><button class="mini dng" onclick="delVenda('${v.id}')">✕</button></div>`).join(''):empty('Ainda sem vendas hoje.');
+function R(){D.prods.sort((a,b)=>a.nome.localeCompare(b.nome,'pt',{sensitivity:'base'}));fpDraw();G();RL();F();I();DV();capShow();LC();AP();ORD();RSV();PL();VH();AH();BV();CTG();MT();MD();RP();CNR();ROT();RIN();PED();HASHIN();PG();UP();
+opts('vProd');opts('aProd');opts('pProd');opts('sProd');if(!$('sData').value)$('sData').value=td();$('sData').max=td();$('vData').max=td();vDataSet();showImg();if(!$('aData').value)$('aData').value=td();$('aData').max=td();lotesDraw();E();if(!$('vPreco').value)fillPreco();if(!$('aPreco').value)fillEmb();
+const hoje=D.vendas.filter(v=>v.data===td());const hojeL=D.vendas.filter(v=>v.data===td()||v.reg===td());
+$('vLista').innerHTML=hojeL.length?hojeL.slice().reverse().map(v=>`<div class="item"><div class="pi">${P(v.pid)?av(P(v.pid),38):''}<div>${v.devol?'↩️ Devolução · ':''}${esc(v.nome)} ×${v.qtd}<small>${v.data!==td()?'📅 venda de '+fmtD(v.data)+' · ':''}${v.hora?v.hora+' · ':''}${money(v.qtd*v.preco)} · ${v.fiado?'🤝 A dever':fpI(fpK(v))+' '+fpN(fpK(v))} · lucro ${money(v.qtd*(v.preco-v.custo))}</small></div></div><button class="mini dng" onclick="delVenda('${v.id}')">✕</button></div>`).join(''):empty('Ainda sem vendas hoje.');
 const bq=($('aBusca').value||'').trim().toLowerCase(),lista=D.prods.filter(p=>!bq||p.nome.toLowerCase().indexOf(bq)>=0);
 $('aLista').innerHTML=lista.length?lista.map(p=>`<div class="item wr"><div class="pi" style="flex:1">${av(p,0,1)}<div><b>${esc(p.nome)}</b><small>Custo${p.cm>0?' médio':''} ${money(custo(p))} · Venda ${money(p.venda)}/un.</small><small class="${p.venda-custo(p)<0?'bad':'good'}">Lucro ${money(p.venda-custo(p))}/un. (${p.venda>0?Math.round((p.venda-custo(p))/p.venda*100):0}%)</small>${p.promoQ>=2?`<small>🏷️ Promoção: ${p.promoQ} por ${money(p.promoP)}</small>`:''}${p.val?`<small class="${valSt(p).c}">Validade ${fmtD(p.val)}${valSt(p).t?' · '+valSt(p).t:''}</small>`:''}</div></div><b class="${p.stock<=0?'bad':p.stock<=mn(p)?'warn':''}">${p.stock} un.</b><div class="acts"><button class="mini sec ab" title="Desfazer compra" aria-label="Desfazer compra" onclick="desfazCompra('${p.id}')">↩️</button><button class="mini sec ab" title="Editar" aria-label="Editar" onclick="editProd('${p.id}')">✏️</button><button class="mini dng ab" title="Apagar" aria-label="Apagar" onclick="delProd('${p.id}')">✕</button></div></div>`).join(''):empty(bq?'Nenhum produto encontrado.':'Sem produtos.');
 $('aCompras').innerHTML=D.compras.length?pastasProd(D.compras.slice().reverse(),c=>c.pid||c.nome,c=>c.nome,c=>`<div class="item"><div>${esc(c.nome)} ${c.sem?'🧺 stock que já tinha':'×'+c.emb+' emb.'}<small>Entrada ${fmtD(c.ent||c.data)}${c.hora&&(!c.ent||c.ent===c.data)?' '+c.hora:''} · +${c.un} un.</small></div><div><b>${c.sem?'sem custo':money(c.total)}</b> ${c.sem?'':`<button class="mini sec" onclick="editCompra('${c.id}')">✏️</button> `}<button class="mini dng" onclick="delCompra('${c.id}')">✕</button></div></div>`,l=>'+'+c2(l.reduce((s,c)=>s+c.un,0))+' un. · '+money(l.reduce((s,c)=>s+(c.total||0),0)),c=>c.ent||c.data):empty('Ainda sem compras.');
@@ -674,6 +698,7 @@ $('rBox').innerHTML=alertCard+semCard+bx('Hoje',h.n,h.r,h.l)+bx('Este mês',m.n,
 /* ===== Fecho do dia ===== */
 const descV=v=>v.qtd>0&&v.lista>v.preco?v.qtd*(v.lista-v.preco):0,dscSum=L=>L.reduce((a,v)=>a+descV(v),0);
 let vManual=0;
+function vDataSet(){const e=$('vData'),i=$('vDataInfo');if(!e||!i)return;const v=e.value;if(v&&v>td()){e.value='';i.textContent='A data da venda não pode ser no futuro.';return}i.innerHTML=(v&&v<td())?'<b style="color:var(--bad)">📅 Esta venda vai ficar com a data de '+fmtD(v)+'.</b> <button class="mini sec" onclick="$(\'vData\').value=\'\';vDataSet()">Voltar a hoje</button>':'Deixe vazio para registar hoje. Use só se esqueceu de registar uma venda de outro dia.'}
 let _lk=0;const once=()=>{const t=Date.now();if(t-_lk<600)return false;_lk=t;return true};
 const cxSaldo=f=>D.caixa.reduce((a,c)=>(c.forma||'din')===f?a+(c.tipo==='entrada'?c.valor:-c.valor):a,0);
 const semSaldo=(v,f)=>{const a=cxSaldo(f);if(!(v>a+0.005))return false;
@@ -973,7 +998,7 @@ q.l.forEach(x=>{const d=String(dt(x)||'').slice(0,10);if(d!==dia){dia=d;h+='<div
 return '<details class="pasta"'+((aberto===true||(aberto!==false&&i===0))?' open':'')+'><summary><span>📁 '+nm+'</span><small>'+q.l.length+' registo(s)'+(sm?' · '+sm(q.l):'')+'</small></summary>'+h+'</details>'}).join('')}
 const sumE=l=>'+'+money(l.filter(c=>!c.troca).reduce((s,c)=>s+c.valor,0)),sumS=l=>'−'+money(l.filter(c=>!c.troca).reduce((s,c)=>s+c.valor,0));
 const sumCx=l=>{const e=l.filter(c=>c.tipo==='entrada'&&!c.troca).reduce((s,c)=>s+c.valor,0),x=l.filter(c=>c.tipo==='saida'&&!c.troca).reduce((s,c)=>s+c.valor,0);return '+'+money(e)+' · −'+money(x)};
-const NAVB=[["hoje","Hoje","<path d=\"M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z\"/>",[["inicio","","Início"],["vendas","","Vendas"],["fecho","","Fecho do dia"]]],["armazem","Armazém","<path d=\"M21 8l-9-5-9 5v8l9 5 9-5z\"/><path d=\"M3 8l9 5 9-5M12 13v9\"/>",[["armazem","prod","Produtos"],["armazem","repor","Repor stock"],["armazem","ent","Entradas"],["armazem","perd","Contagem e perdas"],["armazem","hist","Histórico"]]],["din","Dinheiro","<path d=\"M3 7a2 2 0 0 1 2-2h13v4\"/><path d=\"M3 7v11a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1H5a2 2 0 0 1-2-2z\"/><circle cx=\"16.5\" cy=\"14.5\" r=\"1.2\"/>",[["caixa","mov","Caixa"],["dividas","","Dívidas"],["caixa","bp","Bejoma Pessoal"]]],["ana","Análise","<path d=\"M4 20V10M10 20V4M16 20v-7M22 20H2\"/>",[["resumo","","Resumo"],["graficos","","Gráficos"],["metas","","Metas"]]],["mais","Mais","<circle cx=\"5\" cy=\"12\" r=\"1.4\"/><circle cx=\"12\" cy=\"12\" r=\"1.4\"/><circle cx=\"19\" cy=\"12\" r=\"1.4\"/>",[["lembretes","","Lembretes"],["backup","","Dados e segurança"],["definicoes","","Definições"]]]];
+const NAVB=[["hoje","Hoje","<path d=\"M3 11l9-8 9 8v10a1 1 0 0 1-1 1h-5v-7H9v7H4a1 1 0 0 1-1-1z\"/>",[["inicio","","Início"],["vendas","","Vendas"],["fecho","","Fecho do dia"]]],["armazem","Armazém","<path d=\"M21 8l-9-5-9 5v8l9 5 9-5z\"/><path d=\"M3 8l9 5 9-5M12 13v9\"/>",[["armazem","prod","Produtos"],["armazem","repor","Repor stock"],["armazem","ent","Entradas"],["armazem","perd","Contagem e perdas"],["armazem","hist","Histórico"]]],["din","Dinheiro","<path d=\"M3 7a2 2 0 0 1 2-2h13v4\"/><path d=\"M3 7v11a2 2 0 0 0 2 2h15a1 1 0 0 0 1-1v-9a1 1 0 0 0-1-1H5a2 2 0 0 1-2-2z\"/><circle cx=\"16.5\" cy=\"14.5\" r=\"1.2\"/>",[["caixa","mov","Caixa"],["caixa","orc","Orçamento"],["caixa","res","Reserva"],["dividas","","Dívidas"],["caixa","bp","Bejoma Pessoal"]]],["ana","Análise","<path d=\"M4 20V10M10 20V4M16 20v-7M22 20H2\"/>",[["resumo","","Resumo"],["graficos","","Gráficos"],["metas","","Metas"]]],["mais","Mais","<circle cx=\"5\" cy=\"12\" r=\"1.4\"/><circle cx=\"12\" cy=\"12\" r=\"1.4\"/><circle cx=\"19\" cy=\"12\" r=\"1.4\"/>",[["lembretes","","Lembretes"],["backup","","Dados e segurança"],["definicoes","","Definições"]]]];
 const SXD={armazem:'prod',caixa:'mov'},SXC={};
 function goTab(n,s){const g=NAVB.find(x=>x[3].some(i=>i[0]===n&&(!s||i[1]===s)))||NAVB.find(x=>x[3].some(i=>i[0]===n))||NAVB[0];
 if(SXD[n]){s=s||SXC[n]||SXD[n];SXC[n]=s}else s='';
@@ -1085,6 +1110,11 @@ S.push({ic:'🛍️',n:'Vendas do dia',g:"goTab('vendas')",ok:'Vendas registadas
 {const R=[];FP.forEach(f=>{const v=sdForma(f[0]);if(v<-0.005)R.push([2,'Saldo negativo em '+f[2]+': '+money(v)+' · falta registar uma entrada ou há uma saída a mais',0])});
 const cf=D.confCx,dc=cf?dd(cf,h):null;if(dc===null||dc>=7)R.push([1,dc===null?'Ainda não conferiu o saldo da app com o dinheiro que tem na mão · toque aqui':'Há '+dias(dc)+' que não confere o saldo com o dinheiro que tem na mão · toque aqui',0,'confSaldo()']);
 S.push({ic:'💰',n:'Caixa',g:"goTab('caixa','mov')",ok:'Saldos certos',R})}
+{const R=[],o=orcD(),m=dMes();if(o.tot>0){const p=Math.round(m.t/o.tot*100);if(p>=80)R.push([p>100?2:1,'Despesas do mês: '+p+'% do orçamento · '+money(m.t)+' de '+money(o.tot),p,"goTab('caixa','orc')"])}
+orLin().filter(x=>x.p>=80).forEach(x=>R.push([x.p>100?2:1,esc(x.c)+': '+x.p+'% do orçamento'+(x.g>x.l?' · passou '+money(x.g-x.l):' · faltam '+money(x.l-x.g)),x.p,"goTab('caixa','orc')"]));
+if(m.sc.length>=3&&(o.tot>0||orLin().length))R.push([0,m.sc.length+' despesa(s) deste mês sem categoria · toque para categorizar',0,"goTab('caixa','orc')"]);
+if(o.tot>0||orLin().length)S.push({ic:'💸',n:'Orçamento de despesas',g:"goTab('caixa','orc')",ok:'Dentro do orçamento',R})}
+{const R=[],rs=resD();if(rs.mov.length||rs.meta>0){const rp=rpDados(),t=Math.round(rp.total);if(rp.L.length&&rs.g<t)R.push([rs.g<=0?2:1,'A reserva ('+money(rs.g)+') não chega para repor os '+rp.L.length+' produto(s) em falta (cerca de '+money(t)+')',t-rs.g,"goTab('caixa','res')"]);S.push({ic:'🔄',n:'Reserva para repor stock',g:"goTab('caixa','res')",ok:rp.L.length?'A reserva chega para repor':'Nada a repor agora',R})}}
 {const R=[],mv=mtV(),MS=mtStats(),ks=Object.keys(mv.prods).filter(k=>D.prods.some(p=>p.id===k));
 if(MS.restam<=10){
 if(mv.geral>0){const at=mv.tipo==='lucro'?MS.lu:MS.rc,st=mtSt(at,mv.geral,MS);if(st.r==='atras'||st.r==='quase')R.push([MS.restam<=5&&st.r==='atras'?2:1,'Meta de '+(mv.tipo==='lucro'?'lucro':'vendas')+' do mês em risco: '+st.pct+'% (faltam '+money(Math.ceil(st.falta))+' em '+dias(MS.restam)+')',0])}
@@ -1278,7 +1308,7 @@ if(!p||q<=0)return alert('Escolha o produto e a quantidade.');
 if(q>p.stock)return alert('Só tem '+p.stock+' un. de '+p.nome+' em stock.');
 pdL().push({id:uid(),data:td(),hora:hh(),pid:p.id,nome:p.nome,qtd:q,custo:custo(p),mot:m,obs:$('pObs').value.trim()});p.stock-=q;save();$('pQtd').value='';$('pObs').value='';R()}
 function delPerda(id){const x=pdL().find(y=>y.id===id);if(!x)return;if(x.mot==='pag')return alert('Esta saída foi um pagamento de dívida com mercadoria.\nPara desfazer, vá a Dívidas e use ↩️ Desfazer.');const p=(x.pid&&P(x.pid))||D.prods.find(z=>z.nome===x.nome);
-if(!confirm('Desfazer este registo ('+x.nome+' ×'+x.qtd+', '+pmN(x)+')?'+(p?' O stock volta.':'')))return;if(p)p.stock+=x.qtd;D.perdas=pdL().filter(y=>y.id!==id);save();R()}
+if(!confirm('Desfazer este registo ('+x.nome+' ×'+x.qtd+', '+pmN(x)+')?'+(p?' O stock volta.':'')+'\n\nFica guardado em "Apagados" (Dinheiro → Caixa).'))return;apLog({t:'perda',x:JSON.parse(JSON.stringify(x)),pid:p?p.id:null,ds:p?x.qtd:0});if(p)p.stock+=x.qtd;D.perdas=pdL().filter(y=>y.id!==id);save();R()}
 function PL(){if(!$('pLista'))return;const L=pdL().slice().reverse();
 $('pLista').innerHTML=L.length?'<b style="font-size:.85rem">Registos</b>'+pastas(L,x=>x.data,x=>`<div class="item"><div>${pmI(x)} ${esc(x.nome)} ×${c2(x.qtd)}<small>${fmtD(x.data)}${x.hora?' '+x.hora:''} · ${pmN(x)} · custo ${money(pdV(x))}${x.obs?' · '+esc(x.obs):''}</small></div><button class="mini dng" onclick="delPerda('${x.id}')">✕</button></div>`):empty('Ainda sem perdas, estragos ou ofertas.')}
 function pdPrintSec(L){if(!L.length)return'';const t=L.filter(x=>x.mot!=='con'&&x.mot!=='pag').reduce((s,x)=>s+pdV(x),0);return`<h3 style="margin:16px 0 6px;color:#a93425">Perdas, estragos e ofertas (${L.length})</h3><table><tr><th>Data</th><th class="l">Produto</th><th>Qtd</th><th class="l">Motivo</th><th>Custo</th></tr>`+L.map(x=>`<tr><td class="l">${fmtD(x.data)}${x.hora?' '+x.hora:''}</td><td class="l">${esc(x.nome)}</td><td>${c2(x.qtd)}</td><td class="l">${pmN(x)}</td><td>${money(pdV(x))}</td></tr>`).join('')+`<tr class="t"><td class="l" colspan="4">Total que desconta do lucro (sem consumo próprio nem dívidas pagas com mercadoria)</td><td>${money(t)}</td></tr></table>`}
@@ -1317,12 +1347,57 @@ const trK=c=>c.tr||(c.cap?'ida':'volta');
 const trTxt=c=>isTr(c)?(trK(c)==='ida'?' · 🌅 transporte de ida · sai do capital':' · 🌙 transporte de volta · sai do lucro'):((c.tipo==='saida'&&c.sub==='comida')?' · 🍽️ pessoal, fora do lucro':'');
 function trSug(){const jaV=D.vendas.some(v=>v.data===td()),jaI=D.caixa.some(c=>c.data===td()&&c.tipo==='saida'&&c.tr==='ida');return(!jaV&&!jaI)?'ida':'volta'}
 function trSet(k){trV=k;capShow()}
-function capShow(){const tc=$('cTcDica');if(tc){const on=$('cTipo').value==='troca|Troca';tc.style.display=on?'block':'none';if(on){const pa=(FP.find(f=>f[0]!==fpC)||[fpC])[0];tc.textContent='🔄 Vai passar o valor de '+fpN(fpC)+' para '+fpN(pa)+'. Escolha mais abaixo a forma de onde o dinheiro sai. Não conta como venda, despesa nem lucro.'}}const e=$('cTrL');if(!e)return;const t=$('cTipo').value==='saida|Transporte';e.style.display=t?'block':'none';if(!t){trV='';return}
+function capShow(){const dl=$('cDcL');if(dl)dl.style.display=$('cTipo').value==='saida|Despesa'?'block':'none';const tc=$('cTcDica');if(tc){const on=$('cTipo').value==='troca|Troca';tc.style.display=on?'block':'none';if(on){const pa=(FP.find(f=>f[0]!==fpC)||[fpC])[0];tc.textContent='🔄 Vai passar o valor de '+fpN(fpC)+' para '+fpN(pa)+'. Escolha mais abaixo a forma de onde o dinheiro sai. Não conta como venda, despesa nem lucro.'}}const e=$('cTrL');if(!e)return;const t=$('cTipo').value==='saida|Transporte';e.style.display=t?'block':'none';if(!t){trV='';return}
 if(!trV)trV=trSug();
 $('cTrSel').innerHTML=[['ida','🌅 Ida · sai do capital'],['volta','🌙 Volta · sai do lucro']].map(x=>'<button type="button" class="chip'+(x[0]===trV?' on':'')+'" onclick="trSet(\''+x[0]+'\')">'+x[1]+'</button>').join('');
 $('cTrDica').textContent=trV==='ida'?'Antes de vender: não conta como despesa, sai do capital.':'Depois de vender: conta como despesa e baixa o lucro líquido.'}
 function capTog(id){const c=D.caixa.find(x=>x.id===id);if(!c)return;if(c.cap){delete c.cap;c.tr='volta'}else{c.cap=true;c.tr='ida'}save();R()}
 function foodTog(id){const c=D.caixa.find(x=>x.id===id);if(!c)return;if(c.sub==='comida'){c.cat='Despesa';delete c.sub}else{c.cat='Retirada';c.sub='comida';delete c.cap;delete c.tr}save();R()}
+/* ===== Orçamento de despesas do negócio ===== */
+const DC0=['Transporte','Embalagens','Recargas e comunicação','Renda e espaço','Ajudantes','Outros'];
+const dcL=()=>{if(!Array.isArray(D.dcats)||!D.dcats.length)D.dcats=DC0.slice();return D.dcats};
+const isDesp=c=>c.tipo==='saida'&&!c.ref&&!c.dv&&!c.troca&&catOf(c)!=='Retirada';
+const dcOf=c=>c.dc||(c.tr?'Transporte':'');
+const orcD=()=>{if(!D.orcD||typeof D.orcD!=='object')D.orcD={tot:0,c:{}};if(!D.orcD.c||typeof D.orcD.c!=='object')D.orcD.c={};return D.orcD};
+const orDias=()=>{const d=new Date(td()+'T12:00:00');return new Date(d.getFullYear(),d.getMonth()+1,0).getDate()-d.getDate()+1};
+function dMes(){const ym=td().slice(0,7),g={},sc=[];let t=0;D.caixa.filter(c=>isDesp(c)&&(c.data||'').slice(0,7)===ym).forEach(c=>{t+=c.valor;const k=dcOf(c);if(k)g[k]=(g[k]||0)+c.valor;else sc.push(c)});return{g,t,sc}}
+function orLin(){const o=orcD(),m=dMes();return dcL().filter(k=>o.c[k]>0).map(k=>{const g=m.g[k]||0;return{c:k,l:o.c[k],g,p:Math.round(g/o.c[k]*100)}})}
+const orCol=p=>p>100?'var(--bad)':p>=80?'#e0a000':'var(--good)';
+function orRow(x){const ex=x.g>x.l;return '<div style="margin:12px 0"><div style="display:flex;justify-content:space-between;gap:8px"><span>'+esc(x.c)+'</span><b class="'+(ex?'bad':'')+'">'+x.p+'%</b></div><div style="height:10px;background:#f1e4cd;border-radius:6px;overflow:hidden;margin:4px 0"><div style="height:100%;width:'+Math.min(100,x.p)+'%;background:'+orCol(x.p)+'"></div></div><div style="font-size:.8rem;color:'+(ex?'var(--bad)':'var(--sub)')+'">Gastou '+money(x.g)+' de '+money(x.l)+' · '+(ex?'passou '+money(x.g-x.l):'faltam '+money(x.l-x.g))+'</div>'+(!ex?'<div style="font-size:.8rem;margin-top:2px">👉 Pode gastar <b>'+money(Math.floor((x.l-x.g)/orDias()))+'</b> por dia até ao fim do mês</div>':'')+'</div>'}
+function ORD(){const B=$('orB');if(!B)return;const o=orcD(),m=dMes(),L=orLin().sort((a,b)=>b.p-a.p);let h='';
+if(o.tot>0)h+=orRow({c:'Total das despesas do mês',l:o.tot,g:m.t,p:Math.round(m.t/o.tot*100)});
+h+=L.map(orRow).join('');
+B.innerHTML=h?h+'<div class="empty" style="margin:6px 0 0">Despesas deste mês: '+money(m.t)+(m.sc.length?' · '+m.sc.length+' sem categoria':'')+'</div>':'<div class="empty">Ainda não definiu nenhum orçamento. Preencha abaixo.</div>';
+const E=$('orE');if(E&&!(document.activeElement&&E.contains(document.activeElement)))E.innerHTML='<label>Total de despesas por mês (Kz)</label><input id="ordT" type="number" inputmode="decimal" min="0" placeholder="sem limite" value="'+(o.tot>0?o.tot:'')+'">'+dcL().map((k,i)=>'<label>'+esc(k)+'</label><input id="ordC'+i+'" type="number" inputmode="decimal" min="0" placeholder="sem orçamento" value="'+(o.c[k]>0?o.c[k]:'')+'">').join('');
+const d1=$('dcB');if(d1)d1.innerHTML=dcL().map((k,i)=>'<div class="item"><div>'+esc(k)+'</div><button class="mini dng" onclick="dcDel('+i+')">✕</button></div>').join('');
+const S=$('orS'),SC=$('orSC');if(S&&SC){SC.style.display=m.sc.length?'block':'none';if(!(document.activeElement&&S.contains(document.activeElement)))S.innerHTML=m.sc.slice(-15).reverse().map(c=>'<div class="item"><div>'+esc(c.desc)+'<small>'+fmtD(c.data)+' · '+money(c.valor)+'</small></div><select onchange="dcSet(\''+c.id+'\',this.value)" style="width:auto;max-width:48%"><option value="">Escolher…</option>'+dcL().map(k=>'<option>'+esc(k)+'</option>').join('')+'</select></div>').join('')}
+const cs=$('cDc');if(cs){const cur=cs.value,op='<option value="">— sem categoria —</option>'+dcL().map(k=>'<option>'+esc(k)+'</option>').join('');if(cs.dataset.o!==op){cs.dataset.o=op;cs.innerHTML=op;if(dcL().indexOf(cur)>=0)cs.value=cur}}}
+function orSave(){const o=orcD(),t=$('ordT').value.trim(),nt=t===''?0:parseFloat(t.replace(',','.'));if(!(nt>=0))return alert('Valor inválido no total.');const c={};
+for(let i=0;i<dcL().length;i++){const e=$('ordC'+i);if(!e)continue;const x=e.value.trim();if(x==='')continue;const v=parseFloat(x.replace(',','.'));if(!(v>0))return alert('Valor inválido em "'+dcL()[i]+'".');c[dcL()[i]]=v}
+Object.keys(o.c).forEach(k=>{if(dcL().indexOf(k)<0)c[k]=o.c[k]});D.orcD={tot:nt,c};save();R();toast('Orçamento guardado.')}
+function dcAdd(){const n0=$('dcN').value.trim().slice(0,30);if(!n0)return alert('Escreva o nome da categoria.');if(dcL().some(k=>k.toLowerCase()===n0.toLowerCase()))return alert('Essa categoria já existe.');dcL().push(n0);$('dcN').value='';save();R()}
+function dcDel(i){const k=dcL()[i];if(k===undefined)return;if(!confirm('Tirar a categoria "'+k+'" da lista?\n\nAs despesas já marcadas com ela continuam como estão, mas o orçamento desta categoria deixa de contar.'))return;dcL().splice(i,1);delete orcD().c[k];save();R()}
+function dcSet(id,k){const c=D.caixa.find(x=>x.id==id);if(!c)return;if(k)c.dc=k;else delete c.dc;save();R();if(k)toast('Despesa marcada: '+k+'.')}
+function orAviso(c){if(!c||!isDesp(c)||(c.data||'').slice(0,7)!==td().slice(0,7))return;const o=orcD(),m=dMes(),k=dcOf(c);
+const chk=(nm,l,g)=>{if(!(l>0))return false;const a=g/l,b=(g-c.valor)/l;if(a>1&&b<=1){toast('⚠️ '+nm+': passou o orçamento do mês ('+Math.round(a*100)+'%).');return true}if(a>=.8&&b<.8){toast('💸 '+nm+': já gastou '+Math.round(a*100)+'% do orçamento.');return true}return false};
+if(k&&chk(k,o.c[k],m.g[k]||0))return;chk('Despesas do mês',o.tot,m.t)}
+/* ===== Reserva para repor stock ===== */
+const resD=()=>{if(!D.res||typeof D.res!=='object')D.res={g:0,meta:0,mov:[]};if(!Array.isArray(D.res.mov))D.res.mov=[];return D.res};
+function RSV(){const e=$('rsBox');if(!e)return;const r=resD(),rp=rpDados(),pc=r.meta>0?Math.min(100,Math.round(r.g/r.meta*100)):0;
+const f=$('rsF');if(f&&!f.options.length)f.innerHTML=FP.map(x=>'<option value="'+x[0]+'">'+x[1]+' '+x[2]+'</option>').join('');
+const mi=$('rsM');if(mi&&document.activeElement!==mi)mi.value=r.meta>0?r.meta:'';
+const tot=Math.round(rp.total);
+e.innerHTML='<div class="grid"><div class="stat"><div class="k">GUARDADO</div><div class="v good">'+money(r.g)+'</div></div><div class="stat"><div class="k">META</div><div class="v">'+(r.meta>0?money(r.meta):'sem meta')+'</div></div></div>'
++(r.meta>0?'<div style="height:10px;background:#f1e4cd;border-radius:6px;overflow:hidden;margin:10px 0 0"><div style="height:100%;width:'+pc+'%;background:'+(r.g>=r.meta?'var(--good)':'var(--accent)')+'"></div></div><div class="empty" style="margin:6px 0 0">'+pc+'% da meta'+(r.g>=r.meta?' · ✅ meta atingida':' · faltam '+money(r.meta-r.g))+'</div>':'')
++(rp.L.length?'<p style="margin:12px 0 4px">📦 Para repor os <b>'+rp.L.length+'</b> produto(s) em falta precisa de cerca de <b>'+money(tot)+'</b>'+(r.g>=tot?' · ✅ a reserva chega.':' · faltam <b>'+money(tot-r.g)+'</b> na reserva.')+'</p>'+(tot!==r.meta?'<button class="sec" onclick="rsMeta('+tot+')">Usar '+money(tot)+' como meta</button>':''):'<p class="empty" style="margin:10px 0 0">Não há produtos a repor agora.</p>');
+const H=$('rsH');if(H)H.innerHTML=r.mov.length?r.mov.slice(-8).reverse().map(m=>'<div class="item"><div>'+(m.valor>0?'＋ Guardado':'− Usado')+'<small>'+fmtD(m.data)+(m.hora?' '+m.hora:'')+(m.cx?' · Caixa atualizada':' · só acompanhamento')+'</small></div><b class="'+(m.valor>0?'good':'bad')+'">'+(m.valor>0?'+':'−')+money(Math.abs(m.valor))+'</b></div>').join(''):'<div class="empty">Ainda sem movimentos.</div>'}
+function rsMeta(v){const r=resD(),x=v!==undefined?v:parseFloat(String($('rsM').value).replace(',','.')||0);if(!(x>=0))return alert('Valor inválido.');r.meta=x;save();R();toast(x>0?'Meta guardada.':'Meta retirada.')}
+function rsMov(sg){if(!once())return;const r=resD(),v=n($('rsV').value),f=$('rsF').value||'din',cx=$('rsC').value==='1';
+if(!(v>0))return alert('Indique o valor.');if(sg<0&&v>r.g+0.005)return alert('A reserva só tem '+money(r.g)+'.');
+if(cx&&sg>0&&semSaldo(v,f))return;
+r.g=Math.max(0,r.g+sg*v);r.mov.push({id:uid(),data:td(),hora:hh(),valor:sg*v,cx:cx});if(r.mov.length>200)r.mov.splice(0,r.mov.length-200);
+if(cx)D.caixa.push({id:uid(),data:td(),hora:hh(),tipo:sg>0?'saida':'entrada',desc:sg>0?'Reserva para repor stock':'Da reserva para repor stock',valor:v,cat:'Reserva',forma:f,dv:'res',rs:1});
+save();$('rsV').value='';R();toast((sg>0?'Guardado na reserva':'Retirado da reserva')+(cx?' e Caixa atualizada.':'.')+(r.meta>0&&sg>0&&r.g>=r.meta?' 🎉 Meta atingida!':''))}
 /* ===== Apagados: lista para restaurar ===== */
 const apL=()=>{if(!Array.isArray(D.apagados))D.apagados=[];return D.apagados};
 function apLog(o){const l=apL();l.unshift(Object.assign({id:uid(),qd:td(),qh:hh()},o));if(l.length>60)l.length=60}
@@ -1333,6 +1408,16 @@ if(!confirm('Restaurar "'+a.mov.desc+'" ('+(a.mov.tipo==='entrada'?'+':'−')+mo
 apIns(a.mov)}
 else if(a.t==='troca'){if(a.movs.some(m=>D.caixa.some(c=>c.id===m.id))){l.splice(i,1);save();return R()}
 if(!confirm('Restaurar esta troca de '+money(a.movs[0].valor)+' ('+a.movs[0].desc.replace('Troca: ','')+')?'))return;a.movs.forEach(apIns)}
+else if(a.t==='venda'){const v=a.v;if(D.vendas.some(x=>x.id==v.id)){l.splice(i,1);save();return R()}
+const p=P(a.pid);if(!confirm('Restaurar a venda de '+v.nome+' ×'+c2(v.qtd)+' ('+money(v.qtd*v.preco)+')?'+(a.ds&&p?'\nO stock de '+p.nome+' desce '+c2(a.ds)+'.':'')+(a.dv?'\nA dívida do cliente volta.':'')+(a.cx.length?'\n'+a.cx.length+' movimento(s) voltam à Caixa.':'')))return;
+let j=D.vendas.length;const k=(v.data||'')+(v.hora||'');while(j>0&&((D.vendas[j-1].data||'')+(D.vendas[j-1].hora||''))>k)j--;D.vendas.splice(j,0,v);
+if(p&&a.ds)p.stock=a.ds>0?Math.max(0,p.stock-a.ds):p.stock-a.ds;
+if(a.pd&&!pdL().some(y=>y.id===a.pd.id))pdL().push(a.pd);if(a.dv&&!dvGet(a.dv.id))dvL().push(a.dv);a.cx.forEach(c=>{if(!D.caixa.some(y=>y.id===c.id))apIns(c)})}
+else if(a.t==='perda'){if(pdL().some(y=>y.id===a.x.id)){l.splice(i,1);save();return R()}
+const p=a.pid&&P(a.pid);if(!confirm('Restaurar este registo ('+a.x.nome+' ×'+c2(a.x.qtd)+')?'+(p&&a.ds?'\nO stock de '+p.nome+' desce '+c2(a.ds)+'.':'')))return;
+pdL().push(a.x);if(p&&a.ds)p.stock=Math.max(0,p.stock-a.ds)}
+else if(a.t==='prod'){if(P(a.p.id)){l.splice(i,1);save();return R()}
+if(!confirm('Restaurar o produto '+a.p.nome+'?\nO stock e o preço ficam como estavam quando o apagou.'))return;D.prods.push(a.p)}
 else{if(dvGet(a.d.id)){l.splice(i,1);save();return R()}
 if(!confirm('Restaurar a dívida de '+a.d.pessoa+' ('+money(dvF(a.d))+' em falta)?'+(a.cx.length?'\n'+a.cx.length+' pagamento(s) voltam à Caixa.':'')+(a.pd.length?'\nA mercadoria dada em pagamento volta a sair do stock.':'')))return;
 dvL().push(a.d);a.cx.forEach(apIns);
@@ -1340,9 +1425,9 @@ a.pd.forEach(x=>{const p=(x.pid&&P(x.pid))||D.prods.find(z=>z.nome===x.nome);if(
 l.splice(i,1);save();R()}
 function apClear(){if(!apL().length)return;if(!confirm('Limpar a lista de apagados? Já não poderá restaurar nada.'))return;D.apagados=[];save();R()}
 function AP(){const e=$('apBox');if(!e)return;const l=apL();
-const lab=a=>a.t==='caixa'?esc(a.mov.desc):a.t==='troca'?'🔄 '+esc(a.movs[0].desc):'🤝 Dívida: '+esc(a.d.pessoa)+(a.d.desc?' · '+esc(a.d.desc):'');
-const tp=a=>a.t==='divida'?'Dívida':a.t==='troca'?'Troca':'Movimento';
-const vl=a=>a.t==='caixa'?'<b class="'+(a.mov.tipo==='entrada'?'good':'bad')+'">'+(a.mov.tipo==='entrada'?'+':'−')+money(a.mov.valor)+'</b>':a.t==='troca'?'<b>'+money(a.movs[0].valor)+'</b>':'<b>'+money(a.d.valor)+'</b>';
+const lab=a=>a.t==='caixa'?esc(a.mov.desc):a.t==='troca'?'🔄 '+esc(a.movs[0].desc):a.t==='venda'?'🛍️ '+esc(a.v.nome)+' ×'+c2(a.v.qtd):a.t==='perda'?'📉 '+esc(a.x.nome)+' ×'+c2(a.x.qtd):a.t==='prod'?'📦 '+esc(a.p.nome):'🤝 Dívida: '+esc(a.d.pessoa)+(a.d.desc?' · '+esc(a.d.desc):'');
+const tp=a=>a.t==='divida'?'Dívida':a.t==='troca'?'Troca':a.t==='venda'?'Venda':a.t==='perda'?'Perda':a.t==='prod'?'Produto':'Movimento';
+const vl=a=>a.t==='caixa'?'<b class="'+(a.mov.tipo==='entrada'?'good':'bad')+'">'+(a.mov.tipo==='entrada'?'+':'−')+money(a.mov.valor)+'</b>':a.t==='troca'?'<b>'+money(a.movs[0].valor)+'</b>':a.t==='venda'?'<b>'+money(a.v.qtd*a.v.preco)+'</b>':a.t==='perda'?'<b>'+money(pdV(a.x))+'</b>':a.t==='prod'?'<b>'+money(a.p.venda)+'</b>':'<b>'+money(a.d.valor)+'</b>';
 e.innerHTML=l.length?l.slice(0,20).map(a=>`<div class="item"><div>${lab(a)}<small>${tp(a)} · apagado em ${fmtD(a.qd)}${a.qh?' '+a.qh:''}</small></div><div>${vl(a)} <button class="mini sec" onclick="apRest('${a.id}')">↩️ Restaurar</button></div></div>`).join('')+'<button class="sec" onclick="apClear()" style="margin-top:10px">Limpar lista</button>':empty('Nada apagado.')}
 /* ===== Comida e gastos pessoais: limite diário ===== */
 const limCom=()=>Number(D.limComida)||0;
