@@ -258,6 +258,7 @@ html[data-t=dark] [style*="border-color:#e4bd7d"]{border-color:#6b5230!important
 <div id="cnHist" style="margin-top:12px"></div></div>
 </div>
 <div class="sx" data-sx="repor">
+<div class="card"><h2>📦 Repor por stock mínimo</h2><p class="empty" style="margin:-6px 0 8px">Produto com stock no mínimo ou abaixo: a app sugere uma <b>meia</b> embalagem. Com metade do mínimo ou menos: sugere uma <b>completa</b>. O mínimo de cada produto é o campo "Stock mínimo para alerta".</p><div id="rpMC"></div></div>
 <div class="card"><h2>🛒 Lista de compras sugerida</h2>
 <p class="empty" style="margin:-6px 0 8px">A app vê quanto vende cada produto por dia (últimas 4 semanas) e sugere quanto comprar para durar o número de dias que escolher.</p>
 <label>Quero stock para</label><select id="rpD" onchange="rpSet(this.value)"><option value="7">7 dias</option><option value="15">15 dias</option><option value="30">30 dias</option></select>
@@ -727,7 +728,7 @@ const mes=td().slice(0,7),sum=l=>({r:l.reduce((s,v)=>s+v.qtd*v.preco,0),l:l.redu
 const h=sum(hoje),m=sum(D.vendas.filter(v=>v.data.startsWith(mes))),sv=D.prods.reduce((s,p)=>s+p.stock*custo(p),0),zero=D.prods.filter(p=>p.stock<=0).length;
 const bx=(t,a,b,c,x)=>`<div class="card"><h2>${t}</h2><div class="grid"><div class="stat"><div class="k">VENDAS</div><div class="v">${a}</div></div><div class="stat"><div class="k">RECEITA</div><div class="v">${money(b)}</div></div><div class="stat" style="grid-column:1/-1"><div class="k">LUCRO</div><div class="v good">${money(c)}</div></div></div>${x||''}</div>`;
 const low=D.prods.filter(p=>p.stock<=mn(p)).sort((a,b)=>a.stock-b.stock);
-const alertCard=low.length?`<div class="card"><h2>Stock baixo (${low.length})</h2>`+low.map(p=>`<div class="item"><div>${esc(p.nome)}<small>Mínimo ${mn(p)} un.</small></div><b class="${p.stock<=0?'bad':'warn'}">${p.stock} un.</b></div>`).join('')+'</div>':'';
+const alertCard=low.length?`<div class="card"><h2>Stock baixo (${low.length})</h2>`+low.map(p=>`<div class="item"><div>${esc(p.nome)}<small>Mínimo ${mn(p)} un.${repSugT(p)}</small></div><b class="${p.stock<=0?'bad':'warn'}">${p.stock} un.</b></div>`).join('')+'</div>':'';
 $('vAlert').innerHTML=low.length?`<div class="card" style="border-color:#e4bd7d;background:var(--soft)"><b>⚠️ ${low.length} produto(s) com stock baixo</b><small style="display:block;color:var(--sub);margin-top:3px">${low.slice(0,3).map(p=>esc(p.nome)).join(', ')}${low.length>3?'…':''} — veja o Resumo.</small></div>`:'';
 const{ag}=relData();
 const rows=Object.entries(ag).sort((a,b)=>b[1].l-a[1].l).map(([k,a])=>`<div class="item"><div><b>${esc(k)}</b><small>${a.q} un. vendidas · ${money(a.r)}</small></div><b class="good">${money(a.l)}</b></div>`).join('');
@@ -769,7 +770,7 @@ const f=fechoData(fdia),low=D.prods.filter(p=>p.stock<=mn(p)).sort((a,b)=>a.stoc
 const rw=(t,v,c,b)=>`<div class="item"><div>${b?'<b>'+t+'</b>':t}</div><b class="${c||''}">${v}</b></div>`;
 const pv=Object.entries(f.ag).sort((a,b)=>b[1].q-a[1].q).map(([k,a])=>`<div class="item"><div>${esc(k)}<small>${money(a.r)}</small></div><b>${c2(a.q)} un.</b></div>`).join('');
 const pc=f.compras.map(c=>`<div class="item"><div>${esc(c.nome)}<small>+${c2(c.un)} un.</small></div><b>${money(c.total)}</b></div>`).join('');
-const pl=low.map(p=>`<div class="item"><div>${esc(p.nome)}<small>Mínimo ${mn(p)} un.</small></div><b class="${p.stock<=0?'bad':'warn'}">${p.stock} un.</b></div>`).join('');
+const pl=low.map(p=>`<div class="item"><div>${esc(p.nome)}<small>Mínimo ${mn(p)} un.${repSugT(p)}</small></div><b class="${p.stock<=0?'bad':'warn'}">${p.stock} un.</b></div>`).join('');
 const cd=(t,b)=>`<div class="card"><h2>${t}</h2>${b}</div>`;
 $('fBox').innerHTML=`<div class="card"><h2>Fecho do dia</h2><label>Dia</label><input type="date" value="${fdia}" max="${td()}" onchange="setF(this.value)"><button onclick="printFecho()">📄 Gerar PDF do fecho</button><button class="sec" onclick="partilharFecho()">📤 Partilhar (WhatsApp)</button></div>`
 +cd('💵 Dinheiro do dia',rw('Vendas feitas',f.n)+rw('Receita (total vendido)',money(f.rec))+(f.dsc?rw('🏷️ Descontos dados (já tirados da receita)',money(f.dsc)):'')+rw('Custo dos produtos vendidos','−'+money(f.cst))+rw('Lucro bruto',money(f.bruto),f.bruto<0?'bad':'good',1)+rw('Despesas','−'+money(f.desp))+(f.trV?rw('↳ 🌙 Transporte de volta (já nas despesas)',money(f.trV),''):'')+(f.capD?rw('🌅 Transporte de ida (sai do capital)','−'+money(f.capD)):'')+(f.perd?rw('Perdas e ofertas','−'+money(f.perd)):'')+rw('Lucro líquido',money(f.liq),f.liq<0?'bad':'good',1)+(f.comi?rw('🍽️ Comida / pessoal (fora do lucro)',money(f.comi)+(limCom()?' de '+money(limCom()):''),limCom()&&f.comi>limCom()?'bad':''):'')+(f.liq>0?rw('Guardar para repor stock (50%)',money(f.liq*0.5)):''))
@@ -1014,7 +1015,7 @@ const dias=D.ultBackup?Math.floor((new Date(td()+'T12:00:00')-new Date(D.ultBack
 const hoje2=D.vendas.some(v=>v.data===td())||D.compras.some(c=>c.data===td())||D.caixa.some(c=>c.data===td()),bk=(dias===null||dias>=2||(dias>=1&&hoje2))?`<div class="card" style="border-color:#e4bd7d;background:var(--soft)"><b>💾 ${dias===null?'Ainda não fez backup.':(dias===1?'Ainda não fez backup hoje.':'Último backup há '+dias+' dias.')}</b><small style="display:block;color:var(--sub);margin:3px 0 0">Se o telemóvel se perder ou avariar, os dados perdem-se. Envie um backup para o WhatsApp ou email.</small><button onclick="partilharBackup()">📤 Enviar backup agora</button></div>`:'';
 const st=(k,v,c)=>`<div class="stat"><div class="k">${k}</div><div class="v ${c||''}">${v}</div></div>`;
 const top=Object.entries(f.ag).sort((a,b)=>b[1].q-a[1].q).slice(0,3).map(([k,a],i)=>{const p=D.prods.find(x=>x.nome===k);return`<div class="item"><div class="pi"><span class="rk">${i+1}</span>${p?av(p,40):''}<div>${esc(k)}<small>${money(a.r)}</small></div></div><b>${c2(a.q)} un.</b></div>`}).join('');
-const low=D.prods.filter(p=>p.stock<=mn(p)).sort((a,b)=>a.stock-b.stock),lw=low.slice(0,5).map(p=>`<div class="item"><div class="pi">${av(p,40)}<div>${esc(p.nome)}<small>Mínimo ${mn(p)} un.</small></div></div><b class="${p.stock<=0?'bad':'warn'}">${p.stock} un.</b></div>`).join('');
+const low=D.prods.filter(p=>p.stock<=mn(p)).sort((a,b)=>a.stock-b.stock),lw=low.slice(0,5).map(p=>`<div class="item"><div class="pi">${av(p,40)}<div>${esc(p.nome)}<small>Mínimo ${mn(p)} un.${repSugT(p)}</small></div></div><b class="${p.stock<=0?'bad':'warn'}">${p.stock} un.</b></div>`).join('');
 $('iBox').innerHTML=storCard()+reporCard()+bk+dvIni()+focoCard()+valCard()
 +cd('🏠 Hoje · '+fmtD(td()),`<div class="grid">${st('VENDAS',f.n)}${st('RECEITA',money(f.rec))}${st('LUCRO BRUTO',money(f.bruto),f.bruto<0?'bad':'good')}${st('SALDO DA CAIXA',money(tot),tot<0?'bad':'')}</div><div class="two" style="margin-top:12px"><button onclick="goTab('vendas')">🛍️ Registar venda</button><button class="sec" onclick="goTab('fecho')">📒 Fecho do dia</button></div>`)
 +cd('🏆 Mais vendidos hoje',top||empty('Ainda sem vendas hoje.'))
@@ -1119,11 +1120,28 @@ L.sort((a,b)=>a.urg-b.urg||a.dias-b.dias);
 let mi=null;D.vendas.forEach(v=>{if(mi===null||v.data<mi)mi=v.data});
 return{L:L,sem:sem,total:total,cov:cov,poucos:mi===null||dd(mi,h)<14}}
 function rpSet(v){D.repDias=+v;save();RP()}
+/* ===== Regra de reposição: meia / completa ===== */
+function repUm(p){if(!(p.stock>=0&&p.stock<=mn(p)))return null;const u=p.unEmb>0?p.unEmb:0;if(!u)return{p,sem:true};
+const mi=mn(p),st=p.stock,comp=st<=mi*0.5,par=u>=2&&u%2===0,tipo=comp||!par?'completa':'meia',pe=p.precoEmb>0?p.precoEmb:custo(p)*u,cost=tipo==='meia'?(p.precoMeia>0?p.precoMeia:pe/2):pe;
+return{p,tipo,un:tipo==='meia'?u/2:u,cost,st,mi,forcada:!comp&&!par,pct:mi>0?Math.round(st/mi*100):0}}
+function repMC(){const L=[],sem=[];let nC=0,nM=0,cC=0,cM=0;D.prods.forEach(p=>{const r=repUm(p);if(!r)return;if(r.sem){sem.push(p);return}L.push(r);if(r.tipo==='meia'){nM++;cM+=r.cost}else{nC++;cC+=r.cost}});
+L.sort((a,b)=>(a.tipo==='completa'?0:1)-(b.tipo==='completa'?0:1)||a.st-b.st);return{L,sem,nC,nM,emb:nC+nM/2,cC,cM,cost:cC+cM}}
+const repSugT=p=>{const r=repUm(p);return r&&r.tipo?' · pôr 1 '+r.tipo:''};
+const repTxt=(nC,nM)=>(nC?nC+(nC===1?' completa':' completas'):'')+(nC&&nM?' + ':'')+(nM?nM+(nM===1?' meia':' meias'):'');
+function rpEntradaM(id,tipo){goTab('armazem','ent');const s=$('aProd');if(s){s.value=id;if(typeof fillEmb==='function')fillEmb()}if($('aEmb'))$('aEmb').value=tipo==='completa'?1:'';if($('aMeia'))$('aMeia').value=tipo==='meia'?1:'';if(typeof emSoma==='function')emSoma();window.scrollTo(0,0)}
+function RPM(){const e=$('rpMC');if(!e)return;const r=repMC();
+if(!r.L.length&&!r.sem.length){e.innerHTML='<span class="empty">✅ Nenhum produto está no stock mínimo ou abaixo.</span>';return}
+let h='';
+if(r.L.length)h+='<div style="margin-bottom:8px"><b>Total a repor: '+repTxt(r.nC,r.nM)+' = '+embF(r.emb)+' emb. · '+money(Math.round(r.cost))+'</b><small style="display:block;color:var(--sub)">'+(r.nC?'Completas: '+r.nC+' · '+money(Math.round(r.cC)):'')+(r.nC&&r.nM?'  |  ':'')+(r.nM?'Meias: '+r.nM+' · '+money(Math.round(r.cM)):'')+'</small></div>';
+h+=r.L.map(x=>{const cor=x.tipo==='completa'?'var(--bad)':'#e0a000';
+return '<div class="item" style="align-items:flex-start;gap:12px">'+av(x.p,52)+'<div style="flex:1;min-width:0"><b>'+esc(x.p.nome)+'</b><small style="display:block;color:var(--sub)">Stock '+c2(x.st)+' un. · mínimo '+c2(x.mi)+' un. ('+x.pct+'%)</small><div style="margin-top:4px;color:'+cor+';font-weight:700">Pôr 1 '+x.tipo+' ('+c2(x.un)+' un.) · '+money(Math.round(x.cost))+'</div>'+(x.forcada?'<small style="display:block;color:var(--sub)">A embalagem tem unidades ímpares: a meia não dá, por isso é uma completa.</small>':'')+'<button class="mini" style="margin:6px 0 0;width:auto" onclick="rpEntradaM(\''+x.p.id+'\',\''+x.tipo+'\')">Dar entrada</button></div></div>'}).join('');
+if(r.sem.length)h+='<p class="empty" style="margin:10px 0 0">'+r.sem.length+' produto(s) no stock mínimo sem "unidades por embalagem": '+r.sem.slice(0,4).map(p=>esc(p.nome)).join(', ')+(r.sem.length>4?'…':'')+'. Edite o produto para a app poder sugerir meia ou completa.</p>';
+e.innerHTML=h}
 function rpEntrada(id,packs){goTab('armazem','ent');const s=$('aProd');if(s){s.value=id;if(typeof fillEmb==='function')fillEmb()}if(packs&&$('aEmb'))$('aEmb').value=packs;if($('aMeia'))$('aMeia').value='';if(typeof emSoma==='function')emSoma();window.scrollTo(0,0)}
 function rpShare(){const r=rpDados();if(!r.L.length)return alert('Não há nada a repor com este número de dias.');
 const t='🛒 Lista de compras — '+fmtD(td())+' (stock para '+r.cov+' dias)\n'+r.L.map(x=>'• '+x.p.nome+' — '+(x.packs?x.packs+' emb. ('+c2(x.qty)+' un.)':c2(x.qty)+' un.')+' ~ '+money(Math.round(x.cost))).join('\n')+'\nTotal estimado: '+money(Math.round(r.total));
 if(navigator.share){navigator.share({text:t}).catch(()=>{})}else if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(()=>toast('Lista copiada.'),()=>prompt('Copie a lista:',t))}else prompt('Copie a lista:',t)}
-function RP(){const b=$('rpL');if(!b)return;if($('rpD'))$('rpD').value=String(D.repDias||15);const r=rpDados();
+function RP(){RPM();const b=$('rpL');if(!b)return;if($('rpD'))$('rpD').value=String(D.repDias||15);const r=rpDados();
 $('rpSum').innerHTML=r.L.length?'<b>'+r.L.length+' produto(s) a repor</b> · total estimado <b>'+money(Math.round(r.total))+'</b>'+(r.poucos?'<p class="empty" style="margin:4px 0 0">Ainda há poucos dias de vendas registadas: a estimativa vai melhorando com o tempo.</p>':''):'<span class="empty">✅ Com '+r.cov+' dias de cobertura, não há nada a repor agora.</span>';
 b.innerHTML=r.L.map(x=>{const cor=x.urg<=1?'var(--bad)':x.urg===2?'#e0a000':'var(--good)',ic=x.urg<=1?'🔴':x.urg===2?'🟡':'🟢',dz=x.st<=0?'Sem stock':'dá para '+(x.dias<1?'menos de 1 dia':Math.floor(x.dias)+' dia(s)');
 return '<div class="item" style="align-items:flex-start;gap:12px">'+av(x.p,52)+'<div style="flex:1;min-width:0"><b>'+esc(x.p.nome)+'</b><small style="display:block;color:var(--sub)">Vende ~'+c2(Math.round(x.rate*10)/10)+' por dia · stock '+c2(x.p.stock)+'</small><small style="display:block;color:'+cor+';font-weight:700">'+ic+' '+dz+'</small><div style="margin-top:4px">Comprar: <b>'+(x.packs?x.packs+' emb. ('+c2(x.qty)+' un.)':c2(x.qty)+' un.')+'</b> · ~'+money(Math.round(x.cost))+'</div><button class="mini" style="margin:6px 0 0;width:auto" onclick="rpEntrada(\''+x.p.id+'\','+(x.packs||0)+')">Dar entrada</button></div></div>'}).join('')+(r.sem?'<p class="empty" style="margin:10px 0 0">'+r.sem+' produto(s) sem vendas recentes não entram na lista.</p>':'')}
@@ -1139,8 +1157,9 @@ const sp=ab.filter(d=>!d.prazo).length;if(sp)R.push([1,sp+' dívida(s) sem prazo
 S.push({ic:'🤝',n:'Dívidas',g:"goTab('dividas')",ok:'Tudo em dia',R})}
 {const R=[],P=D.prods,sa=stockAl(),ng=sa.ng;
 if(ng.length)R.push([2,ng.length+' produto(s) com stock negativo: '+nomes(ng)+' · erro de registo',0]);
-const z=sa.z;if(z.length)R.push([2,z.length+' produto(s) sem stock: '+nomes(z),0,"goTab('armazem','repor')"]);
-const bx=sa.bx;if(bx.length)R.push([1,bx.length+' produto(s) com stock baixo: '+nomes(bx),0,"goTab('armazem','repor')"]);
+{const rp=repMC();if(rp.L.length){const dt=rp.L.slice(0,4).map(x=>esc(x.p.nome)+' ('+c2(x.st)+' de '+c2(x.mi)+') → '+x.tipo).join('<br>');
+R.push([rp.nC?2:1,'📦 Repor: '+repTxt(rp.nC,rp.nM)+' = '+embF(rp.emb)+' emb. · total '+money(Math.round(rp.cost))+'<br><span style="font-size:.8rem">'+dt+(rp.L.length>4?'<br>+ '+(rp.L.length-4)+' mais…':'')+'</span>',0,"goTab('armazem','repor')"])}
+if(rp.sem.length)R.push([1,rp.sem.length+' produto(s) com stock baixo e sem "unidades por embalagem": '+nomes(rp.sem),0,"goTab('armazem','repor')"])}
 valAl().forEach(p=>{const d=dvDias(p.val);if(d<0)R.push([2,esc(p.nome)+' · validade passou há '+dias(-d)+' (stock '+c2(p.stock)+')',-d]);else R.push([d<=7?2:1,esc(p.nome)+' · validade '+quando(d)+' (stock '+c2(p.stock)+')',0])});
 const pc=P.filter(p=>p.venda>0&&custo(p)>0&&p.venda<custo(p));if(pc.length)R.push([2,pc.length+' produto(s) com preço de venda abaixo do custo: '+nomes(pc),0]);
 if(P.length){const cs=cnL().map(c=>c.data).sort(),uc=cs.length?cs[cs.length-1]:null,dc=uc?dd(uc,h):null;if(dc===null||dc>=14)R.push([dc===null||dc>=30?2:1,dc===null?'Ainda não contou o stock · toque aqui':'Há '+dias(dc)+' que não conta o stock · toque aqui',0,"goTab('armazem','perd')"])}
