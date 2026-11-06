@@ -200,6 +200,8 @@ html[data-t=dark] [style*="border-color:#e4bd7d"]{border-color:#6b5230!important
 <label>🏷️ Promoção (opcional): leve quantas unidades?</label><input id="ePQ" type="number" inputmode="decimal" placeholder="ex.: 3">
 <label>…por quantos Kz no total?</label><input id="ePP" type="number" inputmode="decimal" placeholder="ex.: 100">
 <label>Avisar quando o stock chegar a (unidades)</label><input id="eMin" type="number" inputmode="decimal" min="0">
+<label>Stock ideal (opcional): repor até quantas unidades?</label><input id="eIdeal" type="number" inputmode="decimal" min="0" placeholder="vazio = igual ao mínimo">
+<label>Este produto vende meia embalagem?</label><select id="eMeia"><option value="1">Sim</option><option value="0">Não: a app sugere sempre completa</option></select>
 <label>Validade (data de expiração)</label><input id="eVal" type="date">
 <p class="empty" id="eInfo" style="margin:8px 0 0"></p>
 <div class="two" style="margin-top:12px"><button onclick="saveEdit()">Guardar</button><button class="sec" onclick="fillEdit(editId)">Desfazer</button></div></div>
@@ -212,6 +214,8 @@ html[data-t=dark] [style*="border-color:#e4bd7d"]{border-color:#6b5230!important
 <label>🏷️ Promoção (opcional): leve quantas unidades?</label><input id="nPQ" type="number" inputmode="decimal" placeholder="ex.: 3">
 <label>…por quantos Kz no total?</label><input id="nPP" type="number" inputmode="decimal" placeholder="ex.: 100">
 <label>Stock mínimo para alerta (unidades)</label><input id="nMin" type="number" inputmode="decimal" placeholder="5">
+<label>Stock ideal (opcional): repor até quantas unidades?</label><input id="nIdeal" type="number" inputmode="decimal" min="0" placeholder="vazio = igual ao mínimo">
+<label>Este produto vende meia embalagem?</label><select id="nMeia"><option value="1">Sim</option><option value="0">Não: a app sugere sempre completa</option></select>
 <label>Validade (opcional)</label><input id="nVal" type="date">
 <label>Foto do produto (opcional)</label><input id="nFoto" type="file" accept="image/*">
 <button onclick="novoProd()">Adicionar produto</button></div>
@@ -258,13 +262,10 @@ html[data-t=dark] [style*="border-color:#e4bd7d"]{border-color:#6b5230!important
 <div id="cnHist" style="margin-top:12px"></div></div>
 </div>
 <div class="sx" data-sx="repor">
-<div class="card"><h2>📦 Repor por stock mínimo</h2><p class="empty" style="margin:-6px 0 8px">Produto com stock no mínimo ou abaixo: a app sugere uma <b>meia</b> embalagem. Com metade do mínimo ou menos: sugere uma <b>completa</b>. O mínimo de cada produto é o campo "Stock mínimo para alerta".</p><div id="rpMC"></div></div>
-<div class="card"><h2>🛒 Lista de compras sugerida</h2>
-<p class="empty" style="margin:-6px 0 8px">A app vê quanto vende cada produto por dia (últimas 4 semanas) e sugere quanto comprar para durar o número de dias que escolher.</p>
+<div class="card"><h2>📦 Repor stock</h2>
+<p class="empty" style="margin:-6px 0 8px">Uma linha por produto. Entra aqui quem está no <b>mínimo</b> ou abaixo (repõe até ao <b>stock ideal</b>, ou até ao mínimo se não houver ideal) e quem, pelas <b>vendas</b> das últimas 4 semanas, não chega para os dias escolhidos. Quando as duas regras pedem coisas diferentes, vale a maior quantidade.</p>
 <label>Quero stock para</label><select id="rpD" onchange="rpSet(this.value)"><option value="7">7 dias</option><option value="15">15 dias</option><option value="30">30 dias</option></select>
-<div id="rpSum" style="margin:10px 0 4px"></div>
-<div id="rpL"></div>
-<button onclick="rpShare()">📤 Enviar / copiar a lista</button></div>
+<div id="rpMC" style="margin-top:10px"></div></div>
 </div>
 <div class="sx" data-sx="hist">
 <div class="card"><h2>📥 Entradas de stock (saldo positivo)</h2><p class="empty" style="margin:-6px 0 8px">Unidades que entraram, por mês e por dia: compras e devoluções que voltaram ao stock.</p><div id="armHistE"></div></div>
@@ -532,7 +533,7 @@ async function novoProd(){const nome=$('nNome').value.trim(),un=n($('nUn').value
 if(!nome||un<=0)return alert('Indique o nome e as unidades por embalagem.');
 if(D.prods.some(p=>p.nome.toLowerCase()===nome.toLowerCase()))return alert('Esse produto já existe.');
 const pq=n($('nPQ').value),pp=n($('nPP').value);if((pq>0||pp>0)&&!(pq>=2&&pp>0))return alert('Promoção: escreva as unidades (2 ou mais) e o preço total.');
-const np={id:uid(),nome,unEmb:un,precoEmb:pe,venda:v,stock:0,promoQ:pq>=2&&pp>0?pq:undefined,promoP:pq>=2&&pp>0?pp:undefined,val:$('nVal').value||'',min:$('nMin').value===''?5:n($('nMin').value)},ff=$('nFoto').files[0];if(ff){try{np.img=await imgFile(ff)}catch(e){alert('Não foi possível usar a foto. O produto foi guardado sem foto.')}}D.prods.push(np);save();['nNome','nUn','nPreco','nVenda','nMin','nVal','nFoto','nPQ','nPP'].forEach(i=>$(i).value='');R()}
+const np={id:uid(),nome,unEmb:un,precoEmb:pe,venda:v,stock:0,promoQ:pq>=2&&pp>0?pq:undefined,promoP:pq>=2&&pp>0?pp:undefined,val:$('nVal').value||'',min:$('nMin').value===''?5:n($('nMin').value),meia:$('nMeia').value==='0'?false:undefined,ideal:n($('nIdeal').value)>0?n($('nIdeal').value):undefined},ff=$('nFoto').files[0];if(ff){try{np.img=await imgFile(ff)}catch(e){alert('Não foi possível usar a foto. O produto foi guardado sem foto.')}}D.prods.push(np);save();['nNome','nUn','nPreco','nVenda','nMin','nVal','nFoto','nPQ','nPP'].forEach(i=>$(i).value='');$('nIdeal').value='';$('nMeia').value='1';R()}
 function editVenda(id){const p=P(id),v=prompt('Novo preço de venda por unidade ('+p.nome+'):',p.venda);if(v===null||!p)return;const x=n(v);if(x<=0)return alert('O preço de venda tem de ser maior que zero.');p.venda=x;save();R()}
 const mn=p=>p.min??5;
 let per='semana';const setPer=v=>{per=v;R()};
@@ -859,7 +860,7 @@ assina();window.print()}
 /* ===== Editar produto ===== */
 let editId=null,eSig='';
 function fillEdit(id){const p=P(id);editId=p?p.id:null;
-$('eNome').value=p?p.nome:'';$('eUn').value=p?p.unEmb:'';$('ePreco').value=p?p.precoEmb:'';$('eVenda').value=p?p.venda:'';$('eMin').value=p?mn(p):'';$('eVal').value=p&&p.val?p.val:'';$('ePQ').value=p&&p.promoQ?p.promoQ:'';$('ePP').value=p&&p.promoP?p.promoP:'';
+$('eNome').value=p?p.nome:'';$('eUn').value=p?p.unEmb:'';$('ePreco').value=p?p.precoEmb:'';$('eVenda').value=p?p.venda:'';$('eMin').value=p?mn(p):'';$('eMeia').value=p&&p.meia===false?'0':'1';$('eIdeal').value=p&&p.ideal>0?p.ideal:'';$('eVal').value=p&&p.val?p.val:'';$('ePQ').value=p&&p.promoQ?p.promoQ:'';$('ePP').value=p&&p.promoP?p.promoP:'';
 if($('eSel').value!==String(editId||''))$('eSel').value=editId||'';
 $('eImg').innerHTML=p?av(p,44,1):'';
 $('eInfo').textContent=p?'As vendas antigas não mudam. O novo custo só vale para as próximas vendas. Se mudar o preço ou as unidades da embalagem, o custo médio recomeça nesse preço.':'Ainda não há produtos. Crie um produto novo mais abaixo.'}
@@ -874,7 +875,7 @@ const nome=$('eNome').value.trim(),un=n($('eUn').value),pe=n($('ePreco').value),
 if(!nome||un<=0)return alert('Indique o nome e as unidades por embalagem.');
 if(D.prods.some(x=>x.id!==p.id&&x.nome.toLowerCase()===nome.toLowerCase()))return alert('Já existe outro produto com esse nome.');
 if(nome!==p.nome){const antigo=p.nome;D.vendas.forEach(x=>{if(x.pid===p.id)x.nome=nome});D.compras.forEach(x=>{if(x.nome===antigo)x.nome=nome});pdL().forEach(x=>{if(x.pid===p.id)x.nome=nome});D.caixa.forEach(c=>{if(c.desc&&c.desc.indexOf(antigo)>=0&&c.ref)c.desc=c.desc.split(antigo).join(nome)})}
-if(pe!==p.precoEmb||un!==p.unEmb)delete p.cm;p.nome=nome;p.unEmb=un;p.precoEmb=pe;p.venda=v;if(pq>=2&&pp>0){p.promoQ=pq;p.promoP=pp}else{delete p.promoQ;delete p.promoP}p.min=mi;p.val=$('eVal').value||'';save();R();fillEdit(p.id);$('eInfo').textContent='✔ Produto guardado.';
+if(pe!==p.precoEmb||un!==p.unEmb)delete p.cm;p.nome=nome;p.unEmb=un;p.precoEmb=pe;p.venda=v;if(pq>=2&&pp>0){p.promoQ=pq;p.promoP=pp}else{delete p.promoQ;delete p.promoP}p.min=mi;if($('eMeia').value==='0')p.meia=false;else delete p.meia;if(n($('eIdeal').value)>0)p.ideal=n($('eIdeal').value);else delete p.ideal;p.val=$('eVal').value||'';save();R();fillEdit(p.id);$('eInfo').textContent='✔ Produto guardado.';
 if(v>0&&pe>0&&v<pe/un)alert('Atenção: o preço de venda ('+money(v)+') é menor que o custo ('+money(pe/un)+').')}
 /* ===== PIN + cifra dos dados (AES-256-GCM; a chave fica protegida pelo PIN e pela frase) ===== */
 const PK='bejoma_pin',FK='bejoma_pin_fail',PIL=200000,PIT=500000;let away=0,lkT=0,busy=0,tmpDek=null;
@@ -1112,39 +1113,50 @@ function rpDados(){const h=td(),dd=(a,c)=>Math.round((new Date(c+'T12:00:00')-ne
 D.vendas.forEach(v=>{if(!first[v.pid]||v.data<first[v.pid])first[v.pid]=v.data});
 const W={},ini={};Object.keys(first).forEach(k=>{W[k]=Math.min(28,Math.max(7,dd(first[k],h)));ini[k]=adD(h,-W[k])});
 const q={};D.vendas.forEach(v=>{if(ini[v.pid]&&v.data>=ini[v.pid]&&v.data<h)q[v.pid]=(q[v.pid]||0)+v.qtd});
-const L=[];let sem=0,total=0;
-D.prods.forEach(p=>{const rate=W[p.id]?(q[p.id]||0)/W[p.id]:0;if(!(rate>0)){sem++;return}const st=Math.max(0,p.stock),need=Math.ceil(rate*cov-st);if(need<=0)return;
+const L=[],rates={};let sem=0,total=0;
+D.prods.forEach(p=>{const rate=W[p.id]?(q[p.id]||0)/W[p.id]:0;rates[p.id]=rate;if(!(rate>0)){sem++;return}const st=Math.max(0,p.stock),need=Math.ceil(rate*cov-st);if(need<=0)return;
 const u=p.unEmb>0?p.unEmb:0,packs=u>0?Math.ceil(need/u):null,qty=u>0?packs*u:need,cost=u>0&&p.precoEmb>0?packs*p.precoEmb:custo(p)*qty,dias=st>0?st/rate:0,urg=st<=0?0:dias<=3?1:dias<=7?2:3;
 total+=cost;L.push({p:p,rate:rate,st:st,dias:dias,urg:urg,packs:packs,qty:qty,cost:cost})});
 L.sort((a,b)=>a.urg-b.urg||a.dias-b.dias);
 let mi=null;D.vendas.forEach(v=>{if(mi===null||v.data<mi)mi=v.data});
-return{L:L,sem:sem,total:total,cov:cov,poucos:mi===null||dd(mi,h)<14}}
+return{L:L,rates:rates,sem:sem,total:total,cov:cov,poucos:mi===null||dd(mi,h)<14}}
 function rpSet(v){D.repDias=+v;save();RP()}
-/* ===== Regra de reposição: meia / completa ===== */
-function repUm(p){if(!(p.stock>=0&&p.stock<=mn(p)))return null;const u=p.unEmb>0?p.unEmb:0;if(!u)return{p,sem:true};
-const mi=mn(p),st=p.stock,comp=st<=mi*0.5,par=u>=2&&u%2===0,tipo=comp||!par?'completa':'meia',pe=p.precoEmb>0?p.precoEmb:custo(p)*u,cost=tipo==='meia'?(p.precoMeia>0?p.precoMeia:pe/2):pe;
-return{p,tipo,un:tipo==='meia'?u/2:u,cost,st,mi,forcada:!comp&&!par,pct:mi>0?Math.round(st/mi*100):0}}
-function repMC(){const L=[],sem=[];let nC=0,nM=0,cC=0,cM=0;D.prods.forEach(p=>{const r=repUm(p);if(!r)return;if(r.sem){sem.push(p);return}L.push(r);if(r.tipo==='meia'){nM++;cM+=r.cost}else{nC++;cC+=r.cost}});
-L.sort((a,b)=>(a.tipo==='completa'?0:1)-(b.tipo==='completa'?0:1)||a.st-b.st);return{L,sem,nC,nM,emb:nC+nM/2,cC,cM,cost:cC+cM}}
-const repSugT=p=>{const r=repUm(p);return r&&r.tipo?' · pôr 1 '+r.tipo:''};
+/* ===== Repor stock: uma só lista (mínimo + ideal + vendas) ===== */
+function repU(p,rate){const cov=+(D.repDias||15),mi=mn(p),st=Math.max(0,p.stock),ide=p.ideal>mi?p.ideal:mi,rt=rate>0?rate:0,
+a=p.stock<=mi,nA=a?Math.max(ide>mi?ide-st:mi-st+1,1):0,nB=rt>0?Math.ceil(rt*cov-st):0;
+if(!a&&nB<=0)return null;
+const need=Math.max(nA,nB),u=p.unEmb>0?p.unEmb:0,sm=p.meia!==false&&u>=2&&u%2===0,pe=p.precoEmb>0?p.precoEmb:custo(p)*u,pm=p.precoMeia>0?p.precoMeia:pe/2;
+let c=0,m=0,un=need;
+if(u){if(sm){const h=Math.ceil(need/(u/2));c=Math.floor(h/2);m=h%2}else c=Math.ceil(need/u);un=c*u+m*u/2}
+const cost=u?c*pe+m*pm:custo(p)*un,dias=rt>0&&st>0?st/rt:0,urg=st<=0?0:((rt>0&&dias<=3)||st<=mi*0.5)?1:((rt>0&&dias<=7)||st<=mi)?2:3;
+return{p,st,mi,ide,rate:rt,need,c,m,un,u,cost,dias,urg,por:a&&nB>0?'ambos':a?'min':'vendas',apos:st+un}}
 const repTxt=(nC,nM)=>(nC?nC+(nC===1?' completa':' completas'):'')+(nC&&nM?' + ':'')+(nM?nM+(nM===1?' meia':' meias'):'');
-function rpEntradaM(id,tipo){goTab('armazem','ent');const s=$('aProd');if(s){s.value=id;if(typeof fillEmb==='function')fillEmb()}if($('aEmb'))$('aEmb').value=tipo==='completa'?1:'';if($('aMeia'))$('aMeia').value=tipo==='meia'?1:'';if(typeof emSoma==='function')emSoma();window.scrollTo(0,0)}
-function RPM(){const e=$('rpMC');if(!e)return;const r=repMC();
-if(!r.L.length&&!r.sem.length){e.innerHTML='<span class="empty">✅ Nenhum produto está no stock mínimo ou abaixo.</span>';return}
-let h='';
-if(r.L.length)h+='<div style="margin-bottom:8px"><b>Total a repor: '+repTxt(r.nC,r.nM)+' = '+embF(r.emb)+' emb. · '+money(Math.round(r.cost))+'</b><small style="display:block;color:var(--sub)">'+(r.nC?'Completas: '+r.nC+' · '+money(Math.round(r.cC)):'')+(r.nC&&r.nM?'  |  ':'')+(r.nM?'Meias: '+r.nM+' · '+money(Math.round(r.cM)):'')+'</small></div>';
-h+=r.L.map(x=>{const cor=x.tipo==='completa'?'var(--bad)':'#e0a000';
-return '<div class="item" style="align-items:flex-start;gap:12px">'+av(x.p,52)+'<div style="flex:1;min-width:0"><b>'+esc(x.p.nome)+'</b><small style="display:block;color:var(--sub)">Stock '+c2(x.st)+' un. · mínimo '+c2(x.mi)+' un. ('+x.pct+'%)</small><div style="margin-top:4px;color:'+cor+';font-weight:700">Pôr 1 '+x.tipo+' ('+c2(x.un)+' un.) · '+money(Math.round(x.cost))+'</div>'+(x.forcada?'<small style="display:block;color:var(--sub)">A embalagem tem unidades ímpares: a meia não dá, por isso é uma completa.</small>':'')+'<button class="mini" style="margin:6px 0 0;width:auto" onclick="rpEntradaM(\''+x.p.id+'\',\''+x.tipo+'\')">Dar entrada</button></div></div>'}).join('');
-if(r.sem.length)h+='<p class="empty" style="margin:10px 0 0">'+r.sem.length+' produto(s) no stock mínimo sem "unidades por embalagem": '+r.sem.slice(0,4).map(p=>esc(p.nome)).join(', ')+(r.sem.length>4?'…':'')+'. Edite o produto para a app poder sugerir meia ou completa.</p>';
-e.innerHTML=h}
+const repQ=x=>x.u?repTxt(x.c,x.m):c2(x.un)+' un.';
+function repMC(){const d=rpDados(),L=[];D.prods.forEach(p=>{const r=repU(p,d.rates[p.id]);if(r)L.push(r)});
+L.sort((a,b)=>a.urg-b.urg||(a.rate>0&&b.rate>0?a.dias-b.dias:a.st-b.st));
+const t=L.reduce((o,x)=>{o.nC+=x.c;o.nM+=x.m;o.cost+=x.cost;return o},{nC:0,nM:0,cost:0});return{L,nC:t.nC,nM:t.nM,cost:t.cost,cov:d.cov,poucos:d.poucos}}
+let _rk='',_rc={};
+const repSugT=p=>{const k=D.vendas.length+'|'+td()+'|'+(D.repDias||15);if(_rk!==k){_rc=rpDados().rates;_rk=k}const r=repU(p,_rc[p.id]);return r?' · pôr '+repQ(r):''};
+function rpEntradaM(id,c,m){goTab('armazem','ent');const s=$('aProd');if(s){s.value=id;if(typeof fillEmb==='function')fillEmb()}if($('aEmb'))$('aEmb').value=c||'';if($('aMeia'))$('aMeia').value=m||'';if(typeof emSoma==='function')emSoma();window.scrollTo(0,0)}
 function rpEntrada(id,packs){goTab('armazem','ent');const s=$('aProd');if(s){s.value=id;if(typeof fillEmb==='function')fillEmb()}if(packs&&$('aEmb'))$('aEmb').value=packs;if($('aMeia'))$('aMeia').value='';if(typeof emSoma==='function')emSoma();window.scrollTo(0,0)}
-function rpShare(){const r=rpDados();if(!r.L.length)return alert('Não há nada a repor com este número de dias.');
-const t='🛒 Lista de compras — '+fmtD(td())+' (stock para '+r.cov+' dias)\n'+r.L.map(x=>'• '+x.p.nome+' — '+(x.packs?x.packs+' emb. ('+c2(x.qty)+' un.)':c2(x.qty)+' un.')+' ~ '+money(Math.round(x.cost))).join('\n')+'\nTotal estimado: '+money(Math.round(r.total));
+function rpShare(){const r=repMC();if(!r.L.length)return alert('Não há nada a repor.');
+const t='🛒 Repor stock — '+fmtD(td())+' (para '+r.cov+' dias)\n'+r.L.map(x=>'• '+x.p.nome+' — '+repQ(x)+' ('+c2(x.un)+' un.) ~ '+money(Math.round(x.cost))).join('\n')+'\nTotal: '+(r.nC||r.nM?repTxt(r.nC,r.nM)+' · ':'')+money(Math.round(r.cost));
 if(navigator.share){navigator.share({text:t}).catch(()=>{})}else if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(()=>toast('Lista copiada.'),()=>prompt('Copie a lista:',t))}else prompt('Copie a lista:',t)}
-function RP(){RPM();const b=$('rpL');if(!b)return;if($('rpD'))$('rpD').value=String(D.repDias||15);const r=rpDados();
-$('rpSum').innerHTML=r.L.length?'<b>'+r.L.length+' produto(s) a repor</b> · total estimado <b>'+money(Math.round(r.total))+'</b>'+(r.poucos?'<p class="empty" style="margin:4px 0 0">Ainda há poucos dias de vendas registadas: a estimativa vai melhorando com o tempo.</p>':''):'<span class="empty">✅ Com '+r.cov+' dias de cobertura, não há nada a repor agora.</span>';
-b.innerHTML=r.L.map(x=>{const cor=x.urg<=1?'var(--bad)':x.urg===2?'#e0a000':'var(--good)',ic=x.urg<=1?'🔴':x.urg===2?'🟡':'🟢',dz=x.st<=0?'Sem stock':'dá para '+(x.dias<1?'menos de 1 dia':Math.floor(x.dias)+' dia(s)');
-return '<div class="item" style="align-items:flex-start;gap:12px">'+av(x.p,52)+'<div style="flex:1;min-width:0"><b>'+esc(x.p.nome)+'</b><small style="display:block;color:var(--sub)">Vende ~'+c2(Math.round(x.rate*10)/10)+' por dia · stock '+c2(x.p.stock)+'</small><small style="display:block;color:'+cor+';font-weight:700">'+ic+' '+dz+'</small><div style="margin-top:4px">Comprar: <b>'+(x.packs?x.packs+' emb. ('+c2(x.qty)+' un.)':c2(x.qty)+' un.')+'</b> · ~'+money(Math.round(x.cost))+'</div><button class="mini" style="margin:6px 0 0;width:auto" onclick="rpEntrada(\''+x.p.id+'\','+(x.packs||0)+')">Dar entrada</button></div></div>'}).join('')+(r.sem?'<p class="empty" style="margin:10px 0 0">'+r.sem+' produto(s) sem vendas recentes não entram na lista.</p>':'')}
+function RP(){const e=$('rpMC');if(!e)return;if($('rpD'))$('rpD').value=String(D.repDias||15);const r=repMC();
+if(!r.L.length){e.innerHTML='<span class="empty">✅ Nada a repor: nenhum produto está no mínimo e, com '+r.cov+' dias de cobertura, as vendas também não pedem mais.</span>';return}
+const sd=D.caixa.reduce((a,c)=>a+(c.tipo==='entrada'?c.valor:-c.valor),0),tt=Math.round(r.cost),f=tt-sd;
+let h='<div style="margin-bottom:8px"><b>'+r.L.length+' produto(s) · '+(r.nC||r.nM?repTxt(r.nC,r.nM)+' · ':'')+money(tt)+'</b></div>'
++'<div style="padding:10px;border-radius:12px;background:'+(f>0?'#fff0ef':'#eefaf1')+'"><b style="color:'+(f>0?'var(--bad)':'var(--good)')+'">'+(f>0?'Tem na Caixa '+money(Math.round(sd))+', faltam '+money(Math.round(f))+' para repor tudo.':'Tem na Caixa '+money(Math.round(sd))+': dá para repor tudo.')+'</b></div>'
++'<button style="margin:10px 0" onclick="rpShare()">📤 Enviar / copiar a lista</button>';
+h+=r.L.map(x=>{const cor=x.urg<=1?'var(--bad)':x.urg===2?'#e0a000':'var(--good)',mot=x.por==='ambos'?'mínimo e vendas':x.por==='min'?'está no mínimo':'pelas vendas';
+return '<div class="item" style="align-items:flex-start;gap:12px">'+av(x.p,52)+'<div style="flex:1;min-width:0"><b>'+esc(x.p.nome)+'</b>'
++'<small style="display:block;color:var(--sub)">Stock '+c2(x.st)+' · mínimo '+c2(x.mi)+(x.ide>x.mi?' · ideal '+c2(x.ide):'')+'</small>'
++(x.rate>0?'<small style="display:block;color:var(--sub)">Vende ~'+c2(Math.round(x.rate*10)/10)+' por dia · '+(x.st<=0?'sem stock':'dá para '+(x.dias<1?'menos de 1 dia':Math.floor(x.dias)+' dia(s)'))+'</small>':'')
++'<div style="margin-top:4px;color:'+cor+';font-weight:700">Pôr '+repQ(x)+' ('+c2(x.un)+' un.) · '+money(Math.round(x.cost))+'</div>'
++'<small style="display:block;color:var(--sub)">Fica com '+c2(x.apos)+' un. · '+mot+(x.u?'':' · sem "unidades por embalagem": a sugestão é em unidades')+'</small>'
++'<button class="mini" style="margin:6px 0 0;width:auto" onclick="rpEntradaM(\''+x.p.id+'\','+x.c+','+x.m+')">Dar entrada</button></div></div>'}).join('');
+if(r.poucos)h+='<p class="empty" style="margin:10px 0 0">Ainda há poucos dias de vendas registadas: a parte das vendas vai melhorando com o tempo.</p>';
+e.innerHTML=h}
 function CTG(){const b=$('ctlG');if(!b)return;if(typeof LOCKED!=='undefined'&&LOCKED)return;
 const h=td(),hr=new Date().getHours(),dd=(a,c)=>Math.round((new Date(c+'T12:00:00')-new Date(a+'T12:00:00'))/864e5),dias=n=>n===1?'1 dia':n+' dias',quando=n=>n===0?'hoje':n===1?'amanhã':'em '+n+' dias',nomes=L=>L.slice(0,3).map(p=>esc(p.nome)).join(', ')+(L.length>3?'…':''),S=[];
 {const R=[],ab=dvL().filter(d=>dvF(d)>0),nm=d=>d.tipo==='receber'?esc(d.pessoa)+' deve-lhe '+money(dvF(d)):'Deve a '+esc(d.pessoa)+': '+money(dvF(d));
