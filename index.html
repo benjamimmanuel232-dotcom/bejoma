@@ -418,7 +418,7 @@ const K='bejoma_v3';
 const $=id=>document.getElementById(id);
 const esc=s=>String(s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 const n=v=>{const x=parseFloat(String(v).replace(',','.'));return isNaN(x)?0:x};
-const money=v=>{const x=Math.round(v*100)/100,p=Math.abs(x).toFixed(2).split('.'),d=p[1]==='00'?'':p[1].replace(/0$/,'');return(x<0?'-':'')+p[0].replace(/\B(?=(\d{3})+(?!\d))/g,'\u00a0')+(d?','+d:'')+'\u00a0Kz'};
+const money=v=>{const x=Math.round((+v||0)*100)/100,p=Math.abs(x).toFixed(2).split('.'),d=p[1]==='00'?'':p[1].replace(/0$/,'');return(x<0?'-':'')+p[0].replace(/\B(?=(\d{3})+(?!\d))/g,'\u00a0')+(d?','+d:'')+'\u00a0Kz'};
 const td=()=>{const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 const hh=()=>{const d=new Date();return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')};
 const uid=()=>Date.now().toString(36)+Math.random().toString(36).slice(2,6);
@@ -917,7 +917,7 @@ if(ENC&&!LOCKED){LOCKED=true;DEK=null;D=inicial();norm();fixL();R();$('printShee
 $('lkImg').src=document.querySelector('.hero img').src;$('lock').style.display='flex';document.body.classList.add('locked');$('lkPin').value='';$('lkRec').style.display='none';$('lkNew').style.display='none';lkMsg('');lkTick()}
 async function openData(dek){let raw=localStorage.getItem(K2),x=null;
 if(raw){try{x=JSON.parse(await decBlob(raw,dek))}catch(e){try{localStorage.setItem('bejoma_enc_copia',raw)}catch(_){}if(!confirm('Os dados cifrados estão danificados e não foi possível abri-los. Começar com dados vazios? (Depois pode importar um backup.)'))return false}}
-D=x||inicial();norm();fixL();DEK=dek;ENC=true;LOCKED=false;R();check();return true}
+D=x||inicial();norm();fixL();DEK=dek;ENC=true;LOCKED=false;try{R()}catch(e){console.error(e);try{toast('Erro ao mostrar um ecrã: '+e.message)}catch(_){}}try{check()}catch(e){}return true}
 async function lkTry(){if(busy)return;if(wait()>0)return lkTick();const d=pinData(),p=$('lkPin').value;if(!d)return unlock();if(!p)return;
 if(d.v===3&&!HASSUB){lkMsg('Este navegador não consegue abrir dados cifrados (precisa de ligação segura HTTPS).',1);return}
 busy=1;lkMsg('A verificar…');$('lkBtn').disabled=true;
@@ -1169,9 +1169,9 @@ const sp=ab.filter(d=>!d.prazo).length;if(sp)R.push([1,sp+' dívida(s) sem prazo
 S.push({ic:'🤝',n:'Dívidas',g:"goTab('dividas')",ok:'Tudo em dia',R})}
 {const R=[],P=D.prods,sa=stockAl(),ng=sa.ng;
 if(ng.length)R.push([2,ng.length+' produto(s) com stock negativo: '+nomes(ng)+' · erro de registo',0]);
-{const rp=repMC();if(rp.L.length){const dt=rp.L.slice(0,4).map(x=>esc(x.p.nome)+' ('+c2(x.st)+' de '+c2(x.mi)+') → '+x.tipo).join('<br>');
-R.push([rp.nC?2:1,'📦 Repor: '+repTxt(rp.nC,rp.nM)+' = '+embF(rp.emb)+' emb. · total '+money(Math.round(rp.cost))+'<br><span style="font-size:.8rem">'+dt+(rp.L.length>4?'<br>+ '+(rp.L.length-4)+' mais…':'')+'</span>',0,"goTab('armazem','repor')"])}
-if(rp.sem.length)R.push([1,rp.sem.length+' produto(s) com stock baixo e sem "unidades por embalagem": '+nomes(rp.sem),0,"goTab('armazem','repor')"])}
+{const rp=repMC();if(rp.L.length){const dt=rp.L.slice(0,4).map(x=>esc(x.p.nome)+' ('+c2(x.st)+' de '+c2(x.mi)+') → '+repQ(x)).join('<br>');
+R.push([rp.nC?2:1,'📦 Repor: '+(rp.nC||rp.nM?repTxt(rp.nC,rp.nM)+' · ':'')+'total '+money(Math.round(rp.cost))+'<br><span style="font-size:.8rem">'+dt+(rp.L.length>4?'<br>+ '+(rp.L.length-4)+' mais…':'')+'</span>',0,"goTab('armazem','repor')"])}
+}
 valAl().forEach(p=>{const d=dvDias(p.val);if(d<0)R.push([2,esc(p.nome)+' · validade passou há '+dias(-d)+' (stock '+c2(p.stock)+')',-d]);else R.push([d<=7?2:1,esc(p.nome)+' · validade '+quando(d)+' (stock '+c2(p.stock)+')',0])});
 const pc=P.filter(p=>p.venda>0&&custo(p)>0&&p.venda<custo(p));if(pc.length)R.push([2,pc.length+' produto(s) com preço de venda abaixo do custo: '+nomes(pc),0]);
 if(P.length){const cs=cnL().map(c=>c.data).sort(),uc=cs.length?cs[cs.length-1]:null,dc=uc?dd(uc,h):null;if(dc===null||dc>=14)R.push([dc===null||dc>=30?2:1,dc===null?'Ainda não contou o stock · toque aqui':'Há '+dias(dc)+' que não conta o stock · toque aqui',0,"goTab('armazem','perd')"])}
@@ -1187,7 +1187,7 @@ S.push({ic:'💰',n:'Caixa',g:"goTab('caixa','mov')",ok:'Saldos certos',R})}
 orLin().filter(x=>x.p>=80).forEach(x=>R.push([x.p>100?2:1,esc(x.c)+': '+x.p+'% do orçamento'+(x.g>x.l?' · passou '+money(x.g-x.l):' · faltam '+money(x.l-x.g)),x.p,"goTab('caixa','orc')"]));
 if(m.sc.length>=3&&(o.tot>0||orLin().length))R.push([0,m.sc.length+' despesa(s) deste mês sem categoria · toque para categorizar',0,"goTab('caixa','orc')"]);
 if(o.tot>0||orLin().length)S.push({ic:'💸',n:'Orçamento de despesas',g:"goTab('caixa','orc')",ok:'Dentro do orçamento',R})}
-{const R=[],rs=resD();if(rs.mov.length||rs.meta>0){const rp=rpDados(),t=Math.round(rp.total);if(rp.L.length&&rs.g<t)R.push([rs.g<=0?2:1,'A reserva ('+money(rs.g)+') não chega para repor os '+rp.L.length+' produto(s) em falta (cerca de '+money(t)+')',t-rs.g,"goTab('caixa','res')"]);S.push({ic:'🔄',n:'Reserva para repor stock',g:"goTab('caixa','res')",ok:rp.L.length?'A reserva chega para repor':'Nada a repor agora',R})}}
+{const R=[],rs=resD();if(rs.mov.length||rs.meta>0){const rp=repMC(),t=Math.round(rp.cost);if(rp.L.length&&rs.g<t)R.push([rs.g<=0?2:1,'A reserva ('+money(rs.g)+') não chega para repor os '+rp.L.length+' produto(s) em falta (cerca de '+money(t)+')',t-rs.g,"goTab('caixa','res')"]);S.push({ic:'🔄',n:'Reserva para repor stock',g:"goTab('caixa','res')",ok:rp.L.length?'A reserva chega para repor':'Nada a repor agora',R})}}
 {const R=[],mv=mtV(),MS=mtStats(),ks=Object.keys(mv.prods).filter(k=>D.prods.some(p=>p.id===k));
 if(MS.restam<=10){
 if(mv.geral>0){const at=mv.tipo==='lucro'?MS.lu:MS.rc,st=mtSt(at,mv.geral,MS);if(st.r==='atras'||st.r==='quase')R.push([MS.restam<=5&&st.r==='atras'?2:1,'Meta de '+(mv.tipo==='lucro'?'lucro':'vendas')+' do mês em risco: '+st.pct+'% (faltam '+money(Math.ceil(st.falta))+' em '+dias(MS.restam)+')',0])}
@@ -1456,10 +1456,10 @@ const chk=(nm,l,g)=>{if(!(l>0))return false;const a=g/l,b=(g-c.valor)/l;if(a>1&&
 if(k&&chk(k,o.c[k],m.g[k]||0))return;chk('Despesas do mês',o.tot,m.t)}
 /* ===== Reserva para repor stock ===== */
 const resD=()=>{if(!D.res||typeof D.res!=='object')D.res={g:0,meta:0,mov:[]};if(!Array.isArray(D.res.mov))D.res.mov=[];return D.res};
-function RSV(){const e=$('rsBox');if(!e)return;const r=resD(),rp=rpDados(),pc=r.meta>0?Math.min(100,Math.round(r.g/r.meta*100)):0;
+function RSV(){const e=$('rsBox');if(!e)return;const r=resD(),rp=repMC(),pc=r.meta>0?Math.min(100,Math.round(r.g/r.meta*100)):0;
 const f=$('rsF');if(f&&!f.options.length)f.innerHTML=FP.map(x=>'<option value="'+x[0]+'">'+x[1]+' '+x[2]+'</option>').join('');
 const mi=$('rsM');if(mi&&document.activeElement!==mi)mi.value=r.meta>0?r.meta:'';
-const tot=Math.round(rp.total);
+const tot=Math.round(rp.cost);
 e.innerHTML='<div class="grid"><div class="stat"><div class="k">GUARDADO</div><div class="v good">'+money(r.g)+'</div></div><div class="stat"><div class="k">META</div><div class="v">'+(r.meta>0?money(r.meta):'sem meta')+'</div></div></div>'
 +(r.meta>0?'<div style="height:10px;background:#f1e4cd;border-radius:6px;overflow:hidden;margin:10px 0 0"><div style="height:100%;width:'+pc+'%;background:'+(r.g>=r.meta?'var(--good)':'var(--accent)')+'"></div></div><div class="empty" style="margin:6px 0 0">'+pc+'% da meta'+(r.g>=r.meta?' · ✅ meta atingida':' · faltam '+money(r.meta-r.g))+'</div>':'')
 +(rp.L.length?'<p style="margin:12px 0 4px">📦 Para repor os <b>'+rp.L.length+'</b> produto(s) em falta precisa de cerca de <b>'+money(tot)+'</b>'+(r.g>=tot?' · ✅ a reserva chega.':' · faltam <b>'+money(tot-r.g)+'</b> na reserva.')+'</p>'+(tot!==r.meta?'<button class="sec" onclick="rsMeta('+tot+')">Usar '+money(tot)+' como meta</button>':''):'<p class="empty" style="margin:10px 0 0">Não há produtos a repor agora.</p>');
