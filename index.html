@@ -252,6 +252,8 @@ html[data-t=dark] [style*="border-color:#e4bd7d"]{border-color:#6b5230!important
 <label>Pago com</label><div id="aForma" class="chips"></div><label id="aSplitL" style="margin-top:12px">Parte paga pela outra forma (opcional)</label><input id="aSplit" type="number" inputmode="decimal" min="0" placeholder="ex.: 400">
 <button onclick="entrada()">Dar entrada no stock</button>
 <p class="empty" id="aInfo" style="margin:8px 0 0"></p></div>
+<div id="cqBox"></div>
+<div id="cestoBox"></div>
 <div id="caraBox"></div>
 <div class="card"><h2>Stock que já tenho (sem pagar)</h2>
 <p class="empty" style="margin:-6px 0 6px">Sobrou mercadoria na bancada, ou já tinha antes de usar o app? Registe aqui as unidades soltas. <b>Não sai dinheiro da caixa.</b> Fica como um lote com a data que escolher.</p>
@@ -295,7 +297,7 @@ html[data-t=dark] [style*="border-color:#e4bd7d"]{border-color:#6b5230!important
 </div>
 </div>
 
-<div class="panel hidden" id="p-caixa">
+<div class="panel hidden" id="p-caixa"><div id="tirarBox"></div>
 <div class="sx" data-sx="mov">
 <div class="card"><h2>Saldo da caixa</h2><div class="grid"><div class="stat" style="grid-column:1/-1"><div class="k">SALDO</div><div class="v" id="cSaldo"></div></div><div class="stat"><div class="k">ENTRADAS</div><div class="v good" id="cEnt"></div></div><div class="stat"><div class="k">SAÍDAS</div><div class="v bad" id="cSai"></div></div></div></div>
 <div class="card"><h2>Onde está o dinheiro</h2><div id="cForma"></div></div>
@@ -393,7 +395,7 @@ html[data-t=dark] [style*="border-color:#e4bd7d"]{border-color:#6b5230!important
 </div>
 <div class="panel hidden" id="p-fecho"><div id="fBox"></div></div>
 
-<div class="panel hidden" id="p-resumo"><div id="anBox"></div><div id="dsBox"></div><div id="rBox"></div></div>
+<div class="panel hidden" id="p-resumo"><div id="anBox"></div><div id="dsBox"></div><div id="saiBox"></div><div id="rBox"></div></div>
 
 <div class="panel hidden" id="p-graficos"><div id="gBox"></div></div>
 
@@ -614,16 +616,16 @@ const gatOk=()=>{if(!D.gatOk||D.gatOk.d!==td())D.gatOk={d:td(),a:0,b:0};return D
 function gatFeito(k){const o=gatOk();o.a=1;if(k==='b')o.b=1;save();R()}
 function gatDesf(k){const o=gatOk();if(k==='b')o.b=0;else{o.a=0;o.b=0}save();R()}
 const gatTot=()=>D.vendas.filter(v=>v.data===td()).reduce((s,v)=>s+v.qtd*v.preco,0);
-function gatSet(){const c=gatC(),a=prompt('Vendas do dia para levar mais mercadoria ANTIGA (Kz):',c.a);if(a===null)return;const b=prompt('Vendas do dia para pôr mercadoria NOVA (Kz):',c.b);if(b===null)return;const x=n(a),y=n(b);if(!(x>0)||!(y>x))return alert('O segundo valor tem de ser maior que o primeiro.');D.gat={a:x,b:y};save();R()}
-function gatAviso(g0){const c=gatC(),g1=gatTot(),o=gatOk();let m='';if(g0<c.b&&g1>=c.b){m='💚 Chegou a '+money(c.b)+' hoje: ponha mercadoria NOVA no cesto.';o.b=0}else if(g0<c.a&&g1>=c.a){m='💛 Chegou a '+money(c.a)+' hoje: acrescente mercadoria ANTIGA no cesto.';o.a=0;o.b=0}if(!m)return false;save();R();try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(_){}toast(m);return true}
+function gatSet(){const c=gatC(),a=prompt('Vendas do dia para acrescentar mercadoria no cesto, 1.ª vez (Kz):',c.a);if(a===null)return;const b=prompt('Vendas do dia para acrescentar mais mercadoria, 2.ª vez (Kz):',c.b);if(b===null)return;const x=n(a),y=n(b);if(!(x>0)||!(y>x))return alert('O segundo valor tem de ser maior que o primeiro.');D.gat={a:x,b:y};save();R()}
+function gatAviso(g0){const c=gatC(),g1=gatTot(),o=gatOk();let m='';if(g0<c.b&&g1>=c.b){m='💚 Chegou a '+money(c.b)+' hoje: acrescente mais mercadoria no cesto.';o.b=0}else if(g0<c.a&&g1>=c.a){m='💛 Chegou a '+money(c.a)+' hoje: acrescente mercadoria no cesto.';o.a=0;o.b=0}if(!m)return false;save();R();try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(_){}toast(m);return true}
 function gatHTML(){const c=gatC(),t=gatTot(),pct=Math.min(100,Math.round(t/c.b*100)),fase=t>=c.b?2:t>=c.a?1:0,ok=gatOk(),al=(fase===2&&!ok.b)||(fase===1&&!ok.a);
 const hj={};D.vendas.forEach(v=>{if(v.data===td()&&v.qtd>0)hj[v.pid]=(hj[v.pid]||0)+v.qtd});
-const L=Object.keys(hj).map(k=>P(k)).filter(p=>p&&p.stock>0).sort((x,y)=>hj[y.id]-hj[x.id]).slice(0,5);
-const sug=al?L.map(p=>{const ls=lotesP(p),l=fase===2?ls[ls.length-1]:ls[0];return`<div class="item" style="padding:6px 0"><div><b>${esc(p.nome)}</b><small>Vendeu ${c2(hj[p.id])} hoje · tem ${c2(p.stock)} un.${l?' · '+(ls.length>1?(fase===2?'lote novo':'lote antigo'):'só 1 lote')+' (entrada '+fmtD(l.ent)+')':''}</small></div></div>`}).join(''):'';
+const L=Object.keys(hj).map(k=>P(k)).filter(p=>p&&p.stock>0).sort((x,y)=>hj[y.id]-hj[x.id]).slice(0,8);
+const sug=al?L.map(p=>{const q=cestoQ(p);return`<div class="item" style="padding:6px 0"><div><b>${esc(p.nome)}</b><small>Vendeu ${c2(hj[p.id])} hoje · tem ${c2(p.stock)} un.</small></div>${q?`<b>+${c2(Math.min(q,p.stock))} un.</b>`:''}</div>`}).join(''):'';
 const bar=fase===2?'#16834a':fase===1?'#d97800':'var(--pri)',cor=al?bar:'var(--line)';
 return`<div style="border:2px solid ${cor};border-radius:14px;padding:10px 12px;margin:6px 0 4px;background:var(--soft)"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><b>Hoje: ${money(t)}</b><button class="mini sec" onclick="gatSet()">⚙️</button></div><div style="height:9px;border-radius:5px;background:var(--card);border:1px solid var(--line);overflow:hidden;margin:6px 0"><div style="height:100%;width:${pct}%;background:${bar}"></div></div>`
-+(fase===2?(al?`<b style="color:#16834a">💚 Passou de ${money(c.b)}: ponha mercadoria NOVA no cesto.</b><button class="mini" style="margin:8px 0 0;width:100%" onclick="gatFeito('b')">✅ Já acrescentei</button>`:`<b style="color:var(--sub)">✔ Mercadoria nova acrescentada.</b><button class="mini sec" onclick="gatDesf('b')">Desfazer</button>`):fase===1?(al?`<b style="color:#d97800">💛 Passou de ${money(c.a)}: acrescente mercadoria ANTIGA no cesto.</b><small style="display:block;color:var(--sub)">Faltam ${money(c.b-t)} para ${money(c.b)} (mercadoria nova).</small><button class="mini" style="margin:8px 0 0;width:100%" onclick="gatFeito('a')">✅ Já acrescentei</button>`:`<b style="color:var(--sub)">✔ Mercadoria antiga acrescentada.</b><button class="mini sec" onclick="gatDesf('a')">Desfazer</button><small style="display:block;color:var(--sub)">Faltam ${money(c.b-t)} para ${money(c.b)} (mercadoria nova).</small>`):`<small style="color:var(--sub)">Faltam ${money(c.a-t)} para ${money(c.a)} (acrescentar mercadoria antiga) e ${money(c.b-t)} para ${money(c.b)} (mercadoria nova).</small>`)
-+(sug?`<div style="margin-top:6px"><small style="color:var(--sub)">Acrescente primeiro os que mais saíram hoje:</small>${sug}</div>`:'')+`</div>`}
++(fase===2?(al?`<b style="color:#16834a">💚 Passou de ${money(c.b)}: acrescente mais mercadoria no cesto.</b><button class="mini" style="margin:8px 0 0;width:100%" onclick="gatFeito('b')">✅ Já acrescentei</button>`:`<b style="color:var(--sub)">✔ Já acrescentou (2.ª vez).</b><button class="mini sec" onclick="gatDesf('b')">Desfazer</button>`):fase===1?(al?`<b style="color:#d97800">💛 Passou de ${money(c.a)}: acrescente mercadoria no cesto.</b><small style="display:block;color:var(--sub)">Faltam ${money(c.b-t)} para ${money(c.b)} (acrescentar outra vez).</small><button class="mini" style="margin:8px 0 0;width:100%" onclick="gatFeito('a')">✅ Já acrescentei</button>`:`<b style="color:var(--sub)">✔ Já acrescentou (1.ª vez).</b><button class="mini sec" onclick="gatDesf('a')">Desfazer</button><small style="display:block;color:var(--sub)">Faltam ${money(c.b-t)} para ${money(c.b)} (acrescentar outra vez).</small>`):`<small style="color:var(--sub)">Faltam ${money(c.a-t)} para ${money(c.a)} (acrescentar mercadoria) e ${money(c.b-t)} para ${money(c.b)} (acrescentar outra vez).</small>`)
++(sug?`<div style="margin-top:6px"><small style="color:var(--sub)">O que acrescentar (quantidade de cada vez):</small>${sug}</div>`:'')+`</div>`}
 
 /* ===== Embalagens completas e meias ===== */
 const embF=x=>String(Math.round(x*100)/100).replace('.',',');
@@ -688,6 +690,63 @@ e.innerHTML=`<div class="card"><h2>📈 Produtos que ficaram mais caros</h2><p c
 return`<div class="item"><div style="flex:1"><b>${esc(p.nome)}</b> <b class="bad">+${Math.round(x.pc*100)}%</b><small>Custo por unidade: ${money(x.ca)} → ${money(x.cu)}</small><small class="${l<=0?'bad':m<m0-.02?'warn':''}">Lucro por unidade com o preço atual (${money(p.venda)}): ${money(l)} · margem ${Math.round(m*100)}% (antes ${Math.round(m0*100)}%)</small>${x.u.forn?`<small>Fornecedor: ${esc(x.u.forn)}${x.a.forn&&x.a.forn!==x.u.forn?' (antes: '+esc(x.a.forn)+')':''}</small>`:''}${x.cheap?`<small class="good">💡 ${esc(x.cheap.forn)} já lhe vendeu a ${money(x.cc)}/un.</small>`:''}</div><div style="text-align:right"><button class="mini" onclick="caraPreco('${p.id}')">Preço ${money(nv)}</button><button class="mini sec" onclick="caraIgn('${p.id}')">Ignorar</button></div></div>`}).join(''):'<div class="empty">Nenhum produto ficou mais caro nas últimas compras. 👍</div>')+`</div>`}
 function caraPreco(id){const x=caraList().find(y=>y.p.id===id);if(!x)return;const p=x.p,nv=Math.ceil(p.venda*(x.cu/x.ca)/10)*10;if(!confirm('Mudar o preço de venda de '+p.nome+' de '+money(p.venda)+' para '+money(nv)+'?\n\nSobe na mesma proporção do aumento do custo (+'+Math.round(x.pc*100)+'%).'))return;p.venda=nv;p.caraOk={cu:x.cu};save();R();toast('Preço de '+p.nome+': '+money(nv))}
 function caraIgn(id){const x=caraList().find(y=>y.p.id===id);if(!x)return;x.p.caraOk={cu:x.cu};save();R()}
+
+
+/* ===== Quanto entra no cesto de cada vez ===== */
+const cestoQ=p=>typeof p.cesto==='number'?p.cesto:/sambapito/i.test(p.nome)?25:/bolacha/i.test(p.nome)?24:p.venda>0&&p.venda<=100?50:0;
+function cestoSet(id){const p=P(id);if(!p)return;const a=prompt('Quantas unidades de '+p.nome+' entram no cesto de cada vez? (0 = não aparece)',cestoQ(p));if(a===null)return;const x=n(a);if(!(x>=0))return;p.cesto=Math.round(x);save();R()}
+function CQ(){const e=$('cqBox');if(!e)return;const L=D.prods.filter(p=>p.venda>0).map(p=>({p,q:cestoQ(p)})).sort((a,b)=>b.q-a.q||a.p.nome.localeCompare(b.p.nome,'pt',{sensitivity:'base'}));
+e.innerHTML=`<details class="pasta"><summary>🧺 Quanto entra no cesto de cada vez</summary><p class="empty" style="margin:6px 0">Quando as vendas passam o valor do aviso, a app diz quanto acrescentar de cada produto. Toque no produto para mudar. Nos sambapitos e nas bolachas, o número é de cada sabor. Ponha 0 para o produto não aparecer.</p>`+L.map(x=>`<div class="item" style="padding:6px 0;cursor:pointer" onclick="cestoSet('${x.p.id}')"><div>${esc(x.p.nome)}</div><b>${x.q?c2(x.q)+' un.':'—'}</b></div>`).join('')+`</details>`}
+/* ===== Cesto do próximo dia de trabalho ===== */
+function cestoDia(){const hoje=td(),f=wkF();let d=addD(hoje,1),w=new Date(d+'T12:00:00').getDay();for(let k=1;k<=7;k++){d=addD(hoje,k);w=new Date(d+'T12:00:00').getDay();if(f[w]>=0.08)break}return{d,w,f:f[w]}}
+function CESTO(){const e=$('cestoBox');if(!e)return;const c=cestoDia(),dr=rpDados(),NM=['domingo','segunda','terça','quarta','quinta','sexta','sábado'],g=gatC();
+const L=D.prods.filter(p=>p.venda>0).map(p=>{const r=dr.rates[p.id]||0,ex=r*7*c.f;return{p,ex,leve:Math.ceil(ex*1.2),st:Math.max(0,p.stock),ls:lotesP(p)}}).filter(x=>x.ex>=0.5).sort((a,b)=>b.ex-a.ex);
+const cab=`<div class="card"><h2>🧺 Cesto de ${NM[c.w]} (${fmtD(c.d)})</h2>`;
+if(!L.length){e.innerHTML=cab+`<p class="empty" style="margin:0">Ainda não tenho vendas suficientes para saber o que acrescentar no cesto.</p></div>`;return}
+const tot=L.reduce((a,x)=>a+x.ex*x.p.venda,0),msg=tot>=g.b?'Num dia assim costuma passar dos '+money(g.b)+': costuma acrescentar <b>2 vezes</b> no cesto.':tot>=g.a?'Num dia assim costuma passar dos '+money(g.a)+': costuma acrescentar <b>1 vez</b> no cesto.':'Num dia assim pode nem chegar aos '+money(g.a)+'.';
+const falta=L.filter(x=>x.st<x.leve);
+e.innerHTML=cab+`<p class="empty" style="margin:-6px 0 8px">Pelo que costuma vender nas ${PL_(c.w)}, vende cerca de <b>${money(Math.round(tot/10)*10)}</b>. ${msg}</p>`
++(falta.length?`<p style="margin:0 0 8px;color:#b3261e"><b>⚠️ ${falta.length} produto(s) não chegam para o dia.</b> Veja em Repor stock.</p>`:'')
++L.slice(0,12).map(x=>{const ok=x.st>=x.leve,l=x.ls;return`<div class="item"><div style="flex:1"><b>${esc(x.p.nome)}</b><small>Costuma vender ~${c2(Math.round(x.ex*10)/10)} un. nesse dia</small>${ok?'':`<small class="bad">Só tem ${c2(x.st)} un. Faltam ${c2(x.leve-x.st)}</small>`}</div><div style="text-align:right"><b>${cestoQ(x.p)?c2(cestoQ(x.p)):c2(x.leve)} un.</b><small>${cestoQ(x.p)?'entra de cada vez':'acrescentar'}</small></div></div>`}).join('')
++(L.length>12?`<p class="empty" style="margin:6px 0 0">Mostro os 12 que mais saem.</p>`:'')+`<p class="empty" style="margin:8px 0 0">A quantidade é o que costuma vender nesse dia mais 20% de folga.</p></div>`}
+const PL_=w=>['domingos','segundas','terças','quartas','quintas','sextas','sábados'][w];
+/* ===== Quanto posso tirar (lucro livre) ===== */
+const tirG=()=>{const g=+D.guardaPct;return g>=0&&g<=90?g:50};
+function tirSet(v){D.tirPer=v;save();TIRAR()}
+function tirCfg(){const a=prompt('Que percentagem do lucro quer guardar para repor a mercadoria? (0 a 90)',tirG());if(a===null)return;const x=n(a);if(!(x>=0&&x<=90))return alert('Escreva um valor entre 0 e 90.');D.guardaPct=x;save();TIRAR()}
+function tirCalc(){const hoje=td(),mes=D.tirPer==='mes',wd=(new Date(hoje+'T12:00:00').getDay()+6)%7,ini=mes?hoje.slice(0,8)+'01':addD(hoje,-wd);
+let A=0,B=0;for(let ds=ini;ds<=hoje;ds=addD(ds,1)){const f=fechoData(ds);A+=f.liq;B+=f.ret}
+let P=0;D.vendas.forEach(v=>{if(v.data<ini||v.data>hoje||!v.fiado)return;const dv=dvL().find(x=>x.venda===v.id),tot=v.qtd*v.preco;if(!dv||!(tot>0))return;P+=Math.min(1,dvF(dv)/tot)*v.qtd*(v.preco-v.custo)});
+const g=tirG(),livre=Math.max(0,A-P),maxT=livre*(1-g/100),resta=maxT-B,saldo=FP.reduce((a,f)=>a+cxSaldo(f[0]),0),pode=Math.max(0,Math.min(resta,saldo));
+return{mes,ini,A,B,P,g,livre,maxT,resta,saldo,pode,exc:Math.max(0,B-maxT)}}
+function TIRAR(){const e=$('tirarBox');if(!e)return;if(LOCKED){e.innerHTML='';return}const c=tirCalc(),r=x=>`<div class="item" style="padding:6px 0"><div>${x[0]}</div><b class="${x[2]||''}">${x[1]}</b></div>`;
+e.innerHTML=`<div class="card" style="border-color:var(--pri)"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h2 style="margin:0">💰 Quanto posso tirar</h2><button class="mini sec" onclick="tirCfg()">⚙️ ${c.g}%</button></div>`
++`<div class="chips" style="margin:8px 0"><button type="button" class="chip${c.mes?'':' on'}" onclick="tirSet('sem')">Esta semana</button><button type="button" class="chip${c.mes?' on':''}" onclick="tirSet('mes')">Este mês</button></div>`
++`<p class="empty" style="margin:0 0 6px">Desde ${fmtD(c.ini)}. O lucro é o do Fecho do dia (vendas menos custo, despesas e perdas).</p>`
++r(['Lucro líquido',money(c.A),c.A<0?'bad':''])+(c.P>0?r(['Lucro ainda por receber (vendas a dever)','−'+money(c.P)]):'')+r(['Guardar para repor a mercadoria ('+c.g+'%)','−'+money(c.livre*c.g/100)])+r(['Já retirou','−'+money(c.B)])
++`<div style="margin-top:8px;padding:10px 12px;border-radius:12px;background:var(--soft);border:2px solid ${c.exc>0?'#b3261e':'var(--pri)'}">`
++(c.A<=0?`<b>Ainda não há lucro neste período.</b><br><small>O dinheiro que está na Caixa é da mercadoria. Não tire nada para si.</small>`:c.exc>0?`<b class="bad">Já retirou ${money(c.exc)} a mais do que o lucro permite.</b><br><small>Está a gastar o dinheiro da mercadoria. Não tire mais até vender mais.</small>`:`<b style="font-size:1.15rem">Pode tirar já: ${money(Math.floor(c.pode))}</b>${c.resta>c.saldo+0.005?`<br><small>A Caixa só tem ${money(c.saldo)}.</small>`:''}`)+`</div>`
++(c.saldo>0?`<p class="empty" style="margin:8px 0 0">Na Caixa tem ${money(c.saldo)}${c.A>0&&c.exc<=0?'. Deste valor, '+money(Math.max(0,c.saldo-Math.floor(c.pode)))+' fica para a mercadoria':''}.</p>`:'')+`</div>`}
+
+/* ===== Vale a pena sair? ===== */
+function sairSet(){const a=prompt('Quanto gasta, em média, para ir vender num dia? (transporte, em Kz)\nDeixe vazio para a app calcular pelo transporte que registar na Caixa.',D.custoSair||'');if(a===null)return;const x=a.trim()===''?0:n(a);if(x<0||isNaN(x))return;D.custoSair=x;save();SAIR()}
+function sairCalc(){const hoje=td(),prim=D.vendas.reduce((m,v)=>v.data<m?v.data:m,hoje),ini=prim>addD(hoje,-56)?prim:addD(hoje,-56),fim=addD(hoje,-1);
+const T={};D.caixa.forEach(c=>{if(isTr(c)&&c.data>=ini&&c.data<=fim)T[c.data]=(T[c.data]||0)+c.valor});const ds=Object.keys(T),auto=ds.length?ds.reduce((a,k)=>a+T[k],0)/ds.length:0,man=+D.custoSair>0,custo=man?+D.custoSair:auto;
+let rec=0,luc=0;const occ=[0,0,0,0,0,0,0],A=[0,1,2,3,4,5,6].map(()=>({d:new Set(),rev:0,luc:0}));
+if(ini<=fim)for(let d=ini;d<=fim;d=addD(d,1))occ[new Date(d+'T12:00:00').getDay()]++;
+D.vendas.forEach(v=>{if(v.data<ini||v.data>fim)return;const r=v.qtd*v.preco,l=v.qtd*(v.preco-v.custo),o=A[new Date(v.data+'T12:00:00').getDay()];rec+=r;luc+=l;if(v.qtd>0)o.d.add(v.data);o.rev+=r;o.luc+=l});
+const m=rec>0?luc/rec:0,X=[1,2,3,4,5,6,0].map(w=>{const o=A[w],k=o.d.size;return{w,n:k,occ:occ[w],rev:k?o.rev/k:0,luc:k?o.luc/k:0}});
+return{ini,custo,man,nDias:ds.length,m,be:custo>0&&m>0?custo/m:0,X}}
+function SAIR(){const e=$('saiBox');if(!e)return;const c=sairCalc(),NM=['Domingo','Segunda','Terça','Quarta','Quinta','Sexta','Sábado'],PL=['domingos','segundas','terças','quartas','quintas','sextas','sábados'],tr=trabL(),av=trabAv();
+const cab=`<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h2 style="margin:0">🚌 Vale a pena sair?</h2><button class="mini sec" onclick="sairSet()">⚙️</button></div>`;
+if(!(c.custo>0)){e.innerHTML=cab+`<p class="empty" style="margin:8px 0 0">Ainda não sei quanto gasta para ir vender. Registe o <b>transporte de ida e de volta</b> na Caixa, ou toque no ⚙️ e escreva o gasto médio por dia.</p></div>`;return}
+if(!(c.m>0)){e.innerHTML=cab+`<p class="empty" style="margin:8px 0 0">Ainda não há vendas suficientes para calcular a sua margem.</p></div>`;return}
+const hoje=td(),wd=new Date(hoje+'T12:00:00').getDay(),x=c.X.find(y=>y.w===wd),vh=D.vendas.filter(v=>v.data===hoje).reduce((a,v)=>a+v.qtd*v.preco,0),falta=Math.max(0,c.be-vh),desc=tr.indexOf(wd)<0&&av.indexOf(wd)<0;
+let h=`<p class="empty" style="margin:6px 0 8px">Gasta em média <b>${money(Math.round(c.custo))}</b> por dia para ir vender${c.man?' (valor que escreveu)':' (pelo transporte registado em '+c.nDias+' dia(s))'}. Com a sua margem média de <b>${Math.round(c.m*100)}%</b>, o dia compensa a partir de <b>${money(Math.round(c.be))}</b> em vendas.</p>`;
+h+=`<div style="padding:10px 12px;border-radius:12px;background:var(--soft);border:2px solid ${vh>=c.be?'#16834a':'var(--pri)'}"><b>Hoje, ${NM[wd].toLowerCase()}${desc?' (dia de descanso)':''}:</b> ${vh>=c.be?'✅ já compensou. Vendeu '+money(vh)+'.':'vendeu '+money(vh)+(falta>0?', faltam '+money(Math.round(falta))+' para compensar.':'.')}${x&&x.n?`<br><small>${[0,6].indexOf(wd)>=0?'Nos':'Nas'} ${PL[wd]} em que vendeu, o lucro depois do transporte foi em média ${money(Math.round(x.luc-c.custo))}.</small>`:''}</div>`;
+h+=c.X.map(y=>{const net=y.luc-c.custo,st=tr.indexOf(y.w)>=0?'':av.indexOf(y.w)>=0?' · às vezes':' · descanso';return`<div class="item" style="padding:6px 0;${y.n?'':'opacity:.55'}"><div><b>${NM[y.w]}</b><small>${y.n?'vendeu em '+y.n+' de '+y.occ+st:'sem vendas'+st}</small></div><b class="${y.n?(net>0?'good':'bad'):''}">${y.n?(net>0?'✅ ':'⚠️ ')+money(Math.round(net)):'—'}</b></div>`}).join('');
+h+=`<p class="empty" style="margin:8px 0 0">O valor de cada dia é o lucro médio nos dias em que vendeu, menos o gasto para sair.${c.nDias<5&&!c.man?' Poucos dias de transporte registados: a conta ainda é fraca.':''}</p>`;
+e.innerHTML=cab+h+`</div>`}
 /* ===== Aviso de compra mais cara ===== */
 function entCara(p,a,b){if(!(a>0&&b>0))return;const r=b/a;if(r<1.03)return;const pc=Math.round((r-1)*100),nv=Math.ceil(p.venda*r/10)*10,l0=p.venda-a,l1=p.venda-b;
 if(confirm('⚠️ Compra mais cara: '+p.nome+'\n\nCusto por unidade: '+money(b)+' (antes '+money(a)+', +'+pc+'%).\nCom o preço de venda de '+money(p.venda)+', o lucro por unidade desce de '+money(l0)+' para '+money(l1)+(l1<=0?' (PREJUÍZO)':'')+'.\n\nPara manter a mesma margem de antes, venda a '+money(nv)+'.\n\nMudar o preço de venda para '+money(nv)+'?')){p.venda=nv;p.caraOk={cu:b};save();R();toast('Preço de '+p.nome+' mudou para '+money(nv))}}
@@ -920,7 +979,7 @@ c4=`<div class="donut chart"><svg viewBox="0 0 120 120">${arcs}<text x="60" y="5
 const cd=(t,b)=>`<div class="card"><h2>${t}</h2>${b}</div>`;
 $('gBox').innerHTML=sel+kpis+cd('Receita e lucro por dia',c1)+cd('Evolução do saldo da caixa',c2)+cd('Produtos mais lucrativos',c3)+cd('Receita por produto',c4)}
 const empty=t=>`<div class="empty">${t}</div>`;
-function R(){D.prods.sort((a,b)=>a.nome.localeCompare(b.nome,'pt',{sensitivity:'base'}));fpDraw();G();RL();F();I();DV();capShow();LC();AP();FN();PR();ORD();RSV();PL();VH();QV();ANP();DSEM();CARA();TRB();AH();BV();CTG();MT();MD();RP();CNR();ROT();RIN();PED();HASHIN();PG();UP();
+function R(){D.prods.sort((a,b)=>a.nome.localeCompare(b.nome,'pt',{sensitivity:'base'}));fpDraw();G();RL();F();I();DV();capShow();LC();AP();FN();PR();ORD();RSV();PL();VH();QV();ANP();DSEM();SAIR();CQ();CESTO();CARA();TIRAR();TRB();AH();BV();CTG();MT();MD();RP();CNR();ROT();RIN();PED();HASHIN();PG();UP();
 opts('vProd');opts('aProd');opts('pProd');opts('sProd');if(!$('sData').value)$('sData').value=td();$('sData').max=td();$('vData').max=td();vDataSet();showImg();if(!$('aData').value)$('aData').value=td();$('aData').max=td();lotesDraw();E();if(!$('vPreco').value)fillPreco();if(!$('aPreco').value)fillEmb();
 const hoje=D.vendas.filter(v=>v.data===td());const hojeL=D.vendas.filter(v=>v.data===td()||v.reg===td());
 $('vLista').innerHTML=hojeL.length?hojeL.slice().reverse().map(v=>`<div class="item"><div class="pi">${P(v.pid)?av(P(v.pid),38):''}<div>${v.devol?'↩️ Devolução · ':''}${esc(v.nome)} ×${v.qtd}<small>${v.data!==td()?'📅 venda de '+fmtD(v.data)+' · ':''}${v.hora?v.hora+' · ':''}${money(v.qtd*v.preco)} · ${v.fiado?'🤝 A dever':fpI(fpK(v))+' '+fpN(fpK(v))} · lucro ${money(v.qtd*(v.preco-v.custo))}</small></div></div><button class="mini dng" onclick="delVenda('${v.id}')">✕</button></div>`).join(''):empty('Ainda sem vendas hoje.');
