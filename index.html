@@ -99,6 +99,9 @@ body.locked>*:not(#lock):not(#splash):not(#ex):not(#priv){visibility:hidden}
 .qvt:active{transform:scale(.97);background:var(--soft)}
 .qvt.on{border-color:var(--pri);background:var(--soft)}
 .qvt.off{opacity:.45}
+.rpt{min-width:0;padding:8px;border:2px solid var(--line);border-radius:14px;background:var(--card)}
+.rpt.ck{opacity:.5}
+.rpt:has(details[open]){grid-column:1/-1}
 .qvt b{display:block;font-size:.85rem;line-height:1.15}
 .qvt small{display:block;color:var(--sub);font-size:.74rem}
 .qvt .bd{position:absolute;top:-8px;right:-6px;min-width:26px;height:26px;border-radius:13px;background:var(--pri);color:#fff;font-weight:800;font-size:.85rem;display:flex;align-items:center;justify-content:center;padding:0 6px}
@@ -285,7 +288,7 @@ html[data-t=dark] [style*="border-color:#e4bd7d"]{border-color:#6b5230!important
 </div>
 <div class="sx" data-sx="repor">
 <div class="card"><h2>📦 Repor stock</h2>
-<p class="empty" style="margin:-6px 0 8px">Quem está no mínimo ou as vendas pedem. Toque em "Ajustar e ver mais" para mudar quantidades.</p>
+<p class="empty" style="margin:-6px 0 8px">Quem está no mínimo ou as vendas pedem. Ordenado como a Venda rápida: os mais vendidos em cima, o que pode esperar em baixo. Toque em "Ajustar e ver mais" para mudar quantidades.</p>
 <label>Quero stock para</label><select id="rpD" onchange="rpSet(this.value)"><option value="7">7 dias</option><option value="10">10 dias</option><option value="15">15 dias</option><option value="30">30 dias</option></select>
 <div id="rpMC" style="margin-top:10px"></div></div>
 <div class="card" id="rpPSc" style="display:none"><h2>📈 Preços que subiram</h2><div id="rpPS"></div></div>
@@ -544,11 +547,16 @@ if(dev)dvL().push({id:did,tipo:'receber',pessoa:cli,desc:p.nome+' ×'+q+' (venda
 else apIns({id:uid()+'c'+novos.length,data:td(),hora:hh(),tipo:'entrada',desc:'Venda: '+p.nome+' ×'+q,valor:t,ref:id,forma:qvF});
 novos.push(id);tot+=t});
 qvC={};qvP={};if(dev){qvDN='';qvDP='';qvF='din'}save();R();if(!gatAviso(g0))toast(dev?'✅ A dever registado: '+cli+' · '+money(tot):'✅ Venda registada: '+money(tot))}
+/* ranking único: Venda rápida e Repor stock usam exatamente a mesma ordem e os mesmos grupos */
+function qvRank(){const ini=addD(td(),-29),cnt={};D.vendas.forEach(v=>{if(v.qtd>0&&v.data>=ini)cnt[v.pid]=(cnt[v.pid]||0)+v.qtd});
+const L=D.prods.filter(p=>p.venda>0).sort((a,b)=>(cnt[b.id]||0)-(cnt[a.id]||0)||a.nome.localeCompare(b.nome,'pt',{sensitivity:'base'}));
+const top=L.slice(0,6),r1=L.slice(6),bot=r1.slice(-6),r2=r1.slice(0,r1.length-bot.length),men=r2.slice(-6),med=r2.slice(0,r2.length-men.length),tier={},idx={};
+[top,med,men,bot].forEach((g,t)=>g.forEach(p=>{tier[p.id]=t}));L.forEach((p,i)=>{idx[p.id]=i});
+return{cnt,L,top,med,men,bot,tier,idx}}
 function QV(){const e=$('qvBox');if(!e)return;
 const ini=addD(td(),-29),cnt={},hj={};D.vendas.forEach(v=>{if(v.qtd>0){if(v.data>=ini)cnt[v.pid]=(cnt[v.pid]||0)+v.qtd;if(v.data===td())hj[v.pid]=(hj[v.pid]||0)+v.qtd}});
 Object.keys(qvC).forEach(k=>{if(!P(k))delete qvC[k]});
-const L=D.prods.filter(p=>p.venda>0).sort((a,b)=>(cnt[b.id]||0)-(cnt[a.id]||0)||a.nome.localeCompare(b.nome,'pt',{sensitivity:'base'}));
-const top=L.slice(0,6),r1=L.slice(6),bot=r1.slice(-6),r2=r1.slice(0,r1.length-bot.length),men=r2.slice(-6),med=r2.slice(0,r2.length-men.length);
+const Q=qvRank(),L=Q.L,top=Q.top,med=Q.med,men=Q.men,bot=Q.bot;
 const ks=Object.keys(qvC),tot=ks.reduce((a,k)=>a+qvLin(P(k),qvC[k]),0),devs=[...new Set(dvL().map(d=>d.pessoa).filter(Boolean))];
 const tile=p=>{const q=qvC[p.id]||0;return`<div class="qvt${q?' on':''}${p.stock<=0?' off':''}" onclick="qvAdd('${p.id}',1)">${q?`<span class="bd">${c2(q)}</span>`:''}${av(p,40)}<div><b>${esc(p.nome)}</b><small>${money(p.venda)} · ${c2(p.stock)} un.</small><small>${hj[p.id]?'hoje: '+c2(hj[p.id]):'30 dias: '+c2(cnt[p.id]||0)}</small></div></div>`};
 const sec=(t,d,l)=>l.length?`<h3 style="margin:14px 0 2px;font-size:.95rem">${t}</h3><p class="empty" style="margin:0 0 4px">${d}</p><div class="qvg">${l.map(tile).join('')}</div>`:'';
@@ -1426,7 +1434,8 @@ const repQ=x=>x.u?repTxt(x.c,x.m,x.q):c2(x.un)+' un.';
 function repMC(){const d=rpDados(),all=[];D.prods.forEach(p=>{const r=repU(p,d.rates[p.id]);if(!r)return;const o=D.repQtd&&D.repQtd[p.id];
 if(o&&o.d===td()&&r.u){r.c=o.c;r.m=o.m;r.q=o.q||0;r.un=o.c*r.u+o.m*r.u/2+r.q*r.u/4;r.cost=o.c*r.pe+o.m*r.pm+r.q*r.pq;r.apos=r.st+r.un;r.edit=true}
 r.skip=!!(D.repSkip&&D.repSkip[p.id]===td());all.push(r)});
-all.sort((a,b)=>a.urg-b.urg||(a.rate>0&&b.rate>0?a.dias-b.dias:a.st-b.st));
+const Q=qvRank(),ix=id=>id in Q.idx?Q.idx[id]:99999;
+all.sort((a,b)=>ix(a.p.id)-ix(b.p.id)||a.urg-b.urg||(a.rate>0&&b.rate>0?a.dias-b.dias:a.st-b.st));
 const L=all.filter(x=>!x.skip),t=L.reduce((o,x)=>{o.nC+=x.c;o.nM+=x.m;o.nQ+=x.q||0;o.cost+=x.cost;return o},{nC:0,nM:0,nQ:0,cost:0});return{all,L,nC:t.nC,nM:t.nM,nQ:t.nQ,cost:t.cost,cov:d.cov,poucos:d.poucos}}
 function rpQ(id,k,d){const x=repMC().all.find(y=>y.p.id===id);if(!x)return;if(!D.repQtd)D.repQtd={};
 if(k==='r')delete D.repQtd[id];else{let c=x.c,m=x.m,q=x.q||0;if(k==='c')c=Math.max(0,c+d);else if(k==='q')q=Math.max(0,q+d);else m=Math.max(0,m+d);if(c===x.c0&&m===x.m0&&q===(x.q0||0))delete D.repQtd[id];else D.repQtd[id]={d:td(),c,m,q}}save();R()}
@@ -1488,12 +1497,12 @@ if(pl.rest.length){
 h+='<div style="padding:10px;border-radius:12px;margin-bottom:8px;background:var(--soft)"><b>🚕 Onde comprar</b>'+(A.nFK>0?'<small style="'+sm+';margin-top:3px">'+A.nFK+' produto(s) só se compram no Kikolo, por isso vai lá de qualquer forma.<br>Kikolo e depois Vila: '+money(Math.round(A.totKV))+' (produtos + táxi '+money(cf.tk)+')</small><small style="'+sm+';margin-top:4px">Os outros produtos são comprados onde for mais barato, sem táxi a mais.</small>':'<small style="'+sm+';margin-top:3px">Só na Vila: '+money(Math.round(A.totV))+' (produtos + táxi '+money(cf.tv)+')<br>Kikolo e depois Vila: '+money(Math.round(A.totKV))+' (produtos + táxi '+money(cf.tk)+')</small>'
 +(A.nBoth>0?'<b style="display:block;margin-top:4px;color:'+(A.rec==='KV'?'var(--good)':'var(--text)')+'">'+(A.rec==='KV'?'Compensa ir ao Kikolo: poupa '+money(Math.round(A.totV-A.totKV))+'.':'Fique só na Vila: o Kikolo só pouparia '+money(Math.round(A.sav))+', menos que os '+money(cf.tk-cf.tv)+' de táxi a mais.')+'</b>':'<small style="'+sm+';margin-top:4px">Ainda não tenho o preço dos dois fornecedores nestes produtos, por isso conto com a Vila. Registe as entradas com o fornecedor "Kikolo" ou "Vila de Cacuaco" para a app comparar.</small>'))
 +'<button class="sec mini" style="margin-top:8px;width:auto" onclick="rpTaxi()">🚕 Mudar o táxi</button></div>';
-h+='<div style="padding:10px;border-radius:12px;background:'+(pl.falta>0?'#fff0ef':'#eefaf1')+'"><b style="color:'+(pl.falta>0?'var(--bad)':'var(--good)')+'">'+(pl.falta>0?'Tem na Caixa '+money(Math.round(pl.sd))+', faltam '+money(pl.falta)+' para repor tudo (com táxi).':'Tem na Caixa '+money(Math.round(pl.sd))+': dá para repor tudo (com táxi).')+'</b>'+(pl.falta>0?'<small style="'+sm+';margin-top:4px">Com a Caixa dá para '+pl.nfit+' de '+pl.rest.length+' produto(s), os mais urgentes primeiro. Os outros ficam para depois.</small>':'')+'</div>';
+h+='<div style="padding:10px;border-radius:12px;background:'+(pl.falta>0?'#fff0ef':'#eefaf1')+'"><b style="color:'+(pl.falta>0?'var(--bad)':'var(--good)')+'">'+(pl.falta>0?'Tem na Caixa '+money(Math.round(pl.sd))+', faltam '+money(pl.falta)+' para repor tudo (com táxi).':'Tem na Caixa '+money(Math.round(pl.sd))+': dá para repor tudo (com táxi).')+'</b>'+(pl.falta>0?'<small style="'+sm+';margin-top:4px">Com a Caixa dá para '+pl.nfit+' de '+pl.rest.length+' produto(s), os mais vendidos primeiro. Os outros ficam para depois.</small>':'')+'</div>';
 h+='<label style="margin-top:10px">Enviar a lista de</label><select onchange="rpSetF(this.value)"><option value="">Os dois (com táxi)</option><option value="K"'+(RPF==='K'?' selected':'')+'>'+KN+'</option><option value="V"'+(RPF==='V'?' selected':'')+'>'+VN+'</option></select><button style="margin:10px 0 0" onclick="rpShare()">📤 Enviar / copiar a lista</button>'}
 if(r.L.length&&pl.reg>0)h+='<button class="sec" style="margin:10px 0 0" onclick="rpTaxiReg()">💸 Registar táxi ('+money(pl.reg)+') na Caixa</button>';else if(pl.paid>0)h+='<small style="'+sm+';margin-top:8px">✔ Táxi de hoje já registado: '+money(pl.paid)+'</small>';
 h+='<div style="height:6px"></div>';
-h+=r.all.map(x=>{const id=x.p.id,sk=x.skip,ck=rpCk(id),i=pl.map[id],cst=i?i.c:x.cost,cor=x.urg<=1?'var(--bad)':x.urg===2?'#e0a000':'var(--good)',mot=x.por==='ambos'?'mínimo e vendas':x.por==='min'?'está no mínimo':'pelas vendas';
-if(sk)return '<div class="item" style="align-items:flex-start;gap:12px;opacity:.5">'+av(x.p,52)+'<div style="flex:1;min-width:0"><b>'+esc(x.p.nome)+'</b><small style="'+sm+'">Hoje não: fica de fora do total. Amanhã volta.</small><button class="mini sec" style="margin:6px 0 0;width:auto" onclick="rpHoje(\''+id+'\')">Voltar à lista</button></div></div>';
+const rowF=x=>{const id=x.p.id,sk=x.skip,ck=rpCk(id),i=pl.map[id],cst=i?i.c:x.cost,cor=x.urg<=1?'var(--bad)':x.urg===2?'#e0a000':'var(--good)',mot=x.por==='ambos'?'mínimo e vendas':x.por==='min'?'está no mínimo':'pelas vendas';
+if(sk)return '<div class="rpt ck"><div style="display:flex;gap:8px;align-items:center">'+av(x.p,40)+'<b style="font-size:.85rem;line-height:1.15">'+esc(x.p.nome)+'</b></div><div style="min-width:0"><small style="'+sm+'">Hoje não: fica de fora do total. Amanhã volta.</small><button class="mini sec" style="margin:6px 0 0;width:auto" onclick="rpHoje(\''+id+'\')">Voltar à lista</button></div></div>';
 const fit=pl.falta>0&&!ck&&i?(pl.fit[id]?' · <span style="color:var(--good)">✅ Cabe na Caixa</span>':' · ⏳ Depois'):'';
 const mb=(t,f,st)=>'<button class="mini sec" style="width:auto;margin:0" onclick="'+f+'">'+t+'</button>';
 const stp=x.u&&!ck?'<div style="margin-top:8px;display:flex;gap:6px;align-items:center;flex-wrap:wrap"><small>Completas</small>'+mb('−','rpQ(\''+id+'\',\'c\',-1)')+'<b>'+x.c+'</b>'+mb('+','rpQ(\''+id+'\',\'c\',1)')+(x.sm?'<small style="margin-left:8px">Meias</small>'+mb('−','rpQ(\''+id+'\',\'m\',-1)')+'<b>'+x.m+'</b>'+mb('+','rpQ(\''+id+'\',\'m\',1)'):'')+(x.sq?'<small style="margin-left:8px">Quartos</small>'+mb('−','rpQ(\''+id+'\',\'q\',-1)')+'<b>'+(x.q||0)+'</b>'+mb('+','rpQ(\''+id+'\',\'q\',1)'):'')+(x.edit?'<span style="margin-left:8px">'+mb('↺ sugerido','rpQ(\''+id+'\',\'r\',0)')+'</span>':'')+'</div>'+(x.edit?'<small style="'+sm+'">Alterado por si (a app sugeria '+repTxt(x.c0,x.m0,x.q0)+')</small>':''):'';
@@ -1504,10 +1513,13 @@ const mais='<details style="margin-top:6px"><summary style="cursor:pointer;color
 +'<small style="'+sm+'">Fica com '+c2(x.apos)+' un. · '+mot+(x.u?' · '+c2(x.un)+' un. a comprar':' · sem "unidades por embalagem": a sugestão é em unidades')+'</small>'+px
 +(i&&i.forced?'<small style="'+sm+';font-weight:700">Só há '+(i.forced==='K'?'no Kikolo':'na Vila')+'</small>':'')+stp
 +'<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap">'+(i&&!i.forced?mb('Trocar para '+(i.fo==='K'?'a Vila':'o Kikolo'),'rpTroca(\''+id+'\')'):'')+(ck?'':mb('Hoje não','rpHoje(\''+id+'\')'))+'</div></details>';
-return '<div class="item" style="align-items:flex-start;gap:12px;'+(ck?'opacity:.5':'')+'">'+av(x.p,52)+'<div style="flex:1;min-width:0"><b>'+esc(x.p.nome)+'</b>'
+return '<div class="rpt'+(ck?' ck':'')+'"><div style="display:flex;gap:8px;align-items:center">'+av(x.p,40)+'<b style="font-size:.85rem;line-height:1.15">'+esc(x.p.nome)+'</b></div><div style="min-width:0">'
 +'<div style="margin-top:2px;color:'+cor+';font-weight:700">Pôr '+repQ(x)+' · '+money(Math.round(cst))+'</div>'
 +'<small style="'+sm+'">Stock '+c2(x.st)+(i?' · 🛒 '+(i.fo==='K'?'Kikolo':'Vila'):'')+fit+'</small>'
-+'<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap"><button class="mini sec" style="width:auto;margin:0" onclick="rpMark(\''+id+'\')">'+(ck?'✔ Comprado':'☐ Comprado')+'</button><button class="mini" style="width:auto;margin:0" onclick="rpEntradaM(\''+id+'\','+x.c+','+x.m+','+(x.q||0)+')">Dar entrada</button></div>'+mais+'</div></div>'}).join('');
++'<div style="margin-top:6px;display:flex;gap:6px;flex-wrap:wrap"><button class="mini sec" style="width:auto;margin:0" onclick="rpMark(\''+id+'\')">'+(ck?'✔ Comprado':'☐ Comprado')+'</button><button class="mini" style="width:auto;margin:0" onclick="rpEntradaM(\''+id+'\','+x.c+','+x.m+','+(x.q||0)+')">Dar entrada</button></div>'+mais+'</div></div>'};
+{const Q=qvRank(),TT=[['🔥 Mais vendidos','Repor primeiro: sem eles perde vendas.'],['📊 Venda média','Repor a seguir.'],['📉 Menos vendidos','Podem esperar. Não invista muito.'],['🐌 Quase não saíram','Ficam para depois.'],['📦 Outros produtos','Sem preço de venda registado.'],['⏳ Hoje não','Deixados para amanhã.']],
+ord=r.all.filter(x=>!x.skip).concat(r.all.filter(x=>x.skip)),tg=x=>x.skip?5:(x.p.id in Q.tier?Q.tier[x.p.id]:4),nt={};ord.forEach(x=>{const t=tg(x);nt[t]=(nt[t]||0)+1});let last=-1;
+h+=ord.map(x=>{const t=tg(x);let hd='';if(t!==last){last=t;hd=(last>=0&&hd===''?'':'')+'<h3 style="margin:14px 0 2px;font-size:.95rem">'+TT[t][0]+' ('+nt[t]+')</h3><p class="empty" style="margin:0 0 4px">'+TT[t][1]+'</p><div class="qvg">'}return hd+rowF(x)+(ord[ord.indexOf(x)+1]&&tg(ord[ord.indexOf(x)+1])!==t||ord.indexOf(x)===ord.length-1?'</div>':'')}).join('')}
 if(r.poucos)h+='<p class="empty" style="margin:10px 0 0">Ainda há poucos dias de vendas registadas: a parte das vendas vai melhorando com o tempo.</p>';
 e.innerHTML=h}
 function CTG(){const b=$('ctlG');if(!b)return;if(typeof LOCKED!=='undefined'&&LOCKED)return;

@@ -1,14 +1,14 @@
 {
   "name": "Bejoma Gestão",
-  "short_name": "Gestão",
-  "id": "./",
-  "start_url": "./",
+  "short_name": "Bejoma",
+  "description": "Gestão de vendas, stock e caixa da Bejoma Doces",
+  "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
   "orientation": "portrait",
-  "lang": "pt",
-  "background_color": "#14110f",
+  "background_color": "#fff8ee",
   "theme_color": "#9e2630",
+  "lang": "pt",
   "icons": [
     {
       "src": "icon-192.png",
