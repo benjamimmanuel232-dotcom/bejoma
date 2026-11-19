@@ -275,13 +275,13 @@ html[data-t=dark] [style*="border-color:#e4bd7d"]{border-color:#6b5230!important
 <label>Nota (opcional)</label><input id="pObs" autocomplete="off" placeholder="ex.: derreteu com o calor">
 <button onclick="perder()">Registar saída do stock</button>
 <div id="pLista" style="margin-top:12px"></div></div>
-<div class="card"><h2>Contagem de stock</h2>
-<p class="empty" style="margin:-6px 0 6px">Conte os doces que tem mesmo na mão e escreva a quantidade <b>em unidades</b> (não em embalagens). O app mostra a diferença. Ao guardar, o stock fica igual à sua contagem. O que faltar desconta do lucro; o que sobrar só corrige o stock. Conte sem fazer vendas ao mesmo tempo.</p>
+<div class="card"><details class="pasta"><summary><span>📋 Contagem de stock</span><small id="cnRes">Conte e acerte o stock</small></summary>
+<p class="empty" style="margin:6px 0 6px">Conte os doces que tem mesmo na mão e escreva a quantidade <b>em unidades</b> (não em embalagens). O app mostra a diferença. Ao guardar, o stock fica igual à sua contagem. O que faltar desconta do lucro; o que sobrar só corrige o stock. Conte sem fazer vendas ao mesmo tempo.</p>
 <input id="cnBusca" type="search" placeholder="🔍 Procurar produto" oninput="CNR()" style="margin-bottom:8px">
 <div id="cnLista"></div>
 <button onclick="cnAplicar()">✔ Guardar contagem e acertar o stock</button>
 <button class="sec" onclick="cnLimpar()">Limpar números</button>
-<div id="cnHist" style="margin-top:12px"></div></div>
+<div id="cnHist" style="margin-top:12px"></div></details></div>
 </div>
 <div class="sx" data-sx="repor">
 <div class="card"><h2>📦 Repor stock</h2>
@@ -711,6 +711,7 @@ e.innerHTML=cab+`<p class="empty" style="margin:-6px 0 8px">Pelo que costuma ven
 +(L.length>12?`<p class="empty" style="margin:6px 0 0">Mostro os 12 que mais saem.</p>`:'')+`<p class="empty" style="margin:8px 0 0">A quantidade é o que costuma vender nesse dia mais 20% de folga.</p></div>`}
 const PL_=w=>['domingos','segundas','terças','quartas','quintas','sextas','sábados'][w];
 /* ===== Quanto posso tirar (lucro livre) ===== */
+var TIRO=false;
 const tirG=()=>{const g=+D.guardaPct;return g>=0&&g<=90?g:50};
 function tirSet(v){D.tirPer=v;save();TIRAR()}
 function tirCfg(){const a=prompt('Que percentagem do lucro quer guardar para repor a mercadoria? (0 a 90)',tirG());if(a===null)return;const x=n(a);if(!(x>=0&&x<=90))return alert('Escreva um valor entre 0 e 90.');D.guardaPct=x;save();TIRAR()}
@@ -720,13 +721,14 @@ let P=0;D.vendas.forEach(v=>{if(v.data<ini||v.data>hoje||!v.fiado)return;const d
 const g=tirG(),livre=Math.max(0,A-P),maxT=livre*(1-g/100),resta=maxT-B,saldo=FP.reduce((a,f)=>a+cxSaldo(f[0]),0),pode=Math.max(0,Math.min(resta,saldo));
 return{mes,ini,A,B,P,g,livre,maxT,resta,saldo,pode,exc:Math.max(0,B-maxT)}}
 function TIRAR(){const e=$('tirarBox');if(!e)return;if(LOCKED){e.innerHTML='';return}const c=tirCalc(),r=x=>`<div class="item" style="padding:6px 0"><div>${x[0]}</div><b class="${x[2]||''}">${x[1]}</b></div>`;
-e.innerHTML=`<div class="card" style="border-color:var(--pri)"><div style="display:flex;justify-content:space-between;align-items:center;gap:8px"><h2 style="margin:0">💰 Quanto posso tirar</h2><button class="mini sec" onclick="tirCfg()">⚙️ ${c.g}%</button></div>`
+const rs=c.A<=0?'Sem lucro neste período':c.exc>0?'Já tirou '+money(c.exc)+' a mais':'Pode tirar já: '+money(Math.floor(c.pode));
+e.innerHTML=`<div class="card" style="border-color:var(--pri)"><details class="pasta"${TIRO?' open':''} ontoggle="TIRO=this.open"><summary><span>💰 Quanto posso tirar</span><small>${rs}</small></summary><div style="display:flex;justify-content:flex-end;margin-top:6px"><button class="mini sec" onclick="tirCfg()">⚙️ Guardar ${c.g}% para a mercadoria</button></div>`
 +`<div class="chips" style="margin:8px 0"><button type="button" class="chip${c.mes?'':' on'}" onclick="tirSet('sem')">Esta semana</button><button type="button" class="chip${c.mes?' on':''}" onclick="tirSet('mes')">Este mês</button></div>`
 +`<p class="empty" style="margin:0 0 6px">Desde ${fmtD(c.ini)}. O lucro é o do Fecho do dia (vendas menos custo, despesas e perdas).</p>`
 +r(['Lucro líquido',money(c.A),c.A<0?'bad':''])+(c.P>0?r(['Lucro ainda por receber (vendas a dever)','−'+money(c.P)]):'')+r(['Guardar para repor a mercadoria ('+c.g+'%)','−'+money(c.livre*c.g/100)])+r(['Já retirou','−'+money(c.B)])
 +`<div style="margin-top:8px;padding:10px 12px;border-radius:12px;background:var(--soft);border:2px solid ${c.exc>0?'#b3261e':'var(--pri)'}">`
 +(c.A<=0?`<b>Ainda não há lucro neste período.</b><br><small>O dinheiro que está na Caixa é da mercadoria. Não tire nada para si.</small>`:c.exc>0?`<b class="bad">Já retirou ${money(c.exc)} a mais do que o lucro permite.</b><br><small>Está a gastar o dinheiro da mercadoria. Não tire mais até vender mais.</small>`:`<b style="font-size:1.15rem">Pode tirar já: ${money(Math.floor(c.pode))}</b>${c.resta>c.saldo+0.005?`<br><small>A Caixa só tem ${money(c.saldo)}.</small>`:''}`)+`</div>`
-+(c.saldo>0?`<p class="empty" style="margin:8px 0 0">Na Caixa tem ${money(c.saldo)}${c.A>0&&c.exc<=0?'. Deste valor, '+money(Math.max(0,c.saldo-Math.floor(c.pode)))+' fica para a mercadoria':''}.</p>`:'')+`</div>`}
++(c.saldo>0?`<p class="empty" style="margin:8px 0 0">Na Caixa tem ${money(c.saldo)}${c.A>0&&c.exc<=0?'. Deste valor, '+money(Math.max(0,c.saldo-Math.floor(c.pode)))+' fica para a mercadoria':''}.</p>`:'')+`</details></div>`}
 
 /* ===== Vale a pena sair? ===== */
 function sairSet(){const a=prompt('Quanto gasta, em média, para ir vender num dia? (transporte, em Kz)\nDeixe vazio para a app calcular pelo transporte que registar na Caixa.',D.custoSair||'');if(a===null)return;const x=a.trim()===''?0:n(a);if(x<0||isNaN(x))return;D.custoSair=x;save();SAIR()}
@@ -1752,7 +1754,7 @@ function CNR(){const e=$('cnLista');if(!e)return;const q=($('cnBusca').value||''
 e.innerHTML=L.length?L.map(p=>{const v=CN[p.id],r=cnTxt(p,v);return`<div class="item"><div><b>${esc(p.nome)}</b><small>No app: ${c2(p.stock)} un.</small></div><div style="text-align:right"><input type="number" inputmode="decimal" min="0" value="${v===undefined?'':esc(v)}" oninput="cnSet('${p.id}',this.value)" aria-label="Quantidade contada" style="width:96px;padding:9px;text-align:center"><span id="cnd_${p.id}" class="${r.c}" style="display:block;font-size:.8rem;margin-top:3px;min-height:1em">${r.t}</span></div></div>`}).join(''):empty(q?'Nenhum produto encontrado.':'Sem produtos.');
 const H=cnL().slice().reverse();
 $('cnHist').innerHTML=H.length?'<b style="font-size:.85rem">Contagens</b>'+pastas(H,h=>h.data,h=>{const dif=h.itens.filter(x=>x.dif!==0),fv=dif.filter(x=>x.dif<0).reduce((s,x)=>s-x.dif*x.custo,0),so=dif.filter(x=>x.dif>0).reduce((s,x)=>s+x.dif,0);
-return`<div class="item"><div>${fmtD(h.data)} · ${h.itens.length} produto(s)<small>${dif.length?dif.length+' com diferença'+(fv?' · faltas custaram '+money(fv):'')+(so?' · sobraram '+c2(so)+' un.':''):'tudo certo ✅'}</small></div></div>`}):''}
+return`<div class="item"><div>${fmtD(h.data)} · ${h.itens.length} produto(s)<small>${dif.length?dif.length+' com diferença'+(fv?' · faltas custaram '+money(fv):'')+(so?' · sobraram '+c2(so)+' un.':''):'tudo certo ✅'}</small></div></div>`}):'';{const u=cnL()[cnL().length-1];if($('cnRes'))$('cnRes').textContent=u?'Última contagem: '+fmtD(u.data):'Ainda sem contagem'}}
 function cnAplicar(){const L=D.prods.filter(p=>CN[p.id]!==undefined&&CN[p.id]!=='').map(p=>{const real=n(CN[p.id]);return{p,real,dif:Math.round((real-p.stock)*1000)/1000,app:p.stock}});
 if(!L.length)return alert('Escreva a quantidade contada em pelo menos um produto.');
 if(L.some(x=>x.real<0))return alert('A quantidade contada não pode ser negativa.');
@@ -1925,7 +1927,7 @@ if(inp&&document.activeElement!==inp)inp.value=lim||'';
 e.innerHTML=`<div class="grid"><div class="stat"><div class="k">GASTO HOJE</div><div class="v ${lim&&g>lim?'bad':''}">${money(g)}</div></div><div class="stat"><div class="k">${lim?(r>=0?'AINDA PODE GASTAR':'PASSOU O LIMITE'):'LIMITE'}</div><div class="v ${lim?(r<0?'bad':'good'):''}">${lim?money(Math.abs(r)):'sem limite'}</div></div></div>`+(lim?`<div style="height:10px;background:#f1e4cd;border-radius:6px;margin:10px 0 0;overflow:hidden"><div style="height:100%;width:${Math.min(100,g/lim*100)}%;background:${g>lim?'var(--bad)':g>lim*.8?'var(--accent)':'var(--good)'}"></div></div>`:'')}
 setInterval(check,30000);let _hid=0;document.addEventListener('visibilitychange',()=>{if(document.hidden){_hid=Date.now();return}if(pinData()&&!LOCKED&&_hid&&Date.now()-_hid>300000)lockNow();check()});
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}catch(e){}
-R();PN();lockNow();check();splashRun();
+
 
 /* ===== Ligação à Bejoma Pessoal (enviar retiradas) ===== */
 var ROTL=[];
@@ -1950,7 +1952,7 @@ function rotCods(){const L=(D.rotCod||[]).slice(-5).reverse();return L.length?'<
 function ROT(){ROT0();const b=$('rotBox');if(b&&!LOCKED)b.innerHTML+=rotCods()+rotEnvL()}
 function ROT0(){const b=$('rotBox');if(!b)return;ROTL=rotPend().slice(-30).reverse();const env=(D.rotEnv||[]).length;
 b.innerHTML=ROTL.length?pastas(ROTL.map((c,k)=>({c:c,k:k})),x=>x.c.data,({c,k})=>`<div class="item"><label class="chk" style="flex:1;font-size:1rem"><input type="checkbox" id="rq${k}"${rotComida(c)?'':' checked'}><span>${esc(c.desc)}<small>${c.data} · ${fpI(fpK(c))} ${fpN(fpK(c))}${isPess(c)?' · dívida pessoal':c.sub==='comida'?' · comida / gasto pessoal':''}</small></span></label><div style="text-align:right"><b>${money(c.valor)}</b><br><button class="mini sec" style="margin-top:6px" onclick="rotNao(${k})">🙈 Esconder</button></div></div>`,sumRot,true)+'<button onclick="rotEnviar()">📤 Enviar selecionadas</button><button class="sec" onclick="rotNaoDes()">🙈 Esconder as desmarcadas</button><p class="empty" style="margin:6px 0 0">Comida e dívidas pessoais vêm desmarcadas: saíram da caixa do negócio, mas não são dinheiro que recebeu na mão.'+(env?' · '+env+' já enviada(s).':'')+' Se não quer enviar uma retirada, toque em Esconder.</p>'+rotIgnL():'<div class="empty">Sem retiradas por enviar.'+(env?' ('+env+' já enviada(s))':'')+'</div>'+rotIgnL()}
-const sumRot=l=>'−'+money(l.reduce((s,x)=>s+x.c.valor,0));
+function sumRot(l){return '−'+money(l.reduce((s,x)=>s+x.c.valor,0))}
 function genCod(){try{return String(1000+crypto.getRandomValues(new Uint32Array(1))[0]%9000)}catch(e){return String(1000+Math.floor(Math.random()*9000))}}
 async function rotEnviar(){if(LOCKED)return;const sel=ROTL.filter((c,k)=>{const e=$('rq'+k);return e&&e.checked});if(!sel.length)return alert('Marque pelo menos uma retirada.');const code=genCod(),lote='l'+uid(),hh0=await aprHash(code,'tr'+lote);
 const itens=sel.map(c=>({id:String(c.id),data:c.data,desc:String(c.desc||'Retirada').slice(0,60),valor:c.valor,forma:fpK(c),comida:rotComida(c),lote:lote,h:hh0})),tot=itens.reduce((q,i)=>q+i.valor,0),nm='retiradas-bejoma-'+td()+'.json',j=JSON.stringify({rotTransfer:1,de:'bejoma',criado:td(),itens});
@@ -2053,6 +2055,8 @@ function pgRecusar(id){if(LOCKED||!confirm('Recusar este pedido?\n\nA Bejoma Pes
 function pgCopiar(){const u=location.href.split('#')[0];try{navigator.clipboard.writeText(u).then(()=>alert('Endereço copiado. Cole-o na Bejoma Pessoal, em Mais → Ligação à Bejoma Gestão.')).catch(()=>prompt('Copie este endereço:',u))}catch(e){prompt('Copie este endereço:',u)}}
 window.addEventListener('hashchange',()=>{HASHIN()});
 if("serviceWorker" in navigator&&location.protocol.startsWith("http"))navigator.serviceWorker.register("sw.js").catch(()=>{});
+/* arranque: só depois de todas as funções e constantes existirem */
+R();PN();lockNow();check();splashRun();
 </script>
 </body>
 </html>
