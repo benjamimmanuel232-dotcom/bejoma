@@ -1,0 +1,6 @@
+{
+  "appId": "com.bejoma.gestao",
+  "appName": "Bejoma Gestão",
+  "webDir": "www",
+  "server": { "androidScheme": "https" }
+}
