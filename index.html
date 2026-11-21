@@ -256,7 +256,7 @@ html[data-t=dark] [style*="border-color:#e4bd7d"]{border-color:#6b5230!important
 <label>Avisar quando o stock chegar a (unidades)</label><input id="eMin" type="number" inputmode="decimal" min="0">
 <label>Onde se compra</label><select id="eOnde"><option value="">Nos dois (Kikolo e Vila)</option><option value="K">Só no Kikolo</option><option value="V">Só na Vila</option></select>
 <label>Fornecedor habitual (opcional)</label><input id="eForn" list="fornList" autocomplete="off" placeholder="ex.: Armazém do Roque">
-<label>Meta mensal de vendas (unidades, opcional)</label><input id="eMeta" type="number" inputmode="decimal" min="0" placeholder="ex.: 144">
+<label>Quanto espero vender por mês (unidades, opcional)<br><small style="font-weight:400;color:var(--sub)">Só serve para sugerir o stock mínimo e o ideal. Não é a meta da aba Metas.</small></label><input id="eMeta" type="number" inputmode="decimal" min="0" placeholder="ex.: 144" oninput="metaRef()"><p class="empty" id="eMetaRef" style="margin:2px 0 8px"></p>
 <button type="button" class="sec" onclick="rpSugForm()">💡 Sugerir mínimo e ideal</button>
 <label>Stock ideal (opcional): repor até quantas unidades?</label><input id="eIdeal" type="number" inputmode="decimal" min="0" placeholder="vazio = igual ao mínimo">
 <label>Este produto pode ser comprado em meia ou quarto?</label><select id="eMeia"><option value="1">Sim</option><option value="0">Não: só embalagem completa</option></select>
@@ -274,7 +274,7 @@ html[data-t=dark] [style*="border-color:#e4bd7d"]{border-color:#6b5230!important
 <label>Stock mínimo para alerta (unidades)</label><input id="nMin" type="number" inputmode="decimal" placeholder="5">
 <label>Onde se compra</label><select id="nOnde"><option value="">Nos dois (Kikolo e Vila)</option><option value="K">Só no Kikolo</option><option value="V">Só na Vila</option></select>
 <label>Fornecedor habitual (opcional)</label><input id="nForn" list="fornList" autocomplete="off" placeholder="ex.: Armazém do Roque">
-<label>Meta mensal de vendas (unidades, opcional)</label><input id="nMeta" type="number" inputmode="decimal" min="0" placeholder="ex.: 144">
+<label>Quanto espero vender por mês (unidades, opcional)<br><small style="font-weight:400;color:var(--sub)">Só serve para sugerir o stock mínimo e o ideal. Não é a meta da aba Metas.</small></label><input id="nMeta" type="number" inputmode="decimal" min="0" placeholder="ex.: 144">
 <label>Stock ideal (opcional): repor até quantas unidades?</label><input id="nIdeal" type="number" inputmode="decimal" min="0" placeholder="vazio = igual ao mínimo">
 <label>Este produto pode ser comprado em meia ou quarto?</label><select id="nMeia"><option value="1">Sim</option><option value="0">Não: só embalagem completa</option></select>
 <label>Validade (opcional)</label><input id="nVal" type="date">
@@ -333,7 +333,7 @@ html[data-t=dark] [style*="border-color:#e4bd7d"]{border-color:#6b5230!important
 <label>Quero stock para</label><select id="rpD" onchange="rpSet(this.value)"><option value="7">7 dias</option><option value="10">10 dias</option><option value="15">15 dias</option><option value="30">30 dias</option></select>
 <div id="rpMC" style="margin-top:10px"></div></div>
 <div class="card" id="rpPSc" style="display:none"><h2>📈 Preços que subiram</h2><div id="rpPS"></div></div>
-<div class="card" id="rpSugC" style="display:none"><h2>💡 Mínimos a rever</h2><p class="empty" style="margin:-6px 0 8px">Calculados pela meta mensal ou pelas vendas. Só muda se aceitar.</p><div id="rpSug"></div></div>
+<div class="card" id="rpSugC" style="display:none"><h2>💡 Mínimos a rever</h2><p class="empty" style="margin:-6px 0 8px">Calculados pela previsão mensal ou pelas vendas. Só muda se aceitar.</p><div id="rpSug"></div></div>
 </div>
 <div class="sx" data-sx="hist">
 <div class="card"><h2>📥 Entradas de stock (saldo positivo)</h2><p class="empty" style="margin:-6px 0 8px">Unidades que entraram, por mês e por dia: compras e devoluções que voltaram ao stock.</p><div id="armHistE"></div></div>
@@ -472,6 +472,7 @@ html[data-t=dark] [style*="border-color:#e4bd7d"]{border-color:#6b5230!important
 <div id="pnOn" style="display:none"><p id="pnLeg" class="empty" style="display:none;color:var(--bad)"><b>⚠️ PIN de versão anterior: os dados ainda NÃO estão cifrados.</b> Remova o PIN e crie um novo para cifrar tudo.</p><p class="empty"><b class="good">🔒 PIN activo.</b> O app pede o PIN ao abrir e depois de ficar mais de 1 minuto fora. Depois de 3 erros o app bloqueia por tempo crescente.</p>
 <label>PIN actual</label><input id="pnC" type="password" inputmode="numeric" maxlength="12" autocomplete="off">
 <button class="sec" onclick="pinOff()">Remover PIN</button></div>
+<div id="stUso"></div>
 <label style="margin-top:14px">Restaurar backup (.json ou .txt)</label><input id="bFile" type="file" accept=".json,.txt,application/json,text/plain" onchange="importar(event)"> <label>Ou cole aqui o texto do backup (se copiou em vez de guardar o ficheiro)</label><textarea id="bTxt" rows="3" placeholder="Cole aqui o texto copiado…"></textarea><button class="sec" onclick="impTxt($('bTxt').value)">📋 Restaurar com o texto colado</button> <button class="sec" onclick="desfazImport()">↩️ Voltar atrás (antes da última importação ou limpeza)</button>
 <button class="dng" onclick="limpar()">🧹 Limpar atividade e recomeçar</button></div>
 <div class="card" id="recCard"><h2>♻️ Reciclagem</h2><p class="empty" style="margin:-6px 0 8px">Tudo o que apagar no app (vendas, produtos, compras, perdas, Caixa, dívidas, metas e categorias de despesa) fica aqui e pode ser restaurado. Guarda os últimos 100.</p><div id="apBox"></div></div>
@@ -481,6 +482,39 @@ html[data-t=dark] [style*="border-color:#e4bd7d"]{border-color:#6b5230!important
 <nav class="tb" id="tb"></nav>
 <div id="printSheet"></div>
 <script>
+(function(){var KS=['bejoma_v3','bejoma_v3e','bejoma_snap'],C={},db=null,mode='ls';
+function ls(k){try{return localStorage.getItem(k)}catch(e){return null}}
+window.kvGet=function(k){return C[k]===undefined?null:C[k]};
+window.kvSet=function(k,v){C[k]=v;if(mode==='ls'){try{localStorage.setItem(k,v);return Promise.resolve()}catch(e){return Promise.reject(e)}}
+return new Promise(function(ok,no){var t=db.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=function(){ok()};t.onerror=t.onabort=function(){no(t.error)}})};
+window.kvDel=function(k){delete C[k];if(mode==='ls'){try{localStorage.removeItem(k)}catch(e){}return Promise.resolve()}
+return new Promise(function(ok,no){var t=db.transaction('kv','readwrite');t.objectStore('kv').delete(k);t.oncomplete=function(){ok()};t.onerror=t.onabort=function(){no(t.error)}})};
+function open(){return new Promise(function(ok,no){var r=indexedDB.open('bejoma',1);r.onupgradeneeded=function(){r.result.createObjectStore('kv')};r.onsuccess=function(){ok(r.result)};r.onerror=r.onblocked=function(){no(r.error||new Error('idb'))}})}
+function load(){return new Promise(function(ok,no){C={};var t=db.transaction('kv','readonly'),o=t.objectStore('kv');KS.forEach(function(k){var q=o.get(k);q.onsuccess=function(){if(q.result!=null)C[k]=q.result}});t.oncomplete=function(){ok()};t.onerror=t.onabort=function(){no(t.error)}})}
+function put(k,v){return new Promise(function(ok,no){var t=db.transaction('kv','readwrite');t.objectStore('kv').put(v,k);t.oncomplete=function(){ok()};t.onerror=t.onabort=function(){no(t.error)}})}
+function clr(){return new Promise(function(ok){try{var t=db.transaction('kv','readwrite');t.objectStore('kv').clear();t.oncomplete=t.onerror=t.onabort=function(){ok()}}catch(e){ok()}})}
+function start(){var s=document.createElement('script');s.textContent=document.getElementById('mainjs').textContent;document.body.appendChild(s)}
+(async function(){
+try{
+if(!window.indexedDB)throw new Error('sem idb');
+db=await open();await load();
+if(C[KS[0]]==null&&C[KS[1]]==null){
+var src={};KS.forEach(function(k){var v=ls(k);if(v!=null)src[k]=v});
+if(src[KS[0]]!=null||src[KS[1]]!=null){
+try{for(var k in src)await put(k,src[k]);await load();
+for(var k2 in src)if(C[k2]==null||C[k2].length!==src[k2].length)throw new Error('verificação');
+try{localStorage.setItem('bejoma_idb_t',String(Date.now()))}catch(e){}}
+catch(e){await clr();throw e}}}
+mode='idb';try{localStorage.setItem('bejoma_idb','1')}catch(e){}
+var t0=+ls('bejoma_idb_t')||0;
+if(t0&&Date.now()-t0>6048e5&&(C[KS[0]]!=null||C[KS[1]]!=null)){KS.forEach(function(k){try{localStorage.removeItem(k)}catch(e){}});try{localStorage.removeItem('bejoma_idb_t')}catch(e){}}
+try{navigator.storage&&navigator.storage.persist&&navigator.storage.persist()}catch(e){}
+}catch(e){
+mode='ls';db=null;C={};KS.forEach(function(k){var v=ls(k);if(v!=null)C[k]=v});
+if(ls('bejoma_idb')==='1')alert('Não foi possível abrir a memória nova do app. Está a ser mostrada uma cópia antiga dos dados. Não registe vendas; feche e abra o app outra vez.')}
+start()})()})();
+</script>
+<script type="text/plain" id="mainjs">
 window.onerror=function(m,s,l){try{console.error(m,s,l);let b=document.getElementById('errB');if(!b){b=document.createElement('div');b.id='errB';b.style.cssText='position:fixed;left:10px;right:10px;bottom:84px;z-index:9998;background:#302014;color:#fff;border-radius:14px;padding:10px 12px;font-size:.8rem';b.onclick=()=>b.remove();document.body.appendChild(b)}b.textContent='⚠️ Algo correu mal ('+m+', linha '+l+'). Toque para fechar. Se se repetir, envie uma captura.'}catch(e){}return false};
 
 const CAT=[['Bolacha Sandwiche',48,2300,1,100],['Chocolate Grande',3,1800,1,1000],['Chocolate Pequeno',12,2500,1,500],['Chugo Café',100,1000,1,25],['Chugo Ibon',100,800,1,25],['Doce de Coco',24,2300,1,200],['Garoto Bon Bon',30,3700,1,200],['Mentol Freegells Grande',12,1900,1,300],['Mentol Freegells Pequeno',100,2000,1,50],['Mentol Shaltox',80,1600,1,50],['Mentol Verde',33,800,1,50],['Mentol XXL',100,1600,1,50],['Pastilha Ginny Gum Grande',12,2400,1,400],['Pastilha Ginny Gum Pequena',24,2300,1,250],['Pastilha Gorila',100,6000,1,100],['Pastilha Max',100,2200,1,50],['Pastilha Oko',100,2500,1,50],['Sambapito Pop',48,1300,1,50],['Sambapito Rambo',24,1200,2,100]];
@@ -497,13 +531,13 @@ const custo=p=>p.cm>0?p.cm:(p.unEmb>0?p.precoEmb/p.unEmb:0);
 function inicial(){return{prods:CAT.map((r,i)=>({id:'c'+i,nome:r[0],unEmb:r[1],precoEmb:r[2],venda:r[4],stock:0})),vendas:[],caixa:[],compras:[],lembretes:defL(),dividas:[],perdas:[],contagens:[]}}
 const K2='bejoma_v3e';let D,ENC=false,LOCKED=false,DEK=null,wq=Promise.resolve();
 try{const pd=JSON.parse(localStorage.getItem('bejoma_pin')||'null');ENC=!!(pd&&pd.v===3)}catch(e){}
-if(ENC){LOCKED=true;D=inicial()}else{try{const r=localStorage.getItem(K);D=r?JSON.parse(r):inicial()}catch(e){D=inicial()}}
-const save=()=>{if(LOCKED)return;remMirror();if(ENC){const j=JSON.stringify(D),k=DEK;wq=wq.then(()=>encW(j,k)).catch(()=>alert('Não foi possível guardar neste navegador.'))}else{try{localStorage.setItem(K,JSON.stringify(D))}catch(e){alert('Não foi possível guardar neste navegador.')}}};
+if(ENC){LOCKED=true;D=inicial()}else{try{const r=kvGet(K);D=r?JSON.parse(r):inicial()}catch(e){D=inicial()}}
+const save=()=>{if(LOCKED)return;remMirror();if(ENC){const j=JSON.stringify(D),k=DEK;wq=wq.then(()=>encW(j,k)).catch(()=>alert('Não foi possível guardar neste navegador.'))}else{kvSet(K,JSON.stringify(D)).catch(()=>alert('Não foi possível guardar neste navegador.'))}};
 function norm(){if(!D||typeof D!=='object')D=inicial();['prods','vendas','caixa','compras'].forEach(k=>{if(!Array.isArray(D[k]))D[k]=[]});D.prods.forEach(p=>{if(typeof p.stock!=='number')p.stock=Number(p.stock)||0});if(!Array.isArray(D.lembretes))D.lembretes=defL();if(!Array.isArray(D.dividas))D.dividas=[];if(!Array.isArray(D.perdas))D.perdas=[];if(!Array.isArray(D.contagens))D.contagens=[]}
 norm();
 function fixL(){if(!D.cov7){D.cov7=1;D.repDias=7}if(!D.compraV2){D.compraV2=1;const c=D.lembretes.find(l=>l.id==='compra');if(c){c.dias=[0,3,4,5,6];c.hora='21:00';c.ult=''}else D.lembretes.push({id:'compra',tipo:'compra',hora:'21:00',dias:[0,3,4,5,6],ativo:true})}{const b=D.lembretes.find(l=>l.id==='backup');if(b&&!D.bkv2){D.bkv2=1;if(b.dias.length===1&&b.dias[0]===0){b.dias=[0,1,2,3,4,5,6];b.hora='20:30'}}}if(!D.lembretes.some(l=>l.id==='foco'))D.lembretes.push({id:'foco',tipo:'foco',hora:'09:00',dias:[1,4],ativo:true});if(!D.lembretes.some(l=>l.id==='backup'))D.lembretes.push({id:'backup',tipo:'backup',hora:'20:30',dias:[0,1,2,3,4,5,6],ativo:true});if(!D.lembretes.some(l=>l.id==='dividas'))D.lembretes.push({id:'dividas',tipo:'dividas',hora:'08:00',dias:[0,1,2,3,4,5,6],ativo:true})}
 fixL();
-if(!ENC&&!localStorage.getItem(K))save();
+if(!ENC&&!kvGet(K))save();
 
 function opts(id){const s=$(id),v=s.value;s.innerHTML=D.prods.map(p=>`<option value="${p.id}">${esc(p.nome)} (${p.stock} un.)</option>`).join('');if(v&&P(v))s.value=v}
 function promoPreco(p,q){if(!p||!(p.promoQ>=2)||!(p.promoP>0)||!(q>0))return null;const g=Math.floor(q/p.promoQ);if(g<1)return null;const tot=g*p.promoP+(q-g*p.promoQ)*p.venda;return{tot,pu:tot/q,g}}
@@ -871,8 +905,11 @@ const inv=f.top.map(x=>row(x,(x,dd)=>'Lucro '+money(x.l)+' · margem '+Math.roun
 const at=f.baixo.map(x=>row(x,x2=>(x2.q===0?'Sem vendas em 30 dias':'Vende pouco')+' · parado: '+money(x2.p.stock*custo(x2.p))+' ('+x2.p.stock+' un.)')).join('');
 return`<div class="card" style="border-color:#e4bd7d;background:var(--soft)"><h2>Onde focar (últimos 30 dias)</h2><label style="margin-top:0">📈 Invista mais (os que mais vendem)</label>${inv||empty('Sem vendas.')}<label>👀 Preste mais atenção (os que menos vendem)</label>${at||empty('Nenhum produto parado. Bom sinal!')}<small style="display:block;color:var(--sub);margin-top:8px">Dica: reponha primeiro os mais vendidos. Nos parados, evite comprar mais e pense numa promoção.</small></div>`}
 const p_low=(x,dd)=>dd!==null&&(dd<=7||x.p.stock<=mn(x.p));
-function storPct(){try{let t=0;for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);t+=k.length+(localStorage.getItem(k)||'').length}return Math.round(t/5000000*100)}catch(e){return 0}}
-function storCard(){const u=storPct();if(u<80)return'';return`<div class="card" style="border-color:#efc2bd;background:#fff0ef"><b>⚠️ Memória do app a ${Math.min(u,100)}%</b><small style="display:block;color:var(--sub);margin:3px 0 0">Quando encher, deixa de guardar vendas novas. Faça um backup agora e use fotos mais pequenas ou apague fotos de produtos que já não vende.</small><button onclick="partilharBackup()">📤 Enviar backup agora</button></div>`}
+var STP=null,STT=0;
+function storUpd(){if(Date.now()-STT<30000)return;STT=Date.now();try{navigator.storage.estimate().then(e=>{if(e&&e.quota){const p=Math.round(e.usage/e.quota*100);if(p!==STP){STP=p;stUso();if(p>=70){const b=document.getElementById('iBox');if(b&&b.innerHTML.indexOf('está a acabar')<0)try{I()}catch(_){}}}}}).catch(()=>{})}catch(e){}}
+function storPct(){if(STP!==null)return STP;try{let t=0;for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);t+=k.length+(localStorage.getItem(k)||'').length}return Math.round(t/5000000*100)}catch(e){return 0}}
+function storCard(){const u=storPct();if(u<70)return'';return`<div class="card" style="border-color:#efc2bd;background:#fff0ef"><b>⚠️ O espaço está a acabar (${Math.min(u,100)}% usado)</b><small style="display:block;color:var(--sub);margin:3px 0 0">Quando encher, deixa de guardar vendas novas. Faça backup e apague o que não precisa, como fotos de produtos que já não vende.</small><button onclick="partilharBackup()">📤 Enviar backup agora</button></div>`}
+function stUso(){const e=document.getElementById('stUso');if(!e)return;const u=storPct(),c=u>=70?'var(--bad)':'var(--sub)';e.innerHTML='<p class="empty" style="color:'+c+'"><b>Espaço usado: '+Math.min(u,100)+'%</b> ('+(STP!==null?'valor dado pelo navegador':'estimativa; o navegador não diz o limite exato')+')'+(u>=70?'. Faça backup e apague o que não precisa.':'.')+'</p>'}
 function valCard(){const L=valAl();if(!L.length)return'';return`<div class="card" style="border-color:#e4bd7d;background:var(--soft)"><h2>⏳ Validades a controlar (${L.length})</h2>`+L.slice(0,5).map(p=>{const s=valSt(p);return`<div class="item"><div class="pi">${av(p,40)}<div>${esc(p.nome)}<small class="${s.c}">${s.t} · ${fmtD(p.val)}</small></div></div><b>${p.stock} un.</b></div>`}).join('')+(L.length>5?`<small style="display:block;color:var(--sub);margin-top:6px">e mais ${L.length-5}… veja no Armazém</small>`:'')+'</div>'}
 function editMin(id){const p=P(id),v=prompt('Avisar quando o stock de '+p.nome+' chegar a (unidades):',mn(p));if(v===null)return;p.min=n(v);const vi=prompt('Stock ideal de '+p.nome+' (repor até quantas unidades?). Deixe vazio para ser igual ao mínimo:',p.ideal>0?p.ideal:'');if(vi!==null){if(n(vi)>0)p.ideal=n(vi);else delete p.ideal}save();R()}
 const perLabel={hoje:'Hoje',semana:'Últimos 7 dias',mes:'Este mês',tudo:'Tudo'};
@@ -929,8 +966,8 @@ return{txt,nm}}
 function baixar(txt,nm){const a=document.createElement('a'),u=URL.createObjectURL(new Blob([txt],{type:'application/json'}));a.href=u;a.download=nm+'.json';document.body.appendChild(a);a.click();setTimeout(()=>{a.remove();URL.revokeObjectURL(u)},60000)}
 async function exportar(){return partilharBackup()}
 const SNAP='bejoma_snap';
-async function snapMake(m){try{const raw=JSON.stringify(D),en=!!(ENC&&DEK);localStorage.setItem(SNAP,JSON.stringify({t:Date.now(),m,enc:en,b:en?await encBlob(raw,DEK):raw}));return true}catch(e){return false}}
-async function desfazImport(){if(LOCKED)return;let x=null;try{x=JSON.parse(localStorage.getItem(SNAP)||'null')}catch(e){}
+async function snapMake(m){try{const raw=JSON.stringify(D),en=!!(ENC&&DEK);await kvSet(SNAP,JSON.stringify({t:Date.now(),m,enc:en,b:en?await encBlob(raw,DEK):raw}));return true}catch(e){return false}}
+async function desfazImport(){if(LOCKED)return;let x=null;try{x=JSON.parse(kvGet(SNAP)||'null')}catch(e){}
 if(!x)return alert('Ainda não há nenhuma cópia guardada. O app guarda uma automaticamente antes de importar um backup ou de limpar.');
 if(!confirm('Voltar aos dados que tinha antes de '+x.m+' ('+new Date(x.t).toLocaleString('pt-PT')+')?\n\nOs dados actuais ficam guardados e pode voltar a trocar.'))return;
 let d;try{d=JSON.parse(x.enc?await decBlob(x.b,DEK):x.b)}catch(e){return alert('Não foi possível abrir essa cópia (o PIN pode ter sido removido ou mudado depois de ela ser feita).')}
@@ -1036,12 +1073,12 @@ c4=`<div class="donut chart"><svg viewBox="0 0 120 120">${arcs}<text x="60" y="5
 const cd=(t,b)=>`<div class="card"><h2>${t}</h2>${b}</div>`;
 $('gBox').innerHTML=sel+kpis+cd('Receita e lucro por dia',c1)+cd('Evolução do saldo da caixa',c2)+cd('Produtos mais lucrativos',c3)+cd('Receita por produto',c4)}
 const empty=t=>`<div class="empty">${t}</div>`;
-function R(){D.prods.sort((a,b)=>a.nome.localeCompare(b.nome,'pt',{sensitivity:'base'}));fpDraw();G();RL();F();I();DV();capShow();LC();AP();FN();PR();ORD();RSV();PL();VH();QV();ANP();DSEM();SAIR();CQ();CESTO();CARA();TIRAR();TRB();AH();BV();CTG();MT();MD();RP();CNR();ROT();RIN();PED();HASHIN();PG();UP();
+function R(){D.prods.sort((a,b)=>a.nome.localeCompare(b.nome,'pt',{sensitivity:'base'}));fpDraw();G();RL();F();I();DV();capShow();LC();AP();FN();PR();ORD();RSV();PL();VH();QV();ANP();DSEM();SAIR();CQ();CESTO();CARA();TIRAR();TRB();AH();BV();CTG();MT();MD();RP();CNR();ROT();RIN();PED();HASHIN();PG();UP();stUso();storUpd();
 opts('vProd');opts('aProd');opts('pProd');opts('sProd');if(!$('sData').value)$('sData').value=td();$('sData').max=td();$('vData').max=td();vDataSet();showImg();if(!$('aData').value)$('aData').value=td();$('aData').max=td();lotesDraw();E();if(!$('vPreco').value)fillPreco();if(!$('aPreco').value)fillEmb();
 const hoje=D.vendas.filter(v=>v.data===td());const hojeL=D.vendas.filter(v=>v.data===td()||v.reg===td());
 $('vLista').innerHTML=hojeL.length?hojeL.slice().reverse().map(v=>`<div class="item"><div class="pi">${P(v.pid)?av(P(v.pid),38):''}<div>${v.devol?'↩️ Devolução · ':''}${esc(v.nome)} ×${v.qtd}<small>${v.data!==td()?'📅 venda de '+fmtD(v.data)+' · ':''}${v.hora?v.hora+' · ':''}${money(v.qtd*v.preco)} · ${v.fiado?'🤝 A dever':fpI(fpK(v))+' '+fpN(fpK(v))} · lucro ${money(v.qtd*(v.preco-v.custo))}</small></div></div><button class="mini dng" onclick="delVenda('${v.id}')">✕</button></div>`).join(''):empty('Ainda sem vendas hoje.');
 const bq=($('aBusca').value||'').trim().toLowerCase(),lista=D.prods.filter(p=>!bq||p.nome.toLowerCase().indexOf(bq)>=0);
-$('aLista').innerHTML=lista.length?lista.map(p=>`<div class="item wr"><div class="pi" style="flex:1">${av(p)}<div><b>${esc(p.nome)}</b><small>Custo${p.cm>0?' médio':''} ${money(custo(p))} · Venda ${money(p.venda)}/un.</small><small class="${p.venda-custo(p)<0?'bad':'good'}">Lucro ${money(p.venda-custo(p))}/un. (${p.venda>0?Math.round((p.venda-custo(p))/p.venda*100):0}%)</small><small>Mín. ${c2(mn(p))}${p.ideal>mn(p)?' · ideal '+c2(p.ideal):''} · ${p.meia===false?'sem meia':'vende meia'}${p.fornH?' · '+esc(p.fornH):''}${p.onde==='K'?' · só Kikolo':p.onde==='V'?' · só Vila':''}</small>${p.meta>0?'<small>Meta '+c2(p.meta)+'/mês · vendidas '+c2(vMes(p))+' este mês</small>':''}${p.promoQ>=2?`<small>🏷️ Promoção: ${p.promoQ} por ${money(p.promoP)}</small>`:''}${p.val?`<small class="${valSt(p).c}">Validade ${fmtD(p.val)}${valSt(p).t?' · '+valSt(p).t:''}</small>`:''}</div></div><b class="${p.stock<=0?'bad':p.stock<=mn(p)?'warn':''}">${p.stock} un.</b><div class="acts"><button class="mini sec ab" title="Desfazer compra" aria-label="Desfazer compra" onclick="desfazCompra('${p.id}')">↩️</button><button class="mini sec ab" title="Editar" aria-label="Editar" onclick="editProd('${p.id}')">✏️</button><button class="mini dng ab" title="Apagar" aria-label="Apagar" onclick="delProd('${p.id}')">✕</button></div></div>`).join(''):empty(bq?'Nenhum produto encontrado.':'Sem produtos.');
+$('aLista').innerHTML=lista.length?lista.map(p=>`<div class="item wr"><div class="pi" style="flex:1">${av(p)}<div><b>${esc(p.nome)}</b><small>Custo${p.cm>0?' médio':''} ${money(custo(p))} · Venda ${money(p.venda)}/un.</small><small class="${p.venda-custo(p)<0?'bad':'good'}">Lucro ${money(p.venda-custo(p))}/un. (${p.venda>0?Math.round((p.venda-custo(p))/p.venda*100):0}%)</small><small>Mín. ${c2(mn(p))}${p.ideal>mn(p)?' · ideal '+c2(p.ideal):''} · ${p.meia===false?'sem meia':'vende meia'}${p.fornH?' · '+esc(p.fornH):''}${p.onde==='K'?' · só Kikolo':p.onde==='V'?' · só Vila':''}</small>${p.meta>0?'<small>Previsão '+c2(p.meta)+'/mês · vendidas '+c2(vMes(p))+' este mês</small>':''}${p.promoQ>=2?`<small>🏷️ Promoção: ${p.promoQ} por ${money(p.promoP)}</small>`:''}${p.val?`<small class="${valSt(p).c}">Validade ${fmtD(p.val)}${valSt(p).t?' · '+valSt(p).t:''}</small>`:''}</div></div><b class="${p.stock<=0?'bad':p.stock<=mn(p)?'warn':''}">${p.stock} un.</b><div class="acts"><button class="mini sec ab" title="Desfazer compra" aria-label="Desfazer compra" onclick="desfazCompra('${p.id}')">↩️</button><button class="mini sec ab" title="Editar" aria-label="Editar" onclick="editProd('${p.id}')">✏️</button><button class="mini dng ab" title="Apagar" aria-label="Apagar" onclick="delProd('${p.id}')">✕</button></div></div>`).join(''):empty(bq?'Nenhum produto encontrado.':'Sem produtos.');
 $('aCompras').innerHTML=D.compras.length?pastasProd(D.compras.slice().reverse(),c=>c.pid||c.nome,c=>c.nome,c=>`<div class="item"><div>${esc(c.nome)} ${c.sem?'🧺 stock que já tinha':'×'+embC(c)}<small>Entrada ${fmtD(c.ent||c.data)}${c.hora&&(!c.ent||c.ent===c.data)?' '+c.hora:''} · +${c.un} un.${c.forn?' · 🏪 '+esc(c.forn):''}</small></div><div><b>${c.sem?'sem custo':money(c.total)}</b> ${c.sem?'':`<button class="mini sec" onclick="editCompra('${c.id}')">✏️</button> <button class="mini sec" onclick="setForn('${c.id}')" title="Fornecedor">🏪</button> `}<button class="mini dng" onclick="delCompra('${c.id}')">✕</button></div></div>`,l=>'+'+c2(l.reduce((s,c)=>s+c.un,0))+' un. · '+money(l.reduce((s,c)=>s+(c.total||0),0)),c=>c.ent||c.data):empty('Ainda sem compras.');
 const ent=D.caixa.filter(c=>c.tipo==='entrada'&&!c.troca).reduce((s,c)=>s+c.valor,0),sai=D.caixa.filter(c=>c.tipo==='saida'&&!c.troca).reduce((s,c)=>s+c.valor,0);
 $('cSaldo').textContent=money(ent-sai);$('cSaldo').className='v '+(ent-sai<0?'bad':'good');$('cEnt').textContent=money(ent);$('cSai').textContent=money(sai);
@@ -1203,7 +1240,7 @@ assina();bjPdf()}
 /* ===== Editar produto ===== */
 let editId=null,eSig='';
 function fillEdit(id){const p=P(id);editId=p?p.id:null;
-$('eNome').value=p?p.nome:'';$('eUn').value=p?p.unEmb:'';$('ePreco').value=p?p.precoEmb:'';$('eVenda').value=p?p.venda:'';$('eMin').value=p?mn(p):'';$('eMeia').value=p&&p.meia===false?'0':'1';$('eIdeal').value=p&&p.ideal>0?p.ideal:'';$('eForn').value=p&&p.fornH?p.fornH:'';$('eMeta').value=p&&p.meta>0?p.meta:'';$('eOnde').value=p&&p.onde?p.onde:'';$('eVal').value=p&&p.val?p.val:'';$('ePQ').value=p&&p.promoQ?p.promoQ:'';$('ePP').value=p&&p.promoP?p.promoP:'';
+$('eNome').value=p?p.nome:'';$('eUn').value=p?p.unEmb:'';$('ePreco').value=p?p.precoEmb:'';$('eVenda').value=p?p.venda:'';$('eMin').value=p?mn(p):'';$('eMeia').value=p&&p.meia===false?'0':'1';$('eIdeal').value=p&&p.ideal>0?p.ideal:'';$('eForn').value=p&&p.fornH?p.fornH:'';$('eMeta').value=p&&p.meta>0?p.meta:'';metaRef(p);$('eOnde').value=p&&p.onde?p.onde:'';$('eVal').value=p&&p.val?p.val:'';$('ePQ').value=p&&p.promoQ?p.promoQ:'';$('ePP').value=p&&p.promoP?p.promoP:'';
 if($('eSel').value!==String(editId||''))$('eSel').value=editId||'';
 $('eImg').innerHTML=p?av(p,44,1):'';
 $('eInfo').textContent=p?'As vendas antigas não mudam. O novo custo só vale para as próximas vendas. Se mudar o preço ou as unidades da embalagem, o custo médio recomeça nesse preço.':'Ainda não há produtos. Crie um produto novo mais abaixo.'}
@@ -1235,7 +1272,7 @@ async function unwrapK(k,b){const u=b2u(b);return new Uint8Array(await crypto.su
 const dekFrom=raw=>crypto.subtle.importKey('raw',raw,'AES-GCM',true,['encrypt','decrypt']);
 async function encBlob(txt,k){const iv=crypto.getRandomValues(new Uint8Array(12));return JSON.stringify({iv:u2b(iv),ct:u2b(new Uint8Array(await crypto.subtle.encrypt({name:'AES-GCM',iv},k,new TextEncoder().encode(txt))))})}
 async function decBlob(s,k){const o=JSON.parse(s);return new TextDecoder().decode(await crypto.subtle.decrypt({name:'AES-GCM',iv:b2u(o.iv)},k,b2u(o.ct)))}
-async function encW(j,k){localStorage.setItem(K2,await encBlob(j,k))}
+async function encW(j,k){await kvSet(K2,await encBlob(j,k))}
 /* PIN de versões antigas (só verificação) */
 async function kdf(t,salt,m){
 if(m==='pb'){if(!HASSUB)return'';const k=await crypto.subtle.importKey('raw',new TextEncoder().encode(t),'PBKDF2',false,['deriveBits']);return b2h(new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2',hash:'SHA-256',salt:h2b(salt),iterations:PIL},k,256)))}
@@ -1258,7 +1295,7 @@ function unlock(){$('lock').style.display='none';document.body.classList.remove(
 function lockNow(){if(!pinData())return;
 if(ENC&&!LOCKED){LOCKED=true;DEK=null;D=inicial();norm();fixL();R();$('printSheet').innerHTML=''}
 $('lkImg').src=document.querySelector('.hero img').src;$('lock').style.display='flex';document.body.classList.add('locked');$('lkPin').value='';$('lkRec').style.display='none';$('lkNew').style.display='none';lkMsg('');lkTick()}
-async function openData(dek){let raw=localStorage.getItem(K2),x=null;
+async function openData(dek){let raw=kvGet(K2),x=null;
 if(raw){try{x=JSON.parse(await decBlob(raw,dek))}catch(e){try{localStorage.setItem('bejoma_enc_copia',raw)}catch(_){}if(!confirm('Os dados cifrados estão danificados e não foi possível abri-los. Começar com dados vazios? (Depois pode importar um backup.)'))return false}}
 D=x||inicial();norm();fixL();DEK=dek;ENC=true;LOCKED=false;try{R()}catch(e){console.error(e);try{toast('Erro ao mostrar um ecrã: '+e.message)}catch(_){}}try{check()}catch(e){}return true}
 async function lkTry(){if(busy)return;if(wait()>0)return lkTick();const d=pinData(),p=$('lkPin').value;if(!d)return unlock();if(!p)return;
@@ -1299,15 +1336,15 @@ if(busy||LOCKED)return;busy=1;const bt=document.querySelector('#pnOff button');b
 try{await wq;const s=rnd(16),rs=rnd(16),dek=await crypto.subtle.generateKey({name:'AES-GCM',length:256},true,['encrypt','decrypt']),raw=new Uint8Array(await crypto.subtle.exportKey('raw',dek));
 const ws=await wrapK(await kek('p|'+a,s,PIT),raw),wr=await wrapK(await kek('r|'+w,rs,PIT),raw);
 const blob=await encBlob(JSON.stringify(D),dek);if(!Array.isArray(JSON.parse(await decBlob(blob,dek)).prods))throw 0;
-localStorage.setItem(K2,blob);localStorage.setItem(PK,JSON.stringify({v:3,it:PIT,ri:PIT,s,rs,ws,wr}));DEK=dek;ENC=true;remMirror();localStorage.removeItem(K);failClear();
+await kvSet(K2,blob);localStorage.setItem(PK,JSON.stringify({v:3,it:PIT,ri:PIT,s,rs,ws,wr}));DEK=dek;ENC=true;remMirror();kvDel(K);failClear();
 ['pnA','pnB','pnW'].forEach(i=>$(i).value='');PN();alert('PIN activado e dados cifrados. Anote a frase de recuperação num sítio seguro.')}
-catch(e){if(!ENC){localStorage.removeItem(K2);localStorage.removeItem(PK)}alert('Não foi possível cifrar os dados. Nada foi alterado.')}
+catch(e){if(!ENC){kvDel(K2);localStorage.removeItem(PK)}alert('Não foi possível cifrar os dados. Nada foi alterado.')}
 finally{busy=0;bt.disabled=false;bt.textContent='Activar PIN'}}
 async function pinOff(){const d=pinData();if(!d)return;if(wait()>0)return alert('Bloqueado por tentativas erradas. Aguarde '+fmt(Math.ceil(wait()/1000))+'.');if(busy)return;busy=1;
 try{let ok=false;
 if(d.v===3){try{await unwrapK(await kek('p|'+$('pnC').value,d.s,d.it),d.ws);ok=true}catch(e){}}else ok=await chkPin(d,$('pnC').value);
 if(!ok){failAdd();$('pnC').value='';return alert('PIN actual errado.')}
-if(d.v===3){if(!confirm('Remover o PIN também retira a cifra dos dados neste aparelho. Continuar?'))return;await wq;localStorage.setItem(K,JSON.stringify(D));ENC=false;DEK=null;localStorage.removeItem(K2);localStorage.removeItem('bejoma_rem')}
+if(d.v===3){if(!confirm('Remover o PIN também retira a cifra dos dados neste aparelho. Continuar?'))return;await wq;await kvSet(K,JSON.stringify(D));ENC=false;DEK=null;kvDel(K2);localStorage.removeItem('bejoma_rem')}
 failClear();localStorage.removeItem(PK);$('pnC').value='';PN();alert('PIN removido.')}
 finally{busy=0}}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)away=Date.now();else if(pinData()&&away&&Date.now()-away>60000)lockNow()});
@@ -1490,7 +1527,14 @@ function mtHist(){const h=td();let mi=null;D.vendas.forEach(v=>{if(mi===null||v.
 function mtSugG(tipo){const hd=mtHist();if(hd<14)return null;const h=td(),ini=adD(h,-hd);let t=0;D.vendas.forEach(v=>{if(v.data>=ini&&v.data<h)t+=tipo==='lucro'?v.qtd*(v.preco-v.custo):v.qtd*v.preco});return Math.max(0,Math.round(t/hd*mtStats().N/100)*100)}
 function mtSugPr(pid){const hd=mtHist();if(hd<14)return null;const h=td(),ini=adD(h,-hd);let t=0;D.vendas.forEach(v=>{if(v.pid===pid&&v.data>=ini&&v.data<h)t+=v.qtd});return t>0?Math.max(1,Math.round(t/hd*mtStats().N)):null}
 const mtCor=r=>r==='feito'||r==='ok'?'var(--good)':r==='quase'?'#e0a000':r==='atras'?'var(--bad)':'var(--sub)',mtLab=r=>({feito:'🏆 Meta atingida!',ok:'✅ No ritmo',quase:'🟡 Quase no ritmo',atras:'🔴 Atrasado',ini:'Começo do mês'})[r];
-const mtRow=(txt,st,pd,bt,img)=>{const cor=mtCor(st.r);return '<div style="margin:8px 0 14px;'+(img?'display:flex;gap:12px;align-items:flex-start':'')+'">'+(img||'')+'<div style="'+(img?'flex:1;min-width:0':'')+'"><div style="display:flex;justify-content:space-between;gap:8px"><b>'+txt+'</b><span style="font-weight:700;color:'+cor+'">'+st.pct+'%</span></div><div style="height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin:6px 0"><div style="height:100%;width:'+Math.min(100,st.pct)+'%;background:'+cor+'"></div></div><small style="color:var(--sub)">'+mtLab(st.r)+(st.r==='feito'?'':' · precisa de '+pd)+'</small>'+(bt?'<div style="display:flex;gap:8px;margin-top:6px">'+bt+'</div>':'')+'</div></div>'};
+function metaRef(p){p=p||P(editId);const e=$('eMetaRef');if(!e)return;if(!p){e.textContent='';return}
+const h=td(),ini=adD(h,-30);let r=0;D.vendas.forEach(v=>{if(v.pid===p.id&&v.data>ini)r+=v.qtd});
+const gm=mtV().prods[p.id],t=n($('eMeta').value);let x=(gm>0?'Meta da aba Metas: '+c2(gm)+' un. · ':'')+'Vendeu '+c2(r)+' un. nos últimos 30 dias.';
+if(t>0&&r>0&&t>r*1.25&&t-r>=3)x+=' ⚠️ A sua previsão está '+Math.round((t/r-1)*100)+'% acima do que vende: o stock sugerido vai ficar a mais.';else if(t>0&&!(r>0))x+=' Ainda sem vendas para comparar.';
+e.textContent=x}
+function mtCx(p){const s=Math.max(0,p.stock||0),mi=mn(p),id=p.ideal>mi?p.ideal:mi*3;return s<=mi?'falta':s>=id?'alto':''}
+function mtCxTx(p){const c=mtCx(p);return c==='falta'?'⚠️ Stock baixo ('+c2(Math.max(0,p.stock||0))+' un., mínimo '+c2(mn(p))+'): pode estar a perder vendas. Reponha.':c==='alto'?'📦 Stock alto ('+c2(Math.max(0,p.stock||0))+' un.): o problema é a saída. Não compre mais; pense numa promoção.':''}
+const mtRow=(txt,st,pd,bt,img,ex)=>{const cor=mtCor(st.r);return '<div style="margin:8px 0 14px;'+(img?'display:flex;gap:12px;align-items:flex-start':'')+'">'+(img||'')+'<div style="'+(img?'flex:1;min-width:0':'')+'"><div style="display:flex;justify-content:space-between;gap:8px"><b>'+txt+'</b><span style="font-weight:700;color:'+cor+'">'+st.pct+'%</span></div><div style="height:8px;background:var(--line);border-radius:6px;overflow:hidden;margin:6px 0"><div style="height:100%;width:'+Math.min(100,st.pct)+'%;background:'+cor+'"></div></div><small style="color:var(--sub)">'+mtLab(st.r)+(st.r==='feito'?'':' · precisa de '+pd)+'</small>'+(ex?'<small style="display:block;margin-top:3px">'+ex+'</small>':'')+(bt?'<div style="display:flex;gap:8px;margin-top:6px">'+bt+'</div>':'')+'</div></div>'};
 function mtSug(){const t=$('mtT').value,v=mtSugG(t);$('mtS').textContent=v===null?'Ainda sem sugestão: são precisas pelo menos 2 semanas de vendas registadas.':'Sugestão: '+money(v)+' (média das últimas '+Math.round(mtHist()/7)+' semanas, ajustada ao mês).'}
 function mtUsarSug(){const v=mtSugG($('mtT').value);if(v===null)return alert('Ainda não há vendas suficientes para sugerir (precisa de 2 semanas).');$('mtV').value=v}
 function mtSaveG(){const t=String($('mtV').value).replace(/\s/g,'').replace(',','.');const n=t===''?0:parseFloat(t);if(isNaN(n)||n<0)return alert('Valor inválido.');const mv=mtV();mv.tipo=$('mtT').value;mv.geral=n;const ok=msBal(-1);save();R();toast(n>0?(ok?'Meta guardada e metas diárias recalculadas.':'Meta guardada.'):'Meta geral removida.')}
@@ -1504,7 +1548,7 @@ if(mv.geral>0){const at=mv.tipo==='lucro'?S.lu:S.rc,st=mtSt(at,mv.geral,S);$('mt
 const vi=$('mtV');if(vi&&vi.dataset.g!==String(mv.geral)){vi.dataset.g=String(mv.geral);vi.value=mv.geral>0?mv.geral:'';$('mtT').value=mv.tipo}
 mtSug();
 const ks=Object.keys(mv.prods).filter(k=>D.prods.some(p=>p.id===k)),ord={atras:0,quase:1,ok:2,ini:3,feito:4};
-$('mtP').innerHTML=ks.length?ks.map(k=>({p:D.prods.find(x=>x.id===k),q:mv.prods[k],at:S.un[k]||0})).map(x=>Object.assign(x,{st:mtSt(x.at,x.q,S)})).sort((a,b)=>ord[a.st.r]-ord[b.st.r]||a.st.pct-b.st.pct).map(x=>mtRow(esc(x.p.nome)+': '+c2(x.at)+' de '+c2(x.q)+' un.',x.st,Math.ceil(x.st.pd)+' un. por dia','<button class="mini" style="margin:0" onclick="mtEdit(\''+x.p.id+'\')">✏️</button><button class="mini dng" style="margin:0" onclick="mtDel(\''+x.p.id+'\')">✕</button>',av(x.p,52))).join(''):'<div class="empty">Ainda sem metas por produto. Escolha abaixo, ou toque em “Criar para os 5 mais vendidos”.</div>';
+$('mtP').innerHTML=ks.length?ks.map(k=>({p:D.prods.find(x=>x.id===k),q:mv.prods[k],at:S.un[k]||0})).map(x=>Object.assign(x,{st:mtSt(x.at,x.q,S)})).sort((a,b)=>ord[a.st.r]-ord[b.st.r]||a.st.pct-b.st.pct).map(x=>mtRow(esc(x.p.nome)+': '+c2(x.at)+' de '+c2(x.q)+' un.',x.st,Math.ceil(x.st.pd)+' un. por dia','<button class="mini" style="margin:0" onclick="mtEdit(\''+x.p.id+'\')">✏️</button><button class="mini dng" style="margin:0" onclick="mtDel(\''+x.p.id+'\')">✕</button>',av(x.p,52),(x.st.r==='atras'||x.st.r==='quase')?mtCxTx(x.p):'')).join(''):'<div class="empty">Ainda sem metas por produto. Escolha abaixo, ou toque em “Criar para os 5 mais vendidos”.</div>';
 const sel=$('mtPr'),op=D.prods.filter(p=>!mv.prods[p.id]).sort((a,b)=>a.nome.localeCompare(b.nome,'pt',{sensitivity:'base'})),key=op.map(p=>p.id).join(',');
 if(sel.dataset.k!==key){const cur=sel.value;sel.dataset.k=key;sel.innerHTML='<option value="">— escolha —</option>'+op.map(p=>'<option value="'+p.id+'">'+esc(p.nome)+'</option>').join('');if(op.some(p=>p.id===cur))sel.value=cur}
 mtSugP()}
@@ -1591,9 +1635,9 @@ if(navigator.share){navigator.share({text:t}).catch(()=>{})}else if(navigator.cl
 function rpBadge(n){const b=document.querySelector('#tb button[data-g="armazem"]');if(!b)return;let i=b.querySelector('.bdg');if(n>0){if(!i){i=document.createElement('i');i.className='bdg';b.appendChild(i)}i.textContent=n>99?'99+':n}else if(i)i.remove()}
 const rpCfg2=()=>Object.assign({dm:3,dc:7},D.repCfg||{});
 function vMes(p){const ym=td().slice(0,7);return D.vendas.filter(v=>v.pid===p.id&&(v.data||'').slice(0,7)===ym).reduce((a,v)=>a+v.qtd,0)}
-function sugMI(p,rates){const c=rpCfg2();let rate=0,src='';if(p.meta>0){rate=p.meta/30;src='meta de '+c2(p.meta)+' por mês'}else if(rates&&rates[p.id]>0){rate=rates[p.id];src='vendas das últimas 4 semanas'}if(!(rate>0))return null;
+function sugMI(p,rates){const c=rpCfg2();let rate=0,src='';if(p.meta>0){rate=p.meta/30;src='previsão de '+c2(p.meta)+' por mês'}else if(rates&&rates[p.id]>0){rate=rates[p.id];src='vendas das últimas 4 semanas'}if(!(rate>0))return null;
 const mi=Math.max(1,Math.ceil(rate*c.dm)),u=p.unEmb>0?p.unEmb:0,ide=u?mi+Math.max(1,Math.round(rate*c.dc/u))*u:mi+Math.ceil(rate*c.dc);return{rate,src,min:mi,ideal:ide}}
-function rpSugForm(){const p=P(editId);if(!p)return alert('Escolha primeiro o produto.');const q=Object.assign({},p),m=n($('eMeta').value);if(m>0)q.meta=m;else delete q.meta;q.unEmb=n($('eUn').value)||p.unEmb;const s=sugMI(q,rpDados().rates);if(!s)return alert('Sem meta mensal nem vendas registadas para calcular.');$('eMin').value=s.min;$('eIdeal').value=s.ideal;toast('Pela '+s.src+': mínimo '+s.min+', ideal '+s.ideal+'. Toque em Guardar para aceitar.')}
+function rpSugForm(){const p=P(editId);if(!p)return alert('Escolha primeiro o produto.');const q=Object.assign({},p),m=n($('eMeta').value);if(m>0)q.meta=m;else delete q.meta;q.unEmb=n($('eUn').value)||p.unEmb;const s=sugMI(q,rpDados().rates);if(!s)return alert('Sem previsão mensal nem vendas registadas para calcular.');$('eMin').value=s.min;$('eIdeal').value=s.ideal;toast('Pela '+s.src+': mínimo '+s.min+', ideal '+s.ideal+'. Toque em Guardar para aceitar.')}
 function rpDias(){const c=rpCfg2(),a=prompt('Quantos dias de vendas o MÍNIMO deve cobrir? (os dias até ir à loja, com folga)',c.dm);if(a===null)return;const b=prompt('De quantos em quantos dias compra? (o IDEAL cobre este tempo)',c.dc);if(b===null)return;D.repCfg=Object.assign({},D.repCfg,{dm:Math.max(1,n(a)),dc:Math.max(1,n(b))});save();R()}
 function rpSugL(){const d=rpDados(),L=[];if(d.poucos&&!D.prods.some(p=>p.meta>0))return L;D.prods.forEach(p=>{if(D.sugIgn&&D.sugIgn[p.id]===td().slice(0,7))return;const s=sugMI(p,p.meta>0||!d.poucos?d.rates:null);if(!s)return;const mi=mn(p),ide=p.ideal>mi?p.ideal:0,dm=Math.abs(s.min-mi)/Math.max(s.min,mi),di=ide?Math.abs(s.ideal-ide)/Math.max(s.ideal,ide):1;if((dm>=0.3&&Math.abs(s.min-mi)>=2)||(ide&&di>=0.3&&Math.abs(s.ideal-ide)>=2)||(!ide&&s.ideal>s.min))L.push({p,s,mi,ide,k:Math.max(dm,di)})});return L.sort((a,b)=>b.k-a.k)}
 function rpSugR(){const e=$('rpSug'),c=$('rpSugC');if(!e||!c)return;const L=rpSugL();c.style.display=L.length?'':'none';
@@ -1673,7 +1717,7 @@ if(o.tot>0||orLin().length)S.push({ic:'💸',n:'Orçamento de despesas',g:"goTab
 if(MS.restam<=10){
 if(mv.geral>0){const at=mv.tipo==='lucro'?MS.lu:MS.rc,st=mtSt(at,mv.geral,MS);if(st.r==='atras'||st.r==='quase')R.push([MS.restam<=5&&st.r==='atras'?2:1,'Meta de '+(mv.tipo==='lucro'?'lucro':'vendas')+' do mês em risco: '+st.pct+'% (faltam '+money(Math.ceil(st.falta))+' em '+dias(MS.restam)+')',0])}
 const rk=ks.filter(k=>{const st=mtSt(MS.un[k]||0,mv.prods[k],MS);return st.r==='atras'||st.r==='quase'}).map(k=>D.prods.find(p=>p.id===k));
-if(rk.length)R.push([MS.restam<=5?2:1,rk.length+' meta(s) de produto em risco: '+nomes(rk),0])}
+if(rk.length){const pr=MS.restam<=5?2:1,al=rk.filter(p=>mtCx(p)==='alto'),ou=rk.filter(p=>mtCx(p)!=='alto');if(al.length)R.push([pr,'Atrasado na meta mas com stock alto, não compre (pense numa promoção): '+nomes(al),0]);if(ou.length)R.push([pr,ou.length+' meta(s) de produto em risco: '+nomes(ou),0])}}
 if(mv.geral>0||ks.length)S.push({ic:'🎯',n:'Metas de vendas',g:"goTab('metas')",ok:'Metas no ritmo',R})}
 {const R=[],pp=(D.pedP||[]).filter(p=>p.estado==='pendente'),pd=(D.pedidos||[]).filter(p=>p.estado==='pendente'),ap=pd.filter(aprOf);let nr=0,vr=0;try{const r=rinPend();nr=r.length;vr=r.reduce((q,i)=>q+i.valor,0)}catch(e){}
 if(pp.length)R.push([2,pp.length+' pedido(s) de dinheiro da Bejoma Pessoal por aprovar: '+money(pp.reduce((q,p)=>q+p.valor,0)),0]);
