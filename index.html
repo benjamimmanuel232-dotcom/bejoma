@@ -46,6 +46,23 @@ button.dng{background:#fff0ef;color:var(--bad);border:1px solid #efc2bd}
 .fade{animation:fd .8s ease both}@keyframes fd{from{opacity:0}}
 .leg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.78rem;color:var(--sub);margin:0 0 6px}.dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
 .tipb{margin-top:8px;font-size:.82rem;color:var(--sub);background:#fffaf3;border:1px dashed var(--line);border-radius:12px;padding:8px 10px;min-height:34px}
+.dtb{margin-top:12px;border:1px solid var(--line);border-radius:16px;background:var(--bg);color:var(--text);overflow:hidden}
+.dtb .dh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:12px 12px 8px}
+.dtb .dh b{font-size:1.05rem}.dtb .dh span{color:var(--sub);font-size:.85rem;font-weight:bold}
+.dtb .dg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 12px 10px}
+.dtb .dg div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:7px 8px}
+.dtb .dg i{display:block;font-style:normal;font-size:.62rem;font-weight:bold;letter-spacing:.04em;text-transform:uppercase;color:var(--sub)}
+.dtb .dg b{font-size:1rem}
+.dtb table{width:100%;border-collapse:collapse;font-size:.78rem;table-layout:fixed}
+.dtb th{background:var(--soft);color:var(--sub);font-size:.62rem;font-weight:bold;letter-spacing:.04em;text-transform:uppercase;text-align:right;padding:7px 4px}
+.dtb th:first-child,.dtb td.pn{text-align:left;padding-left:12px}.dtb th:last-child,.dtb td:last-child{padding-right:12px}
+.dtb td{padding:8px 4px;text-align:right;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums;vertical-align:middle}
+.dtb td.pn{font-weight:bold;line-height:1.2;word-break:break-word}
+.dtb col.c1{width:43%}.dtb col.c2{width:11%}.dtb col.c3{width:21%}.dtb col.c4{width:25%}
+.dtb tr.sc td{text-align:left;font-size:.7rem;font-weight:800;letter-spacing:.03em;text-transform:uppercase;padding:8px 12px;background:var(--card);border-bottom:1px solid var(--line);border-left:4px solid var(--sub)}
+.dtb tr.sc.s1 td{border-left-color:var(--good)}.dtb tr.sc.s2 td{border-left-color:var(--accent)}.dtb tr.sc.s3 td{border-left-color:var(--bad)}
+.dtb tfoot td{font-weight:800;background:var(--soft);border-top:2px solid var(--line);border-bottom:0}
+.dtb .nt{font-size:.7rem;color:var(--sub);margin:0;padding:9px 12px 11px;line-height:1.4}
 .hb{margin:0 0 11px}.hbt{display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:4px}.hbr{height:12px;border-radius:99px;background:#f6ead6;overflow:hidden}.hbf{height:100%;border-radius:99px;animation:gw .7s ease both;transform-origin:left}@keyframes gw{from{transform:scaleX(0)}}
 .donut{display:flex;align-items:center;gap:14px}.donut svg{width:130px;flex:none}.donut .lg{flex:1;font-size:.8rem}.donut .lg div{display:flex;justify-content:space-between;gap:6px;padding:3px 0}
 #printSheet img.pt{width:26px;height:26px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px;-webkit-print-color-adjust:exact;print-color-adjust:exact}#printSheet tr{page-break-inside:avoid}#printSheet h3{page-break-after:avoid}#printSheet td.l,#printSheet th.l{text-align:left}
@@ -682,6 +699,7 @@ const dl={};const add=(pid,d,v)=>{if(!pid||d<ini||d>h)return;(dl[pid]||(dl[pid]=
 D.vendas.forEach(v=>add(v.pid,v.data,v.estr?0:-v.qtd));
 D.compras.forEach(c=>add(c.pid,c.data,+(c.un||0)));
 (Array.isArray(D.perdas)?D.perdas:[]).forEach(x=>add(x.pid,x.data,-(x.qtd||0)));
+(Array.isArray(D.contagens)?D.contagens:[]).forEach(c=>(c.itens||[]).forEach(x=>{if(x&&x.dif>0)add(x.pid,c.data,x.dif)}));
 const out={};D.prods.forEach(p=>{let st=p.stock||0,dias=0;const m=dl[p.id]||{};
 for(let k=N-1;k>=0;k--){const d=ds[k];if(st>0||(m[d]||0)<0)dias++;st-=(m[d]||0)}
 out[p.id]=dias});return out}
@@ -1110,8 +1128,31 @@ return`<p class="empty" style="${bs}">Comparado com ${rg.lab}:<br>Receita ${mone
 function partilharSem(){const A=semData(dAgo(6),td()),t=`Bejoma Doces — Resumo semanal (${dm(dAgo(6))} a ${dm(td())})\nVendas: ${A.n}\nReceita: ${money(A.r)}\nLucro: ${money(A.l)}\nCompras de stock: ${money(A.comp)}\nDespesas: ${money(A.desp)}${A.perd?'\nPerdas e ofertas: '+money(A.perd):''}${A.capD?'\nTransporte de ida (sai do capital): '+money(A.capD):''}`;
 if(navigator.share)navigator.share({text:t}).catch(()=>{});else if(navigator.clipboard)navigator.clipboard.writeText(t).then(()=>alert('Resumo copiado.'));else alert(t)}
 const GT={},GM={};
+/* ===== Tabela do dia (toque num dia do gráfico "Receita e lucro por dia") ===== */
+function dayTbl(id,ds){const box=$('tt'+id.slice(1));if(!box)return;
+const ag={};let nv=0;D.vendas.filter(v=>v.data===ds).forEach(v=>{const a=ag[v.nome]||(ag[v.nome]={q:0,r:0,l:0});a.q+=v.qtd;a.r+=v.qtd*v.preco;a.l+=v.qtd*(v.preco-v.custo);if(v.qtd>0)nv++});
+const all=Object.entries(ag),T=all.reduce((s,e)=>({q:s.q+e[1].q,r:s.r+e[1].r,l:s.l+e[1].l}),{q:0,r:0,l:0});
+const L=all.filter(e=>e[1].q>0).sort((a,b)=>b[1].q-a[1].q||b[1].l-a[1].l||a[0].localeCompare(b[0],'pt',{sensitivity:'base'}));
+const WD=['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'],wd=WD[new Date(ds+'T12:00:00').getDay()];
+const hd='<div class="dh"><b>📅 '+wd+'</b><span>'+dm(ds)+'</span></div>';
+if(!L.length){box.innerHTML='<div class="dtb">'+hd+'<p class="nt">Sem vendas neste dia.</p></div>';return}
+const k=x=>money(x).replace('\u00a0Kz',''),mg=T.r>0?Math.round(T.l/T.r*100):0;
+/* mesma divisão da Venda rápida, mas só com as vendas deste dia */
+const top=L.slice(0,3),r1=L.slice(3),bot=r1.slice(-3),r2=r1.slice(0,r1.length-bot.length),men=r2.slice(-3),med=r2.slice(0,r2.length-men.length);
+const row=e=>{const a=e[1];return'<tr><td class="pn">'+esc(e[0])+'</td><td>'+c2(a.q)+'</td><td>'+k(a.r)+'</td><td class="'+(a.l<0?'bad':'good')+'">'+k(a.l)+'</td></tr>'};
+const sc=(c,t)=>'<tr class="sc s'+c+'"><td colspan="4">'+t+'</td></tr>';
+box.innerHTML='<div class="dtb">'+hd
++'<div class="dg"><div><i>Vendas</i><b>'+nv+'</b></div><div><i>Produtos</i><b>'+L.length+'</b></div><div><i>Margem bruta</i><b>'+mg+'%</b></div></div>'
++'<table><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"></colgroup><thead><tr><th>Produto</th><th>Qtd</th><th>Receita</th><th>Lucro bruto</th></tr></thead><tbody>'
++sc(1,'🔥 Mais vendidos')+top.map(row).join('')
++(men.length?sc(2,'📉 Menos vendidos')+men.map(row).join(''):'')
++(bot.length?sc(3,'🐌 Quase não saíram')+bot.map(row).join(''):'')
++'</tbody><tfoot><tr><td class="pn">Total do dia</td><td>'+c2(T.q)+'</td><td>'+k(T.r)+'</td><td>'+k(T.l)+'</td></tr></tfoot></table>'
++'<p class="nt">Valores em Kz, ordenados pela quantidade vendida só neste dia (como na Venda rápida). Lucro bruto = preço − custo, antes de despesas.'+(med.length?' '+med.length+' produto'+(med.length>1?'s':'')+' de venda média não aparece'+(med.length>1?'m':'')+' na lista, mas conta'+(med.length>1?'m':'')+' no total.':'')+' Para decidir compras, veja "Onde focar" (30 dias).</p></div>'}
+
+
 function scrub(e,id){const g=GM[id];if(!g)return;const r=e.currentTarget.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*g.W;
-let i=g.mode==='b'?Math.floor((x-g.l)/g.st):Math.round((x-g.l)/g.st);i=Math.max(0,Math.min(g.N-1,i));$(id).textContent=GT[id][i];const cx=g.l+g.st*i,h=$('h'+id);
+let i=g.mode==='b'?Math.floor((x-g.l)/g.st):Math.round((x-g.l)/g.st);i=Math.max(0,Math.min(g.N-1,i));$(id).textContent=GT[id][i];if(g.ds&&g.last!==i){g.last=i;dayTbl(id,g.ds[i])}const cx=g.l+g.st*i,h=$('h'+id);
 if(g.mode==='b')h.setAttribute('x',cx);else{h.setAttribute('x1',cx);h.setAttribute('x2',cx);const c=$('hc'+id.slice(1));c.setAttribute('cx',cx);c.setAttribute('cy',g.ys[i])}}
 function G(){
 const N=gper,days=[];for(let k=N-1;k>=0;k--){const ds=dAgo(k),vs=D.vendas.filter(v=>v.data===ds);days.push({ds,r:vs.reduce((s,v)=>s+v.qtd*v.preco,0),l:vs.reduce((s,v)=>s+v.qtd*(v.preco-v.custo),0)})}
@@ -1124,8 +1165,8 @@ if(!R_)c1=empty('Sem vendas neste período.');else{
 const W=360,H=210,m={l:40,r:10,t:12,b:26},st=(W-m.l-m.r)/N,bw=Math.min(st*.62,26),hi=nice(Math.max(...days.map(d=>d.r))),mn_=Math.min(0,...days.map(d=>d.l)),lo=mn_<0?-nice(-mn_):0,f=frame(lo,hi,W,H,m),y0=f.y(0);
 const bars=days.map((d,i)=>{const x=m.l+st*i+(st-bw)/2,yy=f.y(d.r);return`<rect class="bar" x="${x}" y="${yy}" width="${bw}" height="${Math.max(y0-yy,0)}" rx="3" fill="url(#gR)" style="animation-delay:${i*18}ms"/>`+xl(i,N,m.l+st*i+st/2,H,d.ds)}).join('');
 const pts=days.map((d,i)=>[m.l+st*i+st/2,f.y(d.l)]);
-GT.t1=days.map(d=>dm(d.ds)+' — receita '+money(d.r)+' · lucro '+money(d.l));GM.t1={W,l:m.l,st,N,mode:'b'};
-c1=`<div class="leg"><span><i class="dot" style="background:#d97800"></i>Receita</span><span><i class="dot" style="background:#16834a"></i>Lucro</span></div><div class="chart"><svg viewBox="0 0 ${W} ${H}" onpointerdown="scrub(event,'t1')" onpointermove="scrub(event,'t1')"><defs><linearGradient id="gR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3a93a"/><stop offset="1" stop-color="#d97800"/></linearGradient></defs><rect id="ht1" x="-100" y="${m.t}" width="${st}" height="${H-m.t-m.b}" rx="4" fill="#d97800" opacity=".12"/>${f.g}${bars}<polyline class="fade" points="${pts.map(p=>p.join(',')).join(' ')}" fill="none" stroke="#16834a" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>${N<=7?pts.map(p=>`<circle class="fade" cx="${p[0]}" cy="${p[1]}" r="3.6" fill="#fff" stroke="#16834a" stroke-width="2"/>`).join(''):''}</svg></div><div class="tipb" id="t1">Toque ou arraste sobre o gráfico para ver os valores de cada dia.</div>`}
+GT.t1=days.map(d=>dm(d.ds)+' — receita '+money(d.r)+' · lucro '+money(d.l));GM.t1={W,l:m.l,st,N,mode:'b',ds:days.map(d=>d.ds)};
+c1=`<div class="leg"><span><i class="dot" style="background:#d97800"></i>Receita</span><span><i class="dot" style="background:#16834a"></i>Lucro</span></div><div class="chart"><svg viewBox="0 0 ${W} ${H}" onpointerdown="scrub(event,'t1')" onpointermove="scrub(event,'t1')"><defs><linearGradient id="gR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3a93a"/><stop offset="1" stop-color="#d97800"/></linearGradient></defs><rect id="ht1" x="-100" y="${m.t}" width="${st}" height="${H-m.t-m.b}" rx="4" fill="#d97800" opacity=".12"/>${f.g}${bars}<polyline class="fade" points="${pts.map(p=>p.join(',')).join(' ')}" fill="none" stroke="#16834a" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>${N<=7?pts.map(p=>`<circle class="fade" cx="${p[0]}" cy="${p[1]}" r="3.6" fill="#fff" stroke="#16834a" stroke-width="2"/>`).join(''):''}</svg></div><div class="tipb" id="t1">Toque ou arraste sobre o gráfico para ver os valores de cada dia.</div><div id="tt1"></div>`}
 let run=D.caixa.reduce((a,c)=>c.data<dAgo(N-1)?a+(c.tipo==='entrada'?c.valor:-c.valor):a,0);
 const sd=days.map(d=>{D.caixa.filter(c=>c.data===d.ds).forEach(c=>run+=c.tipo==='entrada'?c.valor:-c.valor);return{ds:d.ds,v:run}});
 let c2;
@@ -1569,11 +1610,11 @@ try{p.img=await imgFile(f);save();R()}catch(e){alert('Não foi possível usar es
 function I(){
 const f=fechoData(td()),tot=D.caixa.reduce((s,c)=>s+(c.tipo==='entrada'?c.valor:-c.valor),0),cd=(t,b)=>`<div class="card"><h2>${t}</h2>${b}</div>`;
 const dias=D.ultBackup?Math.floor((new Date(td()+'T12:00:00')-new Date(D.ultBackup+'T12:00:00'))/864e5):null;
-const hoje2=D.vendas.some(v=>v.data===td())||D.compras.some(c=>c.data===td())||D.caixa.some(c=>c.data===td()),bk=xBkBar();
+const hoje2=D.vendas.some(v=>v.data===td())||D.compras.some(c=>c.data===td())||D.caixa.some(c=>c.data===td());
 const st=(k,v,c)=>`<div class="stat"><div class="k">${k}</div><div class="v ${c||''}">${v}</div></div>`;
 const top=Object.entries(f.ag).sort((a,b)=>b[1].q-a[1].q).slice(0,3).map(([k,a],i)=>{const p=D.prods.find(x=>x.nome===k);return`<div class="item"><div class="pi"><span class="rk">${i+1}</span>${p?av(p,40):''}<div>${esc(k)}<small>${money(a.r)}</small></div></div><b>${c2(a.q)} un.</b></div>`}).join('');
 const low=D.prods.filter(p=>p.stock<=mn(p)).sort((a,b)=>a.stock-b.stock),lw=low.slice(0,5).map(p=>`<div class="item"><div class="pi">${av(p,40)}<div>${esc(p.nome)}<small>Mínimo ${mn(p)} un.${repSugT(p)}</small></div></div><b class="${p.stock<=0?'bad':'warn'}">${p.stock} un.</b></div>`).join('');
-$('iBox').innerHTML=storCard()+reporCard()+bk+dvIni()+focoCard()+promoCard()+valCard()+xCapCard()
+$('iBox').innerHTML=storCard()+reporCard()+dvIni()+focoCard()+promoCard()+valCard()+xCapCard()
 +cd('🏠 Hoje · '+fmtD(td()),`<div class="grid">${st('VENDAS',f.n)}${st('RECEITA',money(f.rec))}${st('LUCRO BRUTO',money(f.bruto),f.bruto<0?'bad':'good')}${st('SALDO DA CAIXA',money(tot),tot<0?'bad':'')}</div><div class="two" style="margin-top:12px"><button onclick="goTab('vendas')">🛍️ Registar venda</button><button class="sec" onclick="goTab('fecho')">📒 Fecho do dia</button></div>`)
 +cd('🏆 Mais vendidos hoje',top||empty('Ainda sem vendas hoje.'))
 +(low.length?cd('⚠️ Repor stock ('+low.length+')',lw+(low.length>5?`<small style="display:block;color:var(--sub);margin-top:6px">e mais ${low.length-5}… veja no Armazém</small>`:'')):'')}
@@ -1844,10 +1885,11 @@ if(pd.length>ap.length)R.push([1,(pd.length-ap.length)+' pedido(s) seu(s) ainda 
 if(nr)R.push([1,nr+' retirada(s) da Bejoma Pessoal por importar: '+money(vr),0]);
 S.push({ic:'🔗',n:'Bejoma Pessoal',g:"goTab('caixa','bp')",ok:'Nada pendente',R})}
 {const R=[],dias_=D.ultBackup?dd(D.ultBackup,h):null;if(dias_===null||dias_>=2)R.push([dias_===null||dias_>=7?2:1,dias_===null?'Ainda não fez backup neste telemóvel':'Sem backup há '+dias(dias_),0]);
-{const ex=D.bkExt?dd(D.bkExt,h):null;if(ex===null||ex>=3)R.push([1,ex===null?'Nenhuma cópia saiu do telemóvel: se ele se perder, perde tudo. Partilhe o backup (WhatsApp, Drive ou e-mail)':'Última cópia fora do telemóvel há '+dias(ex),0,'partilharBackup()'])}S.push({ic:'💾',n:'Cópia de segurança',g:"goTab('backup')",ok:'Backup recente',R})}
+{const ex=D.bkExt?dd(D.bkExt,h):null;if(ex===null||ex>=3)R.push([1,ex===null?'Nenhuma cópia saiu do telemóvel: se ele se perder, perde tudo. Partilhe o backup (WhatsApp, Drive ou e-mail)':'Última cópia fora do telemóvel há '+dias(ex),0,'partilharBackup()'])}S.push({ic:'💾',n:'Cópia de segurança',g:"goTab('backup')",ok:'Backup recente',R,bk:1})}
 let u=0,a=0;S.forEach(x=>{x.R.sort((p,q)=>q[0]-p[0]||q[2]-p[2]);x.R.forEach(r=>{if(r[0]===2)u++;else if(r[0]===1)a++})});
+const bkX=()=>{try{const d=D.ultBackup?xDD(D.ultBackup,h):null,e=D.bkExt?xDD(D.bkExt,h):null,pr=d===null||d>=1||e===null||e>=3;return'<div class="empty" style="margin:2px 0 0;font-size:.82rem">Último backup no telemóvel: <b>'+xQuando(d)+'</b><br>Cópia fora do telemóvel (WhatsApp, Drive, e-mail): <b>'+xQuando(e)+'</b></div><button class="'+(pr?'':'sec')+'" style="margin-top:8px" onclick="partilharBackup()">📤 '+(pr?'Enviar backup agora':'Enviar outro backup')+'</button>'}catch(err){return''}};
 const col=sv=>sv===2?'var(--bad)':sv===1?'#e0a000':'var(--sub)',ic=sv=>sv===2?'🔴':sv===1?'🟡':'⚪';
-const html='<div class="card"><h2>🛡️ Controlo</h2><p class="empty" style="margin:-6px 0 6px">'+(u||a?(u?'<b style="color:var(--bad)">'+u+' urgente(s)</b>':'')+(u&&a?' · ':'')+(a?'<b style="color:#e0a000">'+a+' a precisar de atenção</b>':''):'✅ Tudo em ordem.')+'</p>'+S.map(x=>{const pr=x.R.filter(r=>r[0]>0).length,top=x.R.slice(0,4);return '<div style="margin-top:10px;cursor:pointer" onclick="'+x.g+'"><b>'+x.ic+' '+x.n+'</b> <span style="font-size:.8rem;color:'+(pr?col(x.R[0][0]):'var(--good)')+'">'+(pr?'':'✅ '+x.ok)+'</span></div>'+top.map(r=>'<div class="item" style="padding:6px 0;cursor:pointer" onclick="'+(r[3]||x.g)+'"><div style="font-size:.88rem;color:'+col(r[0])+'">'+ic(r[0])+' '+r[1]+'</div></div>').join('')+(x.R.length>4?'<div class="empty" style="margin:2px 0 0">+ '+(x.R.length-4)+' mais…</div>':'')}).join('')+'</div>';
+const html='<div class="card"><h2>🛡️ Controlo</h2><p class="empty" style="margin:-6px 0 6px">'+(u||a?(u?'<b style="color:var(--bad)">'+u+' urgente(s)</b>':'')+(u&&a?' · ':'')+(a?'<b style="color:#e0a000">'+a+' a precisar de atenção</b>':''):'✅ Tudo em ordem.')+'</p>'+S.map(x=>{const pr=x.R.filter(r=>r[0]>0).length,top=x.R.slice(0,4);return '<div style="margin-top:10px;cursor:pointer" onclick="'+x.g+'"><b>'+x.ic+' '+x.n+'</b> <span style="font-size:.8rem;color:'+(pr?col(x.R[0][0]):'var(--good)')+'">'+(pr?'':'✅ '+x.ok)+'</span></div>'+top.map(r=>'<div class="item" style="padding:6px 0;cursor:pointer" onclick="'+(r[3]||x.g)+'"><div style="font-size:.88rem;color:'+col(r[0])+'">'+ic(r[0])+' '+r[1]+'</div></div>').join('')+(x.R.length>4?'<div class="empty" style="margin:2px 0 0">+ '+(x.R.length-4)+' mais…</div>':'')+(x.bk?bkX():'')}).join('')+'</div>';
 if(b.dataset.h!==html){b.dataset.h=html;b.innerHTML=html}}
 function fsGet(){try{return localStorage.getItem('bejoma_fs')||'g'}catch(e){return'g'}}
 function fsSet(v){try{localStorage.setItem('bejoma_fs',v)}catch(e){}document.documentElement.style.fontSize={p:'12px',m:'14px',g:'16px'}[v]||'16px'}
@@ -2213,9 +2255,9 @@ function vhLimpar(){['vhQ','vhF','vhA','vhB'].forEach(i=>{const e=$(i);if(e)e.va
 const fnN=t=>String(t==null?'':t).replace(/\s+/g,' ').trim(),fnK=t=>nz(fnN(t));
 let FNL=[],FNO={};
 function fnAbre(i){const f=FNL[i];if(!f)return;FNO[f.k]=!FNO[f.k];FN()}
-function fnProd(f){const m={};D.compras.forEach(c=>{if(c.sem||fnK(c.forn)!==f.k)return;const k=c.pid||c.nome,p=c.pid?P(c.pid):null,o=m[k]||(m[k]={nome:p?p.nome:c.nome,n:0,un:0,tot:0,ult:'',pu:0,dt:''});o.n++;o.un+=c.un||0;o.tot+=c.total||0;const d=(c.data||'')+(c.hora||'');if(d>=o.ult){o.ult=d;o.pu=c.un>0?(c.total||0)/c.un:0;o.dt=c.data||''}});
-const L=Object.values(m).sort((a,b)=>a.ult<b.ult?1:a.ult>b.ult?-1:b.tot-a.tot);let pd=null;
-return`<div style="margin:0 0 10px 10px;padding:4px 10px;border-left:3px solid var(--line)"><small style="display:block;color:var(--sub);margin:4px 0">${L.length} produto(s) comprados a ${esc(f.nome)}</small>`+L.map(o=>`${o.dt!==pd?(pd=o.dt,'<small style="display:block;margin:10px 0 2px;font-weight:700;color:var(--accent)">📅 '+(o.dt?fmtD(o.dt):'Sem data')+'</small>'):''}<div class="item"><div>${esc(o.nome)}<small>${o.n} compra(s) · ${c2(o.un)} un. · última em ${o.dt?fmtD(o.dt):'—'}${o.pu>0?' · '+money(o.pu)+'/un.':''}</small></div><b>${money(o.tot)}</b></div>`).join('')+'</div>'}
+function fnProd(f){const dd={},ks=new Set();D.compras.forEach(c=>{if(c.sem||fnK(c.forn)!==f.k)return;const dt=c.data||'',k=c.pid||c.nome,p=c.pid?P(c.pid):null,g=dd[dt]||(dd[dt]={}),o=g[k]||(g[k]={nome:p?p.nome:c.nome,n:0,un:0,tot:0});ks.add(k);o.n++;o.un+=c.un||0;o.tot+=c.total||0});
+const ds=Object.keys(dd).sort().reverse();
+return`<div style="margin:0 0 10px 10px;padding:4px 10px;border-left:3px solid var(--line)"><small style="display:block;color:var(--sub);margin:4px 0">${ks.size} produto(s) comprados a ${esc(f.nome)}</small>`+ds.map(dt=>{const L=Object.values(dd[dt]).sort((a,b)=>b.tot-a.tot||a.nome.localeCompare(b.nome,'pt',{sensitivity:'base'})),T=L.reduce((a,o)=>a+o.tot,0);return`<small style="display:block;margin:10px 0 2px;font-weight:700;color:var(--accent)">📅 ${dt?fmtD(dt):'Sem data'} · ${money(T)}</small>`+L.map(o=>`<div class="item"><div>${esc(o.nome)}<small>${o.n} compra(s) · ${c2(o.un)} un.${o.un>0&&o.tot>0?' · '+money(o.tot/o.un)+'/un.':''}</small></div><b>${money(o.tot)}</b></div>`).join('')}).join('')+'</div>'}
 function fnList(){const m={};D.compras.forEach(c=>{const n=fnN(c.forn);if(!n||c.sem)return;const k=fnK(n),o=m[k]||(m[k]={k,nome:n,tot:0,mes:0,qt:0,ult:''}),d=c.data||'';if(d>=o.ult)o.nome=n;o.tot+=c.total||0;if(d.slice(0,7)===td().slice(0,7))o.mes+=c.total||0;o.qt++;if(d>o.ult)o.ult=d});return Object.values(m).sort((a,b)=>b.tot-a.tot)}
 function fnUlt(p){const l=D.compras.filter(c=>c.forn&&!c.sem&&((c.pid&&c.pid===p.id)||(!c.pid&&c.nome===p.nome))).sort((a,b)=>((a.data||'')+(a.hora||''))<((b.data||'')+(b.hora||''))?-1:1);return l.length?l[l.length-1].forn:''}
 function setForn(id){const c=D.compras.find(x=>x.id===id);if(!c)return;const ex=fnList().map(f=>f.nome),v=prompt('Comprado a quem? ('+c.nome+')'+(ex.length?'\nJá usados: '+ex.slice(0,6).join(', '):'')+'\nDeixe vazio para tirar o fornecedor.',c.forn||'');if(v===null)return;const nv=fnN(v),ok=ex.find(x=>fnK(x)===fnK(nv));if(nv)c.forn=ok||nv;else delete c.forn;save();R()}
