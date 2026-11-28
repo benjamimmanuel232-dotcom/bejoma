@@ -46,23 +46,6 @@ button.dng{background:#fff0ef;color:var(--bad);border:1px solid #efc2bd}
 .fade{animation:fd .8s ease both}@keyframes fd{from{opacity:0}}
 .leg{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:.78rem;color:var(--sub);margin:0 0 6px}.dot{display:inline-block;width:10px;height:10px;border-radius:3px;margin-right:5px;vertical-align:-1px}
 .tipb{margin-top:8px;font-size:.82rem;color:var(--sub);background:#fffaf3;border:1px dashed var(--line);border-radius:12px;padding:8px 10px;min-height:34px}
-.dtb{margin-top:12px;border:1px solid var(--line);border-radius:16px;background:var(--bg);color:var(--text);overflow:hidden}
-.dtb .dh{display:flex;justify-content:space-between;align-items:baseline;gap:8px;padding:12px 12px 8px}
-.dtb .dh b{font-size:1.05rem}.dtb .dh span{color:var(--sub);font-size:.85rem;font-weight:bold}
-.dtb .dg{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding:0 12px 10px}
-.dtb .dg div{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:7px 8px}
-.dtb .dg i{display:block;font-style:normal;font-size:.62rem;font-weight:bold;letter-spacing:.04em;text-transform:uppercase;color:var(--sub)}
-.dtb .dg b{font-size:1rem}
-.dtb table{width:100%;border-collapse:collapse;font-size:.78rem;table-layout:fixed}
-.dtb th{background:var(--soft);color:var(--sub);font-size:.62rem;font-weight:bold;letter-spacing:.04em;text-transform:uppercase;text-align:right;padding:7px 4px}
-.dtb th:first-child,.dtb td.pn{text-align:left;padding-left:12px}.dtb th:last-child,.dtb td:last-child{padding-right:12px}
-.dtb td{padding:8px 4px;text-align:right;border-bottom:1px solid var(--line);font-variant-numeric:tabular-nums;vertical-align:middle}
-.dtb td.pn{font-weight:bold;line-height:1.2;word-break:break-word}
-.dtb col.c1{width:43%}.dtb col.c2{width:11%}.dtb col.c3{width:21%}.dtb col.c4{width:25%}
-.dtb tr.sc td{text-align:left;font-size:.7rem;font-weight:800;letter-spacing:.03em;text-transform:uppercase;padding:8px 12px;background:var(--card);border-bottom:1px solid var(--line);border-left:4px solid var(--sub)}
-.dtb tr.sc.s1 td{border-left-color:var(--good)}.dtb tr.sc.s2 td{border-left-color:var(--accent)}.dtb tr.sc.s3 td{border-left-color:var(--bad)}
-.dtb tfoot td{font-weight:800;background:var(--soft);border-top:2px solid var(--line);border-bottom:0}
-.dtb .nt{font-size:.7rem;color:var(--sub);margin:0;padding:9px 12px 11px;line-height:1.4}
 .hb{margin:0 0 11px}.hbt{display:flex;justify-content:space-between;font-size:.85rem;margin-bottom:4px}.hbr{height:12px;border-radius:99px;background:#f6ead6;overflow:hidden}.hbf{height:100%;border-radius:99px;animation:gw .7s ease both;transform-origin:left}@keyframes gw{from{transform:scaleX(0)}}
 .donut{display:flex;align-items:center;gap:14px}.donut svg{width:130px;flex:none}.donut .lg{flex:1;font-size:.8rem}.donut .lg div{display:flex;justify-content:space-between;gap:6px;padding:3px 0}
 #printSheet img.pt{width:26px;height:26px;border-radius:50%;object-fit:cover;vertical-align:middle;margin-right:6px;-webkit-print-color-adjust:exact;print-color-adjust:exact}#printSheet tr{page-break-inside:avoid}#printSheet h3{page-break-after:avoid}#printSheet td.l,#printSheet th.l{text-align:left}
@@ -252,6 +235,16 @@ html[data-t=dark] [style*="border-color:#e4bd7d"]{border-color:#6b5230!important
 #lemb,#pgTop,#pedTop,#rinTop{display:none!important}
 #toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);max-width:88%;background:#302014;color:#fff;padding:10px 16px;border-radius:14px;font-size:.88rem;font-weight:600;text-align:center;z-index:99999;opacity:0;pointer-events:none;transition:opacity .2s;box-shadow:0 4px 14px rgba(0,0,0,.35)}
 #toast.on{opacity:1}
+#am,#ac{position:fixed;inset:0;display:none;align-items:center;justify-content:center;padding:22px;background:rgba(0,0,0,.55)}
+#am{z-index:100002}#ac{z-index:100003}
+#am.on,#ac.on{display:flex}
+#am .bx,#ac .bx{background:var(--card);color:var(--text);border-radius:16px;padding:20px 20px 16px;max-width:420px;width:100%;box-shadow:0 10px 40px rgba(0,0,0,.4);max-height:90vh;overflow:auto}
+#am p,#ac p{margin:0;white-space:pre-wrap;line-height:1.45;font-size:1rem}
+#ac input{margin-top:12px;text-align:center;font-size:1.3rem;width:100%;box-sizing:border-box}
+#ac input.lg{text-align:left;font-size:.95rem}
+#ac .acb{display:flex;gap:10px}#ac .acb button{flex:1;margin-top:14px}
+#ac button.perigo{background:var(--bad);color:#fff}
+@media (prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important;scroll-behavior:auto!important}}
 </style>
 </head>
 <body>
@@ -360,7 +353,7 @@ html[data-t=dark] [style*="border-color:#e4bd7d"]{border-color:#6b5230!important
 <button onclick="stockExistente()">Registar stock existente</button></div>
 <div class="card"><h2>Entradas por produto</h2><p class="empty" style="margin:-6px 0 6px">Enganou-se? Toque no ✏️ para corrigir a quantidade ou o preço, ou no ✕ para desfazer a entrada.</p><div id="aCompras"></div></div>
 <div class="card"><h2>🏪 Fornecedores</h2><p class="empty" style="margin:-6px 0 8px">Onde compra a mercadoria e quanto gasta em cada um. Ao dar entrada, escreva o fornecedor no campo "Comprado a". Toque no nome de um fornecedor para ver os produtos que comprou nele. Toque no ✏️ para mudar o nome ou tirar um fornecedor.</p><div id="fnBox"></div></div>
-<div class="card"><h2>💲 Preços por produto</h2><p class="empty" style="margin:-6px 0 8px">Veja quem vende mais barato e como o preço de cada produto foi mudando.</p><select id="prSel" onchange="PR()"></select><div id="prBox" style="margin-top:8px"></div></div>
+<div class="card"><h2>💲 Preços por produto</h2><p class="empty" style="margin:-6px 0 8px">Veja quem vende mais barato e como o preço de cada produto foi mudando.</p><select id="prSel" aria-label="Produto" onchange="PR()"></select><div id="prBox" style="margin-top:8px"></div></div>
 </div>
 <div class="sx" data-sx="perd">
 <div class="card"><h2>Perdas, estragos e ofertas</h2>
@@ -571,6 +564,53 @@ if(ls('bejoma_idb')==='1')alert('Não foi possível abrir a memória nova do app
 start()})()})();
 </script>
 <script type="text/plain" id="mainjs">
+/* ===== Janelas da própria app (avisos, confirmações, perguntas) · importação segura · acessibilidade ===== */
+const alertNat=window.alert.bind(window);
+(function(){const Q=[];let box=null,aberto=false,cur=null;
+function mk(){box=document.createElement('div');box.id='am';box.setAttribute('role','alertdialog');box.setAttribute('aria-modal','true');box.setAttribute('aria-labelledby','amT');box.innerHTML='<div class="bx"><p id="amT"></p><button id="amB" type="button">OK</button></div>';document.body.appendChild(box);document.getElementById('amB').onclick=prox;box.addEventListener('keydown',e=>{if(e.key==='Escape'||e.key==='Enter'){e.preventDefault();prox()}})}
+function prox(){if(cur){const r=cur;cur=null;r()}if(Q.length){const it=Q.shift();cur=it.res;document.getElementById('amT').textContent=it.m;document.getElementById('amB').textContent=Q.length?'OK ('+Q.length+' a seguir)':'OK';setTimeout(()=>{try{document.getElementById('amB').focus()}catch(e){}},0)}else{box.classList.remove('on');aberto=false}}
+function enq(m,res){if(!box)mk();Q.push({m,res});if(!aberto){aberto=true;box.classList.add('on');prox()}else document.getElementById('amB').textContent='OK ('+Q.length+' a seguir)'}
+window.alertFecha=()=>{if(aberto){prox();return true}return false};
+window.alertTudo=()=>{Q.forEach(i=>i.res&&i.res());Q.length=0;if(aberto)prox()};
+window.alert=function(m){m=String(m==null?'':m);if(!document.body){alertNat(m);return}enq(m,null)};
+window.alertar=function(m){m=String(m==null?'':m);if(!document.body){alertNat(m);return Promise.resolve()}return new Promise(res=>enq(m,res))}})();
+(function(){let box=null,cur=null,chain=Promise.resolve();const g=id=>document.getElementById(id);
+function mk(){box=document.createElement('div');box.id='ac';box.setAttribute('role','alertdialog');box.setAttribute('aria-modal','true');box.setAttribute('aria-labelledby','acT');box.innerHTML='<div class="bx"><p id="acT"></p><input id="acI" autocomplete="off" aria-labelledby="acT"><div class="acb"><button class="sec" id="acN" type="button"></button><button id="acO" type="button"></button></div></div>';document.body.appendChild(box);g('acO').onclick=()=>fim(true);g('acN').onclick=()=>fim(false);box.addEventListener('keydown',e=>{if(e.key==='Escape'){e.preventDefault();fim(false)}else if(e.key==='Enter'&&e.target.id==='acI'){e.preventDefault();fim(true)}})}
+function fim(ok){if(!cur)return;const c=cur;cur=null;box.classList.remove('on');c.res(c.campo?(ok?g('acI').value:null):ok)}
+window.dlgFecha=()=>{if(cur){fim(false);return true}return false};
+window.dlgAberto=()=>!!cur;
+window.dlg=function(o){const run=()=>new Promise(res=>{if(!document.body)return res(o.campo?null:false);if(!box)mk();cur={res,campo:!!o.campo};g('acT').textContent=o.msg;const I=g('acI'),c=o.campo;I.style.display=c?'block':'none';if(c){I.type=c.tipo||'text';I.setAttribute('inputmode',c.im||'text');I.maxLength=c.max||524288;I.value=c.val||'';I.className=(c.tipo==='password'||c.im==='numeric')?'':'lg'}g('acO').textContent=o.ok||(c?'OK':'Confirmar');g('acO').className=o.perigo?'perigo':'';const N=g('acN');N.style.display=o.no===null?'none':'';N.textContent=o.no||'Cancelar';box.classList.add('on');setTimeout(()=>{try{if(c){I.focus();if(c.sel)I.select()}else(o.perigo?N:g('acO')).focus()}catch(e){}},0)});const p=chain.then(run);chain=p.catch(()=>{});return p};
+window.confirmar=(msg,o)=>dlg(Object.assign({msg},o||{}));
+window.perguntar=(msg,campo,o)=>dlg(Object.assign({msg,campo:campo||{}},o||{}));
+window.dlgCopia=(u,msg)=>dlg({msg:msg||'Copie:',campo:{val:u,sel:1},ok:'Fechar',no:null});
+window.bjPv=x=>x==null?'':String(x)})();
+function semProto(o,d){if(!o||typeof o!=='object'||d>12)return;if(Array.isArray(o)){o.forEach(v=>semProto(v,d+1));return}for(const k of Object.keys(o)){if(k==='__proto__'||k==='constructor'||k==='prototype'){delete o[k];continue}semProto(o[k],d+1)}}
+function estOkG(x){const AR=['prods','vendas','caixa','compras','lembretes','dividas','perdas','contagens','apagados'],OB=['prods','vendas','caixa','compras','dividas','perdas','contagens'];for(const k of AR)if(x[k]!==undefined&&x[k]!==null&&!Array.isArray(x[k]))return false;for(const k of OB)if(x[k]&&x[k].some(e=>!e||typeof e!=='object'||Array.isArray(e)))return false;return true}
+function a11yInit(){
+ const SIM={'✎':'Editar','✏️':'Editar','✕':'Remover','×':'Fechar','✖':'Remover','❌':'Remover','✓':'Concluir','✔':'Concluir','↩':'Desfazer','↩️':'Desfazer','▾':'Mostrar mais','▴':'Mostrar menos','＋':'Adicionar','+':'Aumentar','−':'Diminuir','-':'Diminuir','–':'Diminuir','🗑':'Apagar','🗑️':'Apagar','←':'Voltar','⋯':'Mais opções','🔔':'Lembrete','↑':'Subir','↓':'Descer','⚙️':'Configurar','⚙':'Configurar'};
+ const TEM=/[A-Za-zÀ-ÿ0-9]/,CTL='input,select,textarea';let n=0;
+ const titulo=e=>{const it=e.closest('.item,li,tr');if(!it)return '';const w=document.createTreeWalker(it,NodeFilter.SHOW_TEXT);let x;while(x=w.nextNode()){if(e.contains(x))continue;const t=x.textContent.trim();if(t.length>1&&TEM.test(t))return t.slice(0,50)}return ''};
+ function pass(){
+  document.querySelectorAll('[onclick]:not(button):not(a):not(input):not(select):not(textarea):not(summary):not(label):not([role])').forEach(e=>{if(e.querySelector('button,a,input,select,textarea'))return;e.setAttribute('role','button');if(!e.hasAttribute('tabindex'))e.tabIndex=0});
+  document.querySelectorAll('button,[role=button]').forEach(b=>{
+   if(b.getAttribute('aria-label')||b.getAttribute('aria-labelledby'))return;
+   const tx=(b.textContent||'').trim();if(TEM.test(tx))return;
+   const base=SIM[tx]||b.title||(b.classList.contains('av')?'Foto do produto':'');if(!base)return;const t=titulo(b);b.setAttribute('aria-label',t?base+': '+t:base)});
+  document.querySelectorAll('label').forEach(l=>{if(l.htmlFor||l.querySelector(CTL))return;let c=l.nextElementSibling;while(c&&c.tagName==='BR')c=c.nextElementSibling;if(!c)return;const k=c.matches(CTL)?c:c.querySelector(CTL);if(!k||k.getAttribute('aria-label'))return;if(!k.id)k.id='a11y'+(++n);l.htmlFor=k.id});
+  document.querySelectorAll(CTL).forEach(i=>{if(i.type==='hidden'||i.getAttribute('aria-label')||i.getAttribute('aria-labelledby')||(i.labels&&i.labels.length))return;let t=i.getAttribute('placeholder')||'';if(!t){const q=i.previousElementSibling;if(q&&!q.matches(CTL)){const x=(q.textContent||'').trim();if(x&&x.length<48)t=x}}if(!t&&i.title)t=i.title;if(t)i.setAttribute('aria-label',t)});
+  document.querySelectorAll('svg:not([aria-hidden]):not([aria-label])').forEach(v=>{if(!v.querySelector('title'))v.setAttribute('aria-hidden','true')});
+  const tb=document.getElementById('tb');if(tb){tb.setAttribute('aria-label','Navegação principal');tb.querySelectorAll('button').forEach(b=>b.classList.contains('on')?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'))}
+  document.querySelectorAll('div,nav').forEach(g=>{if(g.id==='tb')return;const bs=[...g.children].filter(x=>x.tagName==='BUTTON');if(bs.length<2||bs.length!==g.children.length)return;const on=bs.filter(x=>x.classList.contains('on'));if(on.length>1)return;bs.forEach(x=>x.classList.contains('on')?x.setAttribute('aria-current','true'):x.removeAttribute('aria-current'))});
+  const ts=document.getElementById('toast');if(ts){ts.setAttribute('role','status');ts.setAttribute('aria-live','polite')}
+  const lk=document.getElementById('lock');if(lk){lk.setAttribute('role','dialog');lk.setAttribute('aria-modal','true');lk.setAttribute('aria-label','Bloqueio por PIN')}
+  const ex=document.getElementById('ex');if(ex){ex.setAttribute('role','dialog');ex.setAttribute('aria-modal','true');ex.setAttribute('aria-label','Sair da app')}
+ }
+ document.addEventListener('keydown',e=>{const t=e.target;if((e.key==='Enter'||e.key===' ')&&t&&t.getAttribute&&t.getAttribute('role')==='button'&&t.tagName!=='BUTTON'){e.preventDefault();t.click()}});
+ window.a11yPass=pass;pass();
+ let tm=null,last=0;const sched=()=>{if(tm||document.hidden)return;tm=setTimeout(()=>{tm=null;last=Date.now();try{pass()}catch(e){}},Math.max(150,500-(Date.now()-last)))};
+ new MutationObserver(sched).observe(document.body,{childList:true,subtree:true,attributes:true,attributeFilter:['class']})}
+
+
 window.onerror=function(m,s,l){try{console.error(m,s,l);let b=document.getElementById('errB');if(!b){b=document.createElement('div');b.id='errB';b.style.cssText='position:fixed;left:10px;right:10px;bottom:84px;z-index:9998;background:#302014;color:#fff;border-radius:14px;padding:10px 12px;font-size:.8rem';b.onclick=()=>b.remove();document.body.appendChild(b)}b.textContent='⚠️ Algo correu mal ('+m+', linha '+l+'). Toque para fechar. Se se repetir, envie uma captura.'}catch(e){}return false};
 
 const CAT=[['Bolacha Sandwiche',48,2300,1,100],['Chocolate Grande',3,1800,1,1000],['Chocolate Pequeno',12,2500,1,500],['Chugo Café',100,1000,1,25],['Chugo Ibon',100,800,1,25],['Doce de Coco',24,2300,1,200],['Garoto Bon Bon',30,3700,1,200],['Mentol Freegells Grande',12,1900,1,300],['Mentol Freegells Pequeno',100,2000,1,50],['Mentol Shaltox',80,1600,1,50],['Mentol Verde',33,800,1,50],['Mentol XXL',100,1600,1,50],['Pastilha Ginny Gum Grande',12,2400,1,400],['Pastilha Ginny Gum Pequena',24,2300,1,250],['Pastilha Gorila',100,6000,1,100],['Pastilha Max',100,2200,1,50],['Pastilha Oko',100,2500,1,50],['Sambapito Pop',48,1300,1,50],['Sambapito Rambo',24,1200,2,100]];
@@ -635,22 +675,22 @@ const id=uid(),did=dev?uid():null;{const nv={id,data:dt,hora:past?'':hh(),reg:pa
 if(dev)dvL().push({id:did,tipo:'receber',pessoa:cli,desc:p.nome+' ×'+q+' (venda a dever)',valor:q*pr,pago:0,pagtos:[],data:dt,hora:past?'':hh(),prazo:pz,venda:id});
 else apIns({id:uid(),data:dt,hora:past?'':hh(),tipo:'entrada',desc:'Venda: '+p.nome+' ×'+q,valor:q*pr,ref:id,forma:fpV});
 save();$('vQtd').value='';if(dev){fpV='din';$('vDevNome').value='';$('vDevPrazo').value=''}mkF=(!n0&&dt===td())?1:0;R();mkF=0;vManual=0;fillPreco();gatAviso(g0);if(past)toast('Venda registada com a data de '+fmtD(dt)+'.');if(pr<custo(p))alert('Atenção: vendeu '+p.nome+' a '+money(pr)+', abaixo do custo ('+money(custo(p))+'). A venda foi registada. Se foi engano, apague-a na lista de vendas de hoje.')}
-function devolver(){if(!once())return;const p=P($('vProd').value),q=n($('vQtd').value),pr=n($('vPreco').value);
+async function devolver(){if(!once())return;const p=P($('vProd').value),q=n($('vQtd').value),pr=n($('vPreco').value);
 if(!p||q<=0)return alert('Escolha o produto e a quantidade devolvida.');
 if($('vData').value&&$('vData').value<td())return alert('A devolução é sempre registada com a data de hoje. Primeiro toque em "Voltar a hoje" na data da venda.');
 if(pr<=0)return alert('Indique o preço a que o cliente pagou (por unidade).');
 if(fpV==='dev')return alert('Para devolver dinheiro, escolha Dinheiro ou Multicaixa Express em "Pago com". Se a venda era a dever, apague-a na lista de vendas.');
 const vend=D.vendas.filter(v=>v.pid===p.id).reduce((a,v)=>a+v.qtd,0);
 if(q>vend)return alert('Só vendeu '+c2(vend)+' un. de '+p.nome+'. Não dá para devolver mais.');
-const tot=q*pr;if(semSaldo(tot,fpV))return;
-if(!confirm('Registar a devolução de '+p.nome+' ×'+c2(q)+'?\n'+money(tot)+' saem da caixa ('+fpN(fpV)+').'))return;
-const volta=confirm('A mercadoria está boa para voltar a vender?\n\nOK = sim, volta ao stock.\nCancelar = não, conta como perda (estragada).');
+const tot=q*pr;if((await semSaldo(tot,fpV)))return;
+if(!(await confirmar('Registar a devolução de '+p.nome+' ×'+c2(q)+'?\n'+money(tot)+' saem da caixa ('+fpN(fpV)+').',{ok:'Registar'})))return;
+const volta=(await confirmar("A mercadoria está boa para voltar a vender?",{ok:'Sim, volta ao stock',no:'Não, conta como perda'}));
 const ult=D.vendas.filter(v=>v.pid===p.id&&v.qtd>0).slice(-1)[0],cu=ult?ult.custo:custo(p),id=uid(),pdId=volta?undefined:uid();
 D.vendas.push({id,data:td(),hora:hh(),pid:p.id,nome:p.nome,qtd:-q,preco:pr,custo:cu,forma:fpV,devol:true,estr:volta?undefined:true,perda:pdId});
 if(volta)p.stock+=q;else pdL().push({id:pdId,data:td(),hora:hh(),pid:p.id,nome:p.nome,qtd:q,custo:cu,mot:'est',obs:'Devolução de cliente'});
 D.caixa.push({id:uid(),data:td(),hora:hh(),tipo:'saida',desc:'Devolução: '+p.nome+' ×'+c2(q),valor:tot,cat:'Devolução',forma:fpV,dv:'dev-'+id});
 save();$('vQtd').value='';R()}
-function delVenda(id){const v=D.vendas.find(x=>x.id==id);if(!v||!confirm((v.devol?'Apagar esta devolução? O stock e a caixa voltam ao que eram antes dela.':'Apagar esta venda? O stock volta.')+(v.fiado?' A dívida do cliente também é apagada (e o que ele já pagou sai da Caixa).':'')+'\n\nFica guardada em "Apagados" (Dinheiro → Caixa) e pode ser restaurada.'))return;
+async function delVenda(id){const v=D.vendas.find(x=>x.id==id);if(!v||!(await confirmar((v.devol?'Apagar esta devolução? O stock e a caixa voltam ao que eram antes dela.':'Apagar esta venda? O stock volta.')+(v.fiado?' A dívida do cliente também é apagada (e o que ele já pagou sai da Caixa).':'')+'\n\nFica guardada em "Apagados" (Dinheiro → Caixa) e pode ser restaurada.')))return;
 const cl=o=>o?JSON.parse(JSON.stringify(o)):null,p=P(v.pid),dv=dvL().find(x=>x.venda===id),ids=dv?(dv.pagtos||[]).map(x=>x.id).filter(Boolean):[],cxs=[];
 D.caixa.filter(c=>c.dv==='dev-'+id||c.ref==id||(ids.length&&ids.indexOf(c.dv)>=0)).forEach(c=>{if(!cxs.some(x=>x.id===c.id))cxs.push(cl(c))});
 apLog({t:'venda',v:cl(v),pid:v.pid,ds:(p&&!v.estr)?v.qtd:0,pd:v.perda?cl(pdL().find(x=>x.id===v.perda)):null,dv:cl(dv),cx:cxs});
@@ -661,21 +701,21 @@ if(p&&!v.estr)p.stock+=v.qtd;if(v.perda)D.perdas=pdL().filter(x=>x.id!==v.perda)
 let qvC={},qvF='din',qvP={},qvDN='',qvDP='';
 function qvTot(p,q){const pm=promoPreco(p,q);return pm?pm.tot:q*p.venda}
 function qvLin(p,q){return qvP[p.id]>0?Math.round(qvP[p.id]*q*100)/100:qvTot(p,q)}
-function qvPreco(id){const p=P(id),q=qvC[id];if(!p||!(q>0))return;const tab=qvTot(p,q),at=qvLin(p,q);
-const a=prompt('Quanto pagou o cliente por '+p.nome+' ×'+c2(q)+'?\n(Tabela: '+money(tab)+'. Deixe vazio para voltar ao preço da tabela.)',Math.round(at*100)/100);
+async function qvPreco(id){const p=P(id),q=qvC[id];if(!p||!(q>0))return;const tab=qvTot(p,q),at=qvLin(p,q);
+const a=(await perguntar('Quanto pagou o cliente por '+p.nome+' ×'+c2(q)+'?\n(Tabela: '+money(tab)+'. Deixe vazio para voltar ao preço da tabela.)',{im:'decimal',val:bjPv(Math.round(at*100)/100)}));
 if(a===null)return;if(String(a).trim()===''){delete qvP[id];QV();return}
 const t=n(a);if(!(t>0))return alert('Indique um valor maior que zero.');
-const pu=t/q;if(pu<custo(p)&&!confirm('Atenção: '+money(pu)+' por unidade fica abaixo do custo ('+money(custo(p))+'). Usar mesmo assim?'))return;
+const pu=t/q;if(pu<custo(p)&&!(await confirmar('Atenção: '+money(pu)+' por unidade fica abaixo do custo ('+money(custo(p))+'). Usar mesmo assim?',{ok:'Usar mesmo assim'})))return;
 if(Math.abs(t-tab)<0.005)delete qvP[id];else qvP[id]=pu;QV()}
 function qvAdd(id,k){const p=P(id);if(!p)return;const q=(qvC[id]||0)+k;if(q<=0){delete qvC[id];delete qvP[id]}else{if(q>p.stock){toast('Stock insuficiente: restam '+c2(p.stock)+' un. de '+p.nome+'.');return}qvC[id]=q}QV()}
-function qvTotal(){const ks=Object.keys(qvC).filter(k=>P(k)&&qvC[k]>0);if(!ks.length)return;
+async function qvTotal(){const ks=Object.keys(qvC).filter(k=>P(k)&&qvC[k]>0);if(!ks.length)return;
 const cur=ks.map(k=>qvLin(P(k),qvC[k])),S=cur.reduce((a,b)=>a+b,0),tab=ks.reduce((t,k)=>t+qvTot(P(k),qvC[k]),0);
-const a=prompt('Quanto pagou o cliente pelo cesto todo?\n(Tabela: '+money(tab)+'. Deixe vazio para voltar aos preços da tabela.)',Math.round(S*100)/100);
+const a=(await perguntar('Quanto pagou o cliente pelo cesto todo?\n(Tabela: '+money(tab)+'. Deixe vazio para voltar aos preços da tabela.)',{im:'decimal',val:bjPv(Math.round(S*100)/100)}));
 if(a===null)return;if(String(a).trim()===''){ks.forEach(k=>delete qvP[k]);QV();return}
 const T=n(a);if(!(T>0))return alert('Indique um valor maior que zero.');
 let acc=0;const lt=cur.map((c,i)=>{if(i===cur.length-1)return Math.round((T-acc)*100)/100;const v=Math.round(c*T/S*100)/100;acc+=v;return v});
 if(lt.some(v=>!(v>0)))return alert('Esse valor é pequeno demais para repartir pelos produtos.');
-const baixo=ks.filter((k,i)=>lt[i]/qvC[k]<custo(P(k)));if(baixo.length&&!confirm('Atenção: com este total, '+baixo.map(k=>P(k).nome).join(', ')+' fica(m) abaixo do custo. Usar mesmo assim?'))return;
+const baixo=ks.filter((k,i)=>lt[i]/qvC[k]<custo(P(k)));if(baixo.length&&!(await confirmar('Atenção: com este total, '+baixo.map(k=>P(k).nome).join(', ')+' fica(m) abaixo do custo. Usar mesmo assim?',{ok:'Usar mesmo assim'})))return;
 ks.forEach((k,i)=>{const p=P(k),tb=qvTot(p,qvC[k]);if(Math.abs(lt[i]-tb)<0.005)delete qvP[k];else qvP[k]=lt[i]/qvC[k]});QV()}
 function qvClear(){qvC={};qvP={};qvDN='';qvDP='';QV()}
 function qvPag(f){qvF=f;if(f==='dev'&&!qvDP)qvDP=addD(td(),7);QV()}
@@ -699,7 +739,6 @@ const dl={};const add=(pid,d,v)=>{if(!pid||d<ini||d>h)return;(dl[pid]||(dl[pid]=
 D.vendas.forEach(v=>add(v.pid,v.data,v.estr?0:-v.qtd));
 D.compras.forEach(c=>add(c.pid,c.data,+(c.un||0)));
 (Array.isArray(D.perdas)?D.perdas:[]).forEach(x=>add(x.pid,x.data,-(x.qtd||0)));
-(Array.isArray(D.contagens)?D.contagens:[]).forEach(c=>(c.itens||[]).forEach(x=>{if(x&&x.dif>0)add(x.pid,c.data,x.dif)}));
 const out={};D.prods.forEach(p=>{let st=p.stock||0,dias=0;const m=dl[p.id]||{};
 for(let k=N-1;k>=0;k--){const d=ds[k];if(st>0||(m[d]||0)<0)dias++;st-=(m[d]||0)}
 out[p.id]=dias});return out}
@@ -783,7 +822,7 @@ function gatFeito(k){const o=gatOk();o.a=1;if(k==='b')o.b=1;save();R()}
 function gatDesf(k){const o=gatOk();if(k==='b')o.b=0;else{o.a=0;o.b=0}save();R()}
 const gatNovos=()=>{const ini=addD(td(),-29),ent=new Set(D.compras.filter(c=>(c.data||'')>=ini).map(c=>c.pid)),vc={};D.vendas.forEach(v=>{if(v.qtd>0)vc[v.pid]=(vc[v.pid]||0)+v.qtd});return D.prods.filter(p=>p.venda>0&&p.stock<=0&&!ent.has(p.id)).sort((a,b)=>(vc[b.id]||0)-(vc[a.id]||0)||a.nome.localeCompare(b.nome,'pt',{sensitivity:'base'}))};
 const gatTot=()=>D.vendas.filter(v=>v.data===td()).reduce((s,v)=>s+v.qtd*v.preco,0);
-function gatSet(){const c=gatC(),a=prompt('Vendas do dia para acrescentar mercadoria no cesto, 1.ª vez (Kz):',c.a);if(a===null)return;const b=prompt('Vendas do dia para acrescentar mais mercadoria, 2.ª vez (Kz):',c.b);if(b===null)return;const x=n(a),y=n(b);if(!(x>0)||!(y>x))return alert('O segundo valor tem de ser maior que o primeiro.');D.gat={a:x,b:y};save();R()}
+async function gatSet(){const c=gatC(),a=(await perguntar('Vendas do dia para acrescentar mercadoria no cesto, 1.ª vez (Kz):',{im:'decimal',val:bjPv(c.a)}));if(a===null)return;const b=(await perguntar('Vendas do dia para acrescentar mais mercadoria, 2.ª vez (Kz):',{im:'decimal',val:bjPv(c.b)}));if(b===null)return;const x=n(a),y=n(b);if(!(x>0)||!(y>x))return alert('O segundo valor tem de ser maior que o primeiro.');D.gat={a:x,b:y};save();R()}
 function gatAviso(g0){const c=gatC(),g1=gatTot(),o=gatOk();let m='';if(g0<c.b&&g1>=c.b){const nv=gatNovos().length;m='💚 Chegou a '+money(c.b)+' hoje: acrescente mercadoria antiga e '+(nv?'uma mercadoria nova (sem entrada nos últimos 30 dias).':'uma nova (hoje não há nenhuma sem entrada nos últimos 30 dias).');o.b=0;if(g0<c.a)o.a=0}else if(g0<c.a&&g1>=c.a){m='💛 Chegou a '+money(c.a)+' hoje: acrescente mercadoria antiga que já tem no stock.';o.a=0;o.b=0}if(!m)return false;save();R();try{navigator.vibrate&&navigator.vibrate([200,100,200])}catch(_){}toast(m);return true}
 function gatHTML(){const c=gatC(),t=gatTot(),pct=Math.min(100,Math.round(t/c.b*100)),fase=t>=c.b?2:t>=c.a?1:0,ok=gatOk(),al=(fase===2&&!ok.b)||(fase===1&&!ok.a);
 const hj={};D.vendas.forEach(v=>{if(v.data===td()&&v.qtd>0)hj[v.pid]=(hj[v.pid]||0)+v.qtd});
@@ -808,8 +847,8 @@ const pm=me>0?(pi&&n(pi.value)>0?n(pi.value):pr/2):0,pqt=qu>0?(pq&&n(pq.value)>0
 if(hi)hi.textContent=me>0&&pr>0?'Se deixar vazio, conta metade da completa: '+money(pr/2)+'.':'';
 if(hq)hq.textContent=qu>0&&pr>0?'Se deixar vazio, conta um quarto da completa: '+money(pr/4)+'.':'';
 el.innerHTML='<b>Total: '+embTxt(e,cm,me,qu)+'</b>'+(p.unEmb>0?' · '+embF(un)+' un.':'')+(pr>0?' · '+money(tot):'')+(me>0&&pm>0&&Math.abs(pm-pr/2)>0.005?' (cada meia a '+money(pm)+')':'')+(qu>0&&pqt>0&&Math.abs(pqt-pr/4)>0.005?' (cada quarto a '+money(pqt)+')':'')+(bad?'<br><span style="color:var(--bad)">⚠️ '+embF(e)+' emb. de '+p.unEmb+' un. dá '+embF(un)+' un., que não é um número inteiro. Para meias o número de unidades da embalagem tem de ser par, e para quartos tem de dividir por 4.</span>':'')}
-function entrada(){const pid0=$('aProd')&&$('aProd').value,n0=D.compras.length;entrada0();if(D.compras.length>n0&&pid0){if(!D.repFeito)D.repFeito={};Object.keys(D.repFeito).forEach(k=>{if(D.repFeito[k]!==td())delete D.repFeito[k]});D.repFeito[pid0]=td();save();R()}if(RPA&&pid0===RPC&&D.compras.length>n0)setTimeout(rpProx,400)}
-function entrada0(){if(!once())return;const p=P($('aProd').value),cm=n($('aEmb').value),me=Math.max(0,Math.round(n($('aMeia').value)||0)),qu=Math.max(0,Math.round(n($('aQua').value)||0)),e=cm+me/2+qu/4,pr=n($('aPreco').value);
+async function entrada(){const pid0=$('aProd')&&$('aProd').value,n0=D.compras.length;(await entrada0());if(D.compras.length>n0&&pid0){if(!D.repFeito)D.repFeito={};Object.keys(D.repFeito).forEach(k=>{if(D.repFeito[k]!==td())delete D.repFeito[k]});D.repFeito[pid0]=td();save();R()}if(RPA&&pid0===RPC&&D.compras.length>n0)setTimeout(rpProx,400)}
+async function entrada0(){if(!once())return;const p=P($('aProd').value),cm=n($('aEmb').value),me=Math.max(0,Math.round(n($('aMeia').value)||0)),qu=Math.max(0,Math.round(n($('aQua').value)||0)),e=cm+me/2+qu/4,pr=n($('aPreco').value);
 if(!p||e<=0)return alert('Escolha o produto e as embalagens (completas, meias ou quartos).');if((me>0||qu>0)&&p.meia===false)return alert(p.nome+' está marcado como "só embalagem completa". Registe só embalagens completas, ou edite o produto.');
 const ent=$('aData').value||td();if(ent>td())return alert('A data de entrada não pode ser no futuro.');
 if(!(p.unEmb>0))return alert('Este produto não tem "unidades por embalagem". Edite o produto e preencha.');
@@ -818,14 +857,14 @@ const embT=embTxt(e,cm,me,qu);
 const pef=pr>0?pr:p.precoEmb;if(!(pef>0))return alert('Indique o preço da embalagem.');
 const pmx=n($('aPM').value),pm=me>0?(pmx>0?pmx:pef/2):0,pqx=n($('aPQ').value),pqt=qu>0?(pqx>0?pqx:pef/4):0,tot0=cm*pef+me*pm+qu*pqt,oA=(FP.find(f=>f[0]!==fpA)||[fpA])[0],spA=Math.min(tot0,Math.max(0,n($('aSplit').value))),mA=tot0-spA;
 {const jm=m=>+m.slice(0,2)*60+ +m.slice(3,5),rc=D.compras.slice(-30).find(c=>c.pid===p.id&&c.data===td()&&Math.abs(c.emb-e)<1e-9&&Math.abs(c.total-tot0)<.005&&c.hora&&Math.abs(jm(hh())-jm(c.hora))<=2);if(rc)return alert('Esta compra de '+p.nome+' já foi registada há instantes ('+rc.hora+'): '+embT+' por '+money(tot0)+'.\nNão foi registada outra vez, para não duplicar o stock nem o dinheiro que sai da Caixa.\nSe é mesmo outra compra igual, espere 2 minutos ou mude a quantidade.')}
-if((mA>0&&semSaldo(mA,fpA))||(spA>0&&semSaldo(spA,oA)))return;
+if((mA>0&&(await semSaldo(mA,fpA)))||(spA>0&&(await semSaldo(spA,oA))))return;
 const stk0=Math.max(0,p.stock),c0=custo(p),pe0=p.precoEmb,cm0=p.cm||0;if(pr>0)p.precoEmb=pr;const un=e*p.unEmb,id=uid(),vl=$('aVal').value;p.stock+=un;if(vl&&(stk0<=0||!p.val||vl<p.val))p.val=vl;if(stk0+un>0&&p.unEmb>0)p.cm=(stk0*c0+tot0)/(stk0+un);
 const pv=[...D.compras].reverse().find(c=>c.pid===p.id&&!c.sem&&c.total>0&&c.un>0),pcu=pv?pv.total/pv.un:0,ncu=tot0/un;
 D.compras.push({id,pe0,cm0,data:td(),ent,val:vl||'',hora:hh(),pid:p.id,nome:p.nome,emb:e,un,total:tot0,cmp:(me>0||qu>0)?cm:undefined,mei:me>0?me:undefined,qua:qu>0?qu:undefined,pm:me>0?pm:undefined,pq:qu>0?pqt:undefined,forn:fnN($('aForn').value)||undefined});
 if(me>0){if(pmx>0&&Math.abs(pmx-pef/2)>0.005)p.precoMeia=pmx;else if(pmx>0||$('aPM').dataset.t==='1')delete p.precoMeia}
 if(qu>0){if(pqx>0&&Math.abs(pqx-pef/4)>0.005)p.precoQuarto=pqx;else if(pqx>0||$('aPQ').dataset.t==='1')delete p.precoQuarto}
 {const dA=spA>0&&mA>0,sf=f=>dA?' ['+fpN(f)+']':'';if(mA>0)D.caixa.push({id:uid(),data:td(),hora:hh(),tipo:'saida',desc:'Compra: '+p.nome+' ×'+embT+sf(fpA),valor:mA,ref:id,forma:fpA});if(spA>0)D.caixa.push({id:uid(),data:td(),hora:hh(),tipo:'saida',desc:'Compra: '+p.nome+' ×'+embT+sf(oA),valor:spA,ref:id,forma:oA});$('aSplit').value=''}
-save();$('aEmb').value='';if($('aMeia'))$('aMeia').value='';if($('aQua'))$('aQua').value='';if($('aPM')){$('aPM').value='';$('aPM').dataset.t=''}if($('aPQ')){$('aPQ').value='';$('aPQ').dataset.t=''}$('aData').value=td();$('aVal').value='';R();emSoma();$('aInfo').textContent=Math.abs(custo(p)-c0)>0.005?'✔ Custo médio de '+p.nome+': '+money(custo(p))+'/un. (antes '+money(c0)+').':'';entCara(p,pcu,ncu);vFesta(tot0,[p.nome+' ×'+embT],null,'',{lb:'🛒 Compra registada',sg:'−',fr:VF_CP})}
+save();$('aEmb').value='';if($('aMeia'))$('aMeia').value='';if($('aQua'))$('aQua').value='';if($('aPM')){$('aPM').value='';$('aPM').dataset.t=''}if($('aPQ')){$('aPQ').value='';$('aPQ').dataset.t=''}$('aData').value=td();$('aVal').value='';R();emSoma();$('aInfo').textContent=Math.abs(custo(p)-c0)>0.005?'✔ Custo médio de '+p.nome+': '+money(custo(p))+'/un. (antes '+money(c0)+').':'';(await entCara(p,pcu,ncu));vFesta(tot0,[p.nome+' ×'+embT],null,'',{lb:'🛒 Compra registada',sg:'−',fr:VF_CP})}
 
 /* ===== Vendas por dia da semana ===== */
 function DSEM(){const e=$('dsBox');if(!e)return;const hoje=td();
@@ -856,13 +895,13 @@ function CARA(){const e=$('caraBox');if(!e)return;const L=caraList().slice(0,10)
 e.innerHTML=`<div class="card"><h2>📈 Produtos que ficaram mais caros</h2><p class="empty" style="margin:-6px 0 8px">Comparo o custo por unidade da última compra com a anterior. Só aumentos de 3% ou mais, nos últimos 90 dias.</p>`
 +(L.length?L.map(x=>{const p=x.p,l=p.venda-x.cu,m=p.venda>0?l/p.venda:0,m0=p.venda>0?(p.venda-x.ca)/p.venda:0,nv=Math.ceil(p.venda*(x.cu/x.ca)/10)*10;
 return`<div class="item"><div style="flex:1"><b>${esc(p.nome)}</b> <b class="bad">+${Math.round(x.pc*100)}%</b><small>Custo por unidade: ${money(x.ca)} → ${money(x.cu)}</small><small class="${l<=0?'bad':m<m0-.02?'warn':''}">Lucro por unidade com o preço atual (${money(p.venda)}): ${money(l)} · margem ${Math.round(m*100)}% (antes ${Math.round(m0*100)}%)</small>${x.u.forn?`<small>Fornecedor: ${esc(x.u.forn)}${x.a.forn&&x.a.forn!==x.u.forn?' (antes: '+esc(x.a.forn)+')':''}</small>`:''}${x.cheap?`<small class="good">💡 ${esc(x.cheap.forn)} já lhe vendeu a ${money(x.cc)}/un.</small>`:''}</div><div style="text-align:right"><button class="mini" onclick="caraPreco('${p.id}')">Preço ${money(nv)}</button><button class="mini sec" onclick="caraIgn('${p.id}')">Ignorar</button></div></div>`}).join(''):'<div class="empty">Nenhum produto ficou mais caro nas últimas compras. 👍</div>')+`</div>`}
-function caraPreco(id){const x=caraList().find(y=>y.p.id===id);if(!x)return;const p=x.p,nv=Math.ceil(p.venda*(x.cu/x.ca)/10)*10;if(!confirm('Mudar o preço de venda de '+p.nome+' de '+money(p.venda)+' para '+money(nv)+'?\n\nSobe na mesma proporção do aumento do custo (+'+Math.round(x.pc*100)+'%).'))return;p.venda=nv;p.caraOk={cu:x.cu};save();R();toast('Preço de '+p.nome+': '+money(nv))}
+async function caraPreco(id){const x=caraList().find(y=>y.p.id===id);if(!x)return;const p=x.p,nv=Math.ceil(p.venda*(x.cu/x.ca)/10)*10;if(!(await confirmar('Mudar o preço de venda de '+p.nome+' de '+money(p.venda)+' para '+money(nv)+'?\n\nSobe na mesma proporção do aumento do custo (+'+Math.round(x.pc*100)+'%).',{ok:'Mudar'})))return;p.venda=nv;p.caraOk={cu:x.cu};save();R();toast('Preço de '+p.nome+': '+money(nv))}
 function caraIgn(id){const x=caraList().find(y=>y.p.id===id);if(!x)return;x.p.caraOk={cu:x.cu};save();R()}
 
 
 /* ===== Quanto entra no cesto de cada vez ===== */
 const cestoQ=p=>typeof p.cesto==='number'?p.cesto:/sambapito/i.test(p.nome)?25:/bolacha/i.test(p.nome)?24:p.venda>0&&p.venda<=100?50:0;
-function cestoSet(id){const p=P(id);if(!p)return;const a=prompt('Quantas unidades de '+p.nome+' entram no cesto de cada vez? (0 = não aparece)',cestoQ(p));if(a===null)return;const x=n(a);if(!(x>=0))return;p.cesto=Math.round(x);save();R()}
+async function cestoSet(id){const p=P(id);if(!p)return;const a=(await perguntar('Quantas unidades de '+p.nome+' entram no cesto de cada vez? (0 = não aparece)',{im:'decimal',val:bjPv(cestoQ(p))}));if(a===null)return;const x=n(a);if(!(x>=0))return;p.cesto=Math.round(x);save();R()}
 function CQ(){const e=$('cqBox');if(!e)return;const L=D.prods.filter(p=>p.venda>0).map(p=>({p,q:cestoQ(p)})).sort((a,b)=>b.q-a.q||a.p.nome.localeCompare(b.p.nome,'pt',{sensitivity:'base'}));
 e.innerHTML=`<details class="pasta"><summary>🧺 Quanto entra no cesto de cada vez</summary><p class="empty" style="margin:6px 0">Quando as vendas passam o valor do aviso, a app diz quanto acrescentar de cada produto. Toque no produto para mudar. Nos sambapitos e nas bolachas, o número é de cada sabor. Ponha 0 para o produto não aparecer.</p>`+L.map(x=>`<div class="item" style="padding:6px 0;cursor:pointer" onclick="cestoSet('${x.p.id}')"><div>${esc(x.p.nome)}</div><b>${x.q?c2(x.q)+' un.':'—'}</b></div>`).join('')+`</details>`}
 /* ===== Cesto do próximo dia de trabalho ===== */
@@ -886,7 +925,7 @@ const PL_=w=>['domingos','segundas','terças','quartas','quintas','sextas','sáb
 var TIRO=false;
 const tirG=()=>{const g=+D.guardaPct;return g>=0&&g<=90?g:50};
 function tirSet(v){D.tirPer=v;save();TIRAR()}
-function tirCfg(){const a=prompt('Que percentagem do lucro quer guardar para repor a mercadoria? (0 a 90)',tirG());if(a===null)return;const x=n(a);if(!(x>=0&&x<=90))return alert('Escreva um valor entre 0 e 90.');D.guardaPct=x;save();TIRAR()}
+async function tirCfg(){const a=(await perguntar('Que percentagem do lucro quer guardar para repor a mercadoria? (0 a 90)',{im:'decimal',val:bjPv(tirG())}));if(a===null)return;const x=n(a);if(!(x>=0&&x<=90))return alert('Escreva um valor entre 0 e 90.');D.guardaPct=x;save();TIRAR()}
 function tirCalc(){const hoje=td(),mes=D.tirPer==='mes',wd=(new Date(hoje+'T12:00:00').getDay()+6)%7,ini=mes?hoje.slice(0,8)+'01':addD(hoje,-wd);
 let A=0,B=0;for(let ds=ini;ds<=hoje;ds=addD(ds,1)){const f=fechoData(ds);A+=f.liq;B+=f.ret}
 let P=0;D.vendas.forEach(v=>{if(v.data<ini||v.data>hoje||!v.fiado)return;const dv=dvL().find(x=>x.venda===v.id),tot=v.qtd*v.preco;if(!dv||!(tot>0))return;P+=Math.min(1,dvF(dv)/tot)*v.qtd*(v.preco-v.custo)});
@@ -903,7 +942,7 @@ e.innerHTML=`<div class="card" style="border-color:var(--pri)"><details class="p
 +(c.saldo>0?`<p class="empty" style="margin:8px 0 0">Na Caixa tem ${money(c.saldo)}${c.A>0&&c.exc<=0?'. Deste valor, '+money(Math.max(0,c.saldo-Math.floor(c.pode)))+' fica para a mercadoria':''}.</p>`:'')+`</details></div>`}
 
 /* ===== Vale a pena sair? ===== */
-function sairSet(){const a=prompt('Quanto gasta, em média, para ir vender num dia? (transporte, em Kz)\nDeixe vazio para a app calcular pelo transporte que registar na Caixa.',D.custoSair||'');if(a===null)return;const x=a.trim()===''?0:n(a);if(x<0||isNaN(x))return;D.custoSair=x;save();SAIR()}
+async function sairSet(){const a=(await perguntar('Quanto gasta, em média, para ir vender num dia? (transporte, em Kz)\nDeixe vazio para a app calcular pelo transporte que registar na Caixa.',{im:'decimal',val:bjPv(D.custoSair||'')}));if(a===null)return;const x=a.trim()===''?0:n(a);if(x<0||isNaN(x))return;D.custoSair=x;save();SAIR()}
 function sairCalc(){const hoje=td(),prim=D.vendas.reduce((m,v)=>v.data<m?v.data:m,hoje),ini=prim>addD(hoje,-56)?prim:addD(hoje,-56),fim=addD(hoje,-1);
 const T={};D.caixa.forEach(c=>{if(isTr(c)&&c.data>=ini&&c.data<=fim)T[c.data]=(T[c.data]||0)+c.valor});const ds=Object.keys(T),auto=ds.length?ds.reduce((a,k)=>a+T[k],0)/ds.length:0,man=+D.custoSair>0,custo=man?+D.custoSair:auto;
 let rec=0,luc=0;const occ=[0,0,0,0,0,0,0],A=[0,1,2,3,4,5,6].map(()=>({d:new Set(),rev:0,luc:0}));
@@ -922,37 +961,37 @@ h+=c.X.map(y=>{const net=y.luc-c.custo,st=tr.indexOf(y.w)>=0?'':av.indexOf(y.w)>
 h+=`<p class="empty" style="margin:8px 0 0">O valor de cada dia é o lucro médio nos dias em que vendeu, menos o gasto para sair.${c.nDias<5&&!c.man?' Poucos dias de transporte registados: a conta ainda é fraca.':''}</p>`;
 e.innerHTML=cab+h+`</div>`}
 /* ===== Aviso de compra mais cara ===== */
-function entCara(p,a,b){if(!(a>0&&b>0))return;const r=b/a;if(r<1.03)return;const pc=Math.round((r-1)*100),nv=Math.ceil(p.venda*r/10)*10,l0=p.venda-a,l1=p.venda-b;
-if(confirm('⚠️ Compra mais cara: '+p.nome+'\n\nCusto por unidade: '+money(b)+' (antes '+money(a)+', +'+pc+'%).\nCom o preço de venda de '+money(p.venda)+', o lucro por unidade desce de '+money(l0)+' para '+money(l1)+(l1<=0?' (PREJUÍZO)':'')+'.\n\nPara manter a mesma margem de antes, venda a '+money(nv)+'.\n\nMudar o preço de venda para '+money(nv)+'?')){p.venda=nv;p.caraOk={cu:b};save();R();toast('Preço de '+p.nome+' mudou para '+money(nv))}}
-function stockExistente(){if(!once())return;const p=P($('sProd').value),q=n($('sQtd').value),ent=$('sData').value||td(),vl=$('sVal').value;
+async function entCara(p,a,b){if(!(a>0&&b>0))return;const r=b/a;if(r<1.03)return;const pc=Math.round((r-1)*100),nv=Math.ceil(p.venda*r/10)*10,l0=p.venda-a,l1=p.venda-b;
+if((await confirmar('⚠️ Compra mais cara: '+p.nome+'\n\nCusto por unidade: '+money(b)+' (antes '+money(a)+', +'+pc+'%).\nCom o preço de venda de '+money(p.venda)+', o lucro por unidade desce de '+money(l0)+' para '+money(l1)+(l1<=0?' (PREJUÍZO)':'')+'.\n\nPara manter a mesma margem de antes, venda a '+money(nv)+'.\n\nMudar o preço de venda para '+money(nv)+'?',{ok:'Mudar o preço',no:'Manter'}))){p.venda=nv;p.caraOk={cu:b};save();R();toast('Preço de '+p.nome+' mudou para '+money(nv))}}
+async function stockExistente(){if(!once())return;const p=P($('sProd').value),q=n($('sQtd').value),ent=$('sData').value||td(),vl=$('sVal').value;
 if(!p||q<=0)return alert('Escolha o produto e quantas unidades tem.');
 if(ent>td())return alert('A data de entrada não pode ser no futuro.');
 {const jm=m=>+m.slice(0,2)*60+ +m.slice(3,5),rc=D.compras.slice(-30).find(c=>c.sem&&c.pid===p.id&&c.data===td()&&Math.abs(c.un-q)<1e-9&&c.hora&&Math.abs(jm(hh())-jm(c.hora))<=2);if(rc)return alert('Já registou '+c2(q)+' un. de '+p.nome+' como stock existente há instantes ('+rc.hora+').\nNão foi registado outra vez, para o stock não ficar a dobrar.\nSe é mesmo outra quantidade igual, espere 2 minutos ou mude a quantidade.')}
-if(!confirm('Registar '+c2(q)+' un. de '+p.nome+' que já tem consigo?\n\nO stock sobe '+c2(q)+' un. Não sai dinheiro da caixa.'))return;
+if(!(await confirmar('Registar '+c2(q)+' un. de '+p.nome+' que já tem consigo?\n\nO stock sobe '+c2(q)+' un. Não sai dinheiro da caixa.',{ok:'Registar'})))return;
 const stk0=Math.max(0,p.stock);p.stock+=q;if(vl&&(stk0<=0||!p.val||vl<p.val))p.val=vl;
 D.compras.push({id:uid(),data:td(),ent,val:vl||'',hora:hh(),pid:p.id,nome:p.nome,emb:0,un:q,total:0,sem:true});
 save();$('sQtd').value='';$('sVal').value='';$('sData').value=td();R();alert('Registado: '+c2(q)+' un. de '+p.nome+' (entrada '+fmtD(ent)+'). O stock agora é '+c2(p.stock)+' un. e a caixa não foi alterada.')}
-function editCompra(id){const c=D.compras.find(x=>x.id===id);if(!c)return;const p=(c.pid&&P(c.pid))||D.prods.find(x=>x.nome===c.nome),ue=c.emb>0?c.un/c.emb:0;
+async function editCompra(id){const c=D.compras.find(x=>x.id===id);if(!c)return;const p=(c.pid&&P(c.pid))||D.prods.find(x=>x.nome===c.nome),ue=c.emb>0?c.un/c.emb:0;
 if(!(ue>0))return alert(c.sem?'Este registo é de stock que já tinha. Para mudar, apague-o (✕) e registe outra vez.':'Não foi possível editar esta compra. Desfaça-a e registe outra vez.');
-const a=prompt('Quantas embalagens de '+c.nome+' comprou? (agora: '+c.emb+')',c.emb);if(a===null)return;const e2=n(a);if(e2<=0)return alert('Indique um número de embalagens maior que zero.');
-const b=prompt('Preço de cada embalagem (Kz)? (agora: '+money(c.total/c.emb)+')',Math.round(c.total/c.emb*100)/100);if(b===null)return;const pr2=n(b);if(pr2<=0)return alert('Indique um preço maior que zero.');
+const a=(await perguntar('Quantas embalagens de '+c.nome+' comprou? (agora: '+c.emb+')',{im:'decimal',val:bjPv(c.emb)}));if(a===null)return;const e2=n(a);if(e2<=0)return alert('Indique um número de embalagens maior que zero.');
+const b=(await perguntar('Preço de cada embalagem (Kz)? (agora: '+money(c.total/c.emb)+')',{im:'decimal',val:bjPv(Math.round(c.total/c.emb*100)/100)}));if(b===null)return;const pr2=n(b);if(pr2<=0)return alert('Indique um preço maior que zero.');
 const un2=e2*ue,tot2=e2*pr2,du=un2-c.un,dt=tot2-c.total;
 if(p&&p.stock+du<0)return alert('Não dá para reduzir tanto: parte desta mercadoria já foi vendida (stock actual '+p.stock+' un.).');
 if(D.caixa.filter(x=>x.ref===id).length>1)return alert('Esta compra foi paga com duas formas (Dinheiro e Multicaixa). Para mudar, desfaça-a (✕) e registe outra vez.');
-const cx=D.caixa.find(x=>x.ref===id);if(dt>0&&semSaldo(dt,cx?(cx.forma||'din'):'din'))return;
-if(!confirm('Alterar a compra de '+c.nome+'?\n\nAntes: ×'+embC(c)+' · '+money(c.total)+'\nDepois: ×'+e2+' emb. · '+money(tot2)+'\n\nStock: '+(du>=0?'+':'')+du+' un.\nCaixa: '+(dt>0?'sai mais '+money(dt):dt<0?'volta '+money(-dt):'sem alteração')))return;
+const cx=D.caixa.find(x=>x.ref===id);if(dt>0&&(await semSaldo(dt,cx?(cx.forma||'din'):'din')))return;
+if(!(await confirmar('Alterar a compra de '+c.nome+'?\n\nAntes: ×'+embC(c)+' · '+money(c.total)+'\nDepois: ×'+e2+' emb. · '+money(tot2)+'\n\nStock: '+(du>=0?'+':'')+du+' un.\nCaixa: '+(dt>0?'sai mais '+money(dt):dt<0?'volta '+money(-dt):'sem alteração'),{ok:'Alterar'})))return;
 if(p){const ult=D.compras.filter(x=>x.pid==p.id||(!x.pid&&x.nome===p.nome)).slice(-1)[0]===c,rest=p.stock+du;if(p.cm>0&&rest>0){const x=(p.stock*p.cm+dt)/rest;if(x>0)p.cm=x}else if(rest<=0)delete p.cm;if(ult)p.precoEmb=pr2;p.stock=rest}
 c.emb=e2;delete c.cmp;delete c.mei;delete c.qua;delete c.pm;delete c.pq;c.un=un2;c.total=tot2;if(cx)cx.valor=tot2;save();R()}
-function delCompra(id){const c=D.compras.find(x=>x.id===id);if(!c)return;const p=(c.pid&&P(c.pid))||D.prods.find(x=>x.nome===c.nome);
+async function delCompra(id){const c=D.compras.find(x=>x.id===id);if(!c)return;const p=(c.pid&&P(c.pid))||D.prods.find(x=>x.nome===c.nome);
 let m='Apagar esta compra ('+c.nome+' ×'+embC(c)+', '+money(c.total)+')?\n'+(p?'O stock diminui '+c.un+' un. e '+money(c.total)+' voltam para a caixa.':'O dinheiro volta para a caixa.');
 if(c.sem)m='Apagar este registo de stock que já tinha ('+c.nome+' ×'+c2(c.un)+' un.)?\n'+(p?'O stock diminui '+c2(c.un)+' un. A caixa não é alterada.':'A caixa não é alterada.');if(p&&p.stock<c.un)m+='\nAtenção: parte desta mercadoria já foi vendida, por isso o stock vai ficar a 0.';
-if(!confirm(m))return;if(p){const rest=p.stock-c.un,ult=c.pe0!==undefined&&D.compras.filter(x=>x.pid==p.id||(!x.pid&&x.nome===p.nome)).slice(-1)[0]===c;if(ult){p.precoEmb=c.pe0;if(c.cm0>0)p.cm=c.cm0;else delete p.cm}else if(p.cm>0&&rest>0&&c.total>0){const x=(p.stock*p.cm-c.total)/rest;if(x>0)p.cm=x}else if(rest<=0)delete p.cm;p.stock=Math.max(0,rest)}apLog({t:'compra',c:JSON.parse(JSON.stringify(c)),cx:D.caixa.filter(x=>x.ref===id).map(x=>JSON.parse(JSON.stringify(x)))});D.compras=D.compras.filter(x=>x.id!==id);D.caixa=D.caixa.filter(x=>x.ref!==id);if(p&&D.repFeito&&D.repFeito[p.id]===td()&&!D.compras.some(x=>(x.pid===p.id||(!x.pid&&x.nome===p.nome))&&(x.ent||x.data)===td()))delete D.repFeito[p.id];save();R()}
+if(!(await confirmar(m,{ok:'Apagar',perigo:1})))return;if(p){const rest=p.stock-c.un,ult=c.pe0!==undefined&&D.compras.filter(x=>x.pid==p.id||(!x.pid&&x.nome===p.nome)).slice(-1)[0]===c;if(ult){p.precoEmb=c.pe0;if(c.cm0>0)p.cm=c.cm0;else delete p.cm}else if(p.cm>0&&rest>0&&c.total>0){const x=(p.stock*p.cm-c.total)/rest;if(x>0)p.cm=x}else if(rest<=0)delete p.cm;p.stock=Math.max(0,rest)}apLog({t:'compra',c:JSON.parse(JSON.stringify(c)),cx:D.caixa.filter(x=>x.ref===id).map(x=>JSON.parse(JSON.stringify(x)))});D.compras=D.compras.filter(x=>x.id!==id);D.caixa=D.caixa.filter(x=>x.ref!==id);if(p&&D.repFeito&&D.repFeito[p.id]===td()&&!D.compras.some(x=>(x.pid===p.id||(!x.pid&&x.nome===p.nome))&&(x.ent||x.data)===td()))delete D.repFeito[p.id];save();R()}
 async function novoProd(){const nome=$('nNome').value.trim(),un=n($('nUn').value),pe=n($('nPreco').value),v=n($('nVenda').value);
 if(!nome||un<=0)return alert('Indique o nome e as unidades por embalagem.');
 if(D.prods.some(p=>p.nome.toLowerCase()===nome.toLowerCase()))return alert('Esse produto já existe.');
 const pq=n($('nPQ').value),pp=n($('nPP').value);if((pq>0||pp>0)&&!(pq>=2&&pp>0))return alert('Promoção: escreva as unidades (2 ou mais) e o preço total.');
 const np={id:uid(),nome,unEmb:un,precoEmb:pe,venda:v,stock:0,promoQ:pq>=2&&pp>0?pq:undefined,promoP:pq>=2&&pp>0?pp:undefined,val:$('nVal').value||'',min:$('nMin').value===''?5:n($('nMin').value),meia:$('nMeia').value==='0'?false:undefined,ideal:n($('nIdeal').value)>0?n($('nIdeal').value):undefined,fornH:fnN($('nForn').value)||undefined,onde:$('nOnde').value||undefined,meta:n($('nMeta').value)>0?n($('nMeta').value):undefined},ff=$('nFoto').files[0];if(ff){try{np.img=await imgFile(ff)}catch(e){alert('Não foi possível usar a foto. O produto foi guardado sem foto.')}}D.prods.push(np);save();['nNome','nUn','nPreco','nVenda','nMin','nVal','nFoto','nPQ','nPP'].forEach(i=>$(i).value='');$('nIdeal').value='';$('nForn').value='';$('nOnde').value='';$('nMeta').value='';$('nMeia').value='1';R()}
-function editVenda(id){const p=P(id),v=prompt('Novo preço de venda por unidade ('+p.nome+'):',p.venda);if(v===null||!p)return;const x=n(v);if(x<=0)return alert('O preço de venda tem de ser maior que zero.');p.venda=x;save();R()}
+async function editVenda(id){const p=P(id),v=(await perguntar('Novo preço de venda por unidade ('+p.nome+'):',{im:'decimal',val:bjPv(p.venda)}));if(v===null||!p)return;const x=n(v);if(x<=0)return alert('O preço de venda tem de ser maior que zero.');p.venda=x;save();R()}
 const mn=p=>p.min??5;
 let per='semana';const setPer=v=>{per=v;R()};
 const dAgo=k=>{const d=new Date();d.setDate(d.getDate()-k);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
@@ -1000,7 +1039,7 @@ function storPct(){return espUso()}
 function storCard(){const u=storPct();if(u<70)return'';return`<div class="card" style="border-color:#efc2bd;background:#fff0ef"><b>⚠️ O espaço está a acabar (${Math.min(u,100)}% usado)</b><small style="display:block;color:var(--sub);margin:3px 0 0">Quando encher, deixa de guardar vendas novas. Faça backup e apague o que não precisa, como fotos de produtos que já não vende.</small><button onclick="partilharBackup()">📤 Enviar backup agora</button></div>`}
 function stUso(){const e=document.getElementById('stUso');if(!e)return;const u=storPct(),c=u>=70?'var(--bad)':'var(--sub)';e.innerHTML='<p class="empty" style="color:'+c+'"><b>Espaço usado: '+Math.min(u,100)+'%</b> ('+(STP!==null?'valor dado pelo navegador':'estimativa; o navegador não diz o limite exato')+')'+(u>=70?'. Faça backup e apague o que não precisa.':'.')+'</p>'}
 function valCard(){const L=valAl();if(!L.length)return'';return`<div class="card" style="border-color:#e4bd7d;background:var(--soft)"><h2>⏳ Validades a controlar (${L.length})</h2>`+L.slice(0,5).map(p=>{const s=valSt(p);return`<div class="item"><div class="pi">${av(p,40)}<div>${esc(p.nome)}<small class="${s.c}">${s.t} · ${fmtD(p.val)}</small></div></div><b>${p.stock} un.</b></div>`}).join('')+(L.length>5?`<small style="display:block;color:var(--sub);margin-top:6px">e mais ${L.length-5}… veja no Armazém</small>`:'')+'</div>'}
-function editMin(id){const p=P(id),v=prompt('Avisar quando o stock de '+p.nome+' chegar a (unidades):',mn(p));if(v===null)return;p.min=n(v);const vi=prompt('Stock ideal de '+p.nome+' (repor até quantas unidades?). Deixe vazio para ser igual ao mínimo:',p.ideal>0?p.ideal:'');if(vi!==null){if(n(vi)>0)p.ideal=n(vi);else delete p.ideal}save();R()}
+async function editMin(id){const p=P(id),v=(await perguntar('Avisar quando o stock de '+p.nome+' chegar a (unidades):',{im:'decimal',val:bjPv(mn(p))}));if(v===null)return;p.min=n(v);const vi=(await perguntar('Stock ideal de '+p.nome+' (repor até quantas unidades?). Deixe vazio para ser igual ao mínimo:',{im:'decimal',val:bjPv(p.ideal>0?p.ideal:'')}));if(vi!==null){if(n(vi)>0)p.ideal=n(vi);else delete p.ideal}save();R()}
 const perLabel={hoje:'Hoje',semana:'Últimos 7 dias',mes:'Este mês',tudo:'Tudo'};
 function relData(){const mes=td().slice(0,7),ag={};
 const vp=D.vendas.filter(v=>per==='hoje'?v.data===td():per==='semana'?v.data>=dAgo(6):per==='mes'?v.data.startsWith(mes):true);
@@ -1014,40 +1053,40 @@ function csvVendas(){const{vp}=relData();dl('bejoma_vendas_'+per+'_'+td()+'.csv'
 function printRel(){const{ag}=relData(),t={q:0,r:0,c:0,l:0};
 const r=Object.entries(ag).sort((a,b)=>b[1].l-a[1].l).map(([k,a])=>{for(const x in t)t[x]+=a[x];return`<tr><td>${esc(k)}</td><td>${c2(a.q)}</td><td>${money(a.r)}</td><td>${money(a.c)}</td><td>${money(a.l)}</td></tr>`}).join('');
 $('printSheet').innerHTML=`<div class="ph"><img src="${document.querySelector('.hero img').src}"><div><h2>Bejoma Doces</h2><p>Relatório por produto · ${perLabel[per]} · gerado em ${agora()}</p></div></div><table><tr><th>Produto</th><th>Unidades</th><th>Receita</th><th>Custo</th><th>Lucro</th></tr>${r||'<tr><td colspan="5">Sem vendas neste período.</td></tr>'}<tr class="t"><td>TOTAL</td><td>${c2(t.q)}</td><td>${money(t.r)}</td><td>${money(t.c)}</td><td>${money(t.l)}</td></tr></table>`;assina();bjPdf()}
-function delProd(id){const p=P(id);if(!p||!confirm('Apagar '+p.nome+'?\n\nSe só quer desfazer uma compra errada, cancele e use o botão "Desfazer compra". O dinheiro só volta à caixa ao desfazer a compra.\n\nFica guardado em "Apagados" (Dinheiro → Caixa) e pode ser restaurado.'))return;apLog({t:'prod',p:JSON.parse(JSON.stringify(p))});D.prods=D.prods.filter(x=>x.id!=id);save();R()}
-function desfazCompra(id){const p=P(id);if(!p)return;const cs=D.compras.filter(c=>c.pid==id||(!c.pid&&c.nome===p.nome));
+async function delProd(id){const p=P(id);if(!p||!(await confirmar('Apagar '+p.nome+'?\n\nSe só quer desfazer uma compra errada, cancele e use o botão "Desfazer compra". O dinheiro só volta à caixa ao desfazer a compra.\n\nFica guardado em "Apagados" (Dinheiro → Caixa) e pode ser restaurado.',{ok:'Apagar',perigo:1})))return;apLog({t:'prod',p:JSON.parse(JSON.stringify(p))});D.prods=D.prods.filter(x=>x.id!=id);save();R()}
+async function desfazCompra(id){const p=P(id);if(!p)return;const cs=D.compras.filter(c=>c.pid==id||(!c.pid&&c.nome===p.nome));
 if(!cs.length)return alert('Este produto não tem compras para desfazer.');
-const c=cs[cs.length-1];delCompra(c.id)}
+const c=cs[cs.length-1];(await delCompra(c.id))}
 
 function comCat(){const l=dcL();if(!l.includes('Comida')){const i=l.indexOf('Outros');if(i>=0)l.splice(i,0,'Comida');else l.push('Comida')}return'Comida'}
-function caixaAdd(){if(!once())return;const[t,l0]=$('cTipo').value.split('|'),v=n($('cValor').value);
+async function caixaAdd(){if(!once())return;const[t,l0]=$('cTipo').value.split('|'),v=n($('cValor').value);
 if(v<=0)return alert('Indique o valor.');
 if(t==='troca'){const de=fpC,pa=(FP.find(f=>f[0]!==de)||[de])[0];if(pa===de)return;const a=cxSaldo(de);if(v>a+0.005)return alert('Em '+fpN(de)+' só tem '+money(a)+'. Não dá para trocar '+money(v)+'.');fazTroca(v,de,pa);$('cValor').value='';R();vFesta(v,[fpN(de)+' → '+fpN(pa)],null,'',{lb:'🔄 Troca registada',sg:'',fr:VF_TR});return}
-if(t==='saida'&&semSaldo(v,fpC))return;
+if(t==='saida'&&(await semSaldo(v,fpC)))return;
 let l=l0,ex={},dd=l0;
 if(l0==='Despesa'&&$('cDc')&&$('cDc').value)ex.dc=$('cDc').value;
 if(l0==='Transporte'){l='Despesa';const k=trV||trSug();ex=k==='ida'?{cap:true,tr:'ida'}:{tr:'volta'};dd=k==='ida'?'Transporte de ida':'Transporte de volta';ex.dc='Transporte'}
-else if(l0==='ComidaDesp'){l='Despesa';ex={dc:comCat()};dd='Comida';const lim=limCom();if(lim>0){const g=comDia(td())+v;if(g>lim&&!confirm('⚠️ Isto passa o limite diário de '+money(lim)+'.\nHoje já gastou '+money(comDia(td()))+' e ficaria em '+money(g)+'.\n\nRegistar mesmo assim?'))return}}
-else if(l0==='Comida'){l='Retirada';ex={sub:'comida'};dd='Comida';const lim=limCom();if(lim>0){const g=comDia(td())+v;if(g>lim&&!confirm('⚠️ Isto passa o limite diário de '+money(lim)+'.\nHoje já gastou '+money(comDia(td()))+' e ficaria em '+money(g)+'.\n\nRegistar mesmo assim?'))return}}
+else if(l0==='ComidaDesp'){l='Despesa';ex={dc:comCat()};dd='Comida';const lim=limCom();if(lim>0){const g=comDia(td())+v;if(g>lim&&!(await confirmar('⚠️ Isto passa o limite diário de '+money(lim)+'.\nHoje já gastou '+money(comDia(td()))+' e ficaria em '+money(g)+'.\n\nRegistar mesmo assim?',{ok:'Registar mesmo assim'})))return}}
+else if(l0==='Comida'){l='Retirada';ex={sub:'comida'};dd='Comida';const lim=limCom();if(lim>0){const g=comDia(td())+v;if(g>lim&&!(await confirmar('⚠️ Isto passa o limite diário de '+money(lim)+'.\nHoje já gastou '+money(comDia(td()))+' e ficaria em '+money(g)+'.\n\nRegistar mesmo assim?',{ok:'Registar mesmo assim'})))return}}
 let ep='',pz='';if(l0==='Empréstimo'){ep=($('cEmpN').value||'').trim();pz=$('cEmpP').value||'';if(!ep)return alert('Escreva quem lhe emprestou o dinheiro, para abrir a dívida a devolver.');if(pz&&pz<td())return alert('O prazo para devolver não pode ser antes de hoje.');dd='Empréstimo de '+ep}
 {const d2=$('cDesc').value.trim()||dd,jm=m=>+m.slice(0,2)*60+ +m.slice(3,5),rc=D.caixa.slice(-30).find(c=>c.data===td()&&c.tipo===t&&Math.abs(c.valor-v)<.005&&c.forma===fpC&&(c.desc||'')===d2&&c.hora&&Math.abs(jm(hh())-jm(c.hora))<=2);if(rc)return alert('Este valor já foi registado há instantes ('+rc.hora+'): '+money(v)+'.\nNão foi registado outra vez, para não duplicar.\nSe é mesmo outro movimento, mude a descrição.')}
 const cid=uid();D.caixa.push(Object.assign({id:cid,data:td(),hora:hh(),tipo:t,desc:$('cDesc').value.trim()||dd,valor:v,cat:l,forma:fpC},ex));if(l0==='Empréstimo'){dvL().push({id:uid(),tipo:'pagar',pessoa:ep,desc:$('cDesc').value.trim()||'Empréstimo recebido',valor:v,pago:0,pagtos:[],data:td(),hora:hh(),prazo:pz,emp:cid});$('cEmpN').value='';$('cEmpP').value=''}trV='';save();$('cDesc').value='';$('cValor').value='';R();try{orAviso(D.caixa[D.caixa.length-1])}catch(e){}if(l0==='Empréstimo')toast('🤝 Dívida aberta: deve '+money(v)+' a '+ep);vfCx(t,l0,cid,v)}
-function empTog(id){const c=D.caixa.find(x=>x.id==id);if(!c)return;const emp=c.cat==='Empréstimo',dv=emp?dvL().find(d=>d.emp===c.id):null;if(dv&&(dv.pagtos||[]).length)return alert('Este empréstimo já tem pagamentos registados na dívida. Apague a dívida primeiro, em Dívidas.');
-if(!confirm('Entrada de '+money(c.valor)+'\n\n'+(emp?'Mudar de "Empréstimo" para "Investimento (capital próprio)"?\n\nDeixa de contar como dinheiro que tem de devolver.':'Mudar de "Investimento (capital próprio)" para "Empréstimo"?\n\nPassa a contar como dinheiro que tem de devolver.')))return;
-if(dv){if(!confirm('A dívida de '+money(dv.valor)+' a '+dv.pessoa+' também será apagada (fica na Reciclagem). Continuar?'))return;apLog({t:'divida',d:JSON.parse(JSON.stringify(dv)),cx:[],pd:[]});D.dividas=dvL().filter(x=>x.id!==dv.id)}
+async function empTog(id){const c=D.caixa.find(x=>x.id==id);if(!c)return;const emp=c.cat==='Empréstimo',dv=emp?dvL().find(d=>d.emp===c.id):null;if(dv&&(dv.pagtos||[]).length)return alert('Este empréstimo já tem pagamentos registados na dívida. Apague a dívida primeiro, em Dívidas.');
+if(!(await confirmar('Entrada de '+money(c.valor)+'\n\n'+(emp?'Mudar de "Empréstimo" para "Investimento (capital próprio)"?\n\nDeixa de contar como dinheiro que tem de devolver.':'Mudar de "Investimento (capital próprio)" para "Empréstimo"?\n\nPassa a contar como dinheiro que tem de devolver.'))))return;
+if(dv){if(!(await confirmar('A dívida de '+money(dv.valor)+' a '+dv.pessoa+' também será apagada (fica na Reciclagem). Continuar?',{ok:'Continuar'})))return;apLog({t:'divida',d:JSON.parse(JSON.stringify(dv)),cx:[],pd:[]});D.dividas=dvL().filter(x=>x.id!==dv.id)}
 c.cat=emp?'Entrada extra':'Empréstimo';save();R()}
-function empDv(id){const c=D.caixa.find(x=>x.id==id);if(!c||!isEmp(c)||dvL().some(d=>d.emp===c.id))return;const nm=prompt('Quem emprestou os '+money(c.valor)+'?\n(Abre uma dívida a devolver em Dívidas. O prazo pode pôr lá.)');if(nm===null)return;const pe=nm.trim();if(!pe)return alert('Escreva o nome de quem emprestou.');dvL().push({id:uid(),tipo:'pagar',pessoa:pe,desc:c.desc||'Empréstimo recebido',valor:c.valor,pago:0,pagtos:[],data:c.data,hora:c.hora||hh(),prazo:'',emp:c.id});save();R();toast('🤝 Dívida aberta: deve '+money(c.valor)+' a '+pe)}
+async function empDv(id){const c=D.caixa.find(x=>x.id==id);if(!c||!isEmp(c)||dvL().some(d=>d.emp===c.id))return;const nm=(await perguntar('Quem emprestou os '+money(c.valor)+'?\n(Abre uma dívida a devolver em Dívidas. O prazo pode pôr lá.)',{im:'text'}));if(nm===null)return;const pe=nm.trim();if(!pe)return alert('Escreva o nome de quem emprestou.');dvL().push({id:uid(),tipo:'pagar',pessoa:pe,desc:c.desc||'Empréstimo recebido',valor:c.valor,pago:0,pagtos:[],data:c.data,hora:c.hora||hh(),prazo:'',emp:c.id});save();R();toast('🤝 Dívida aberta: deve '+money(c.valor)+' a '+pe)}
 const empLbl=c=>isEmp(c)?'<span style="display:inline-block;margin-left:8px;padding:2px 8px;border-radius:10px;font-size:.72rem;font-weight:800;background:rgba(224,160,0,.18);color:#e0a000;vertical-align:middle">🤝 Empréstimo (a devolver)</span>':(c.tipo==='entrada'&&!c.ref&&!c.dv&&c.cat==='Entrada extra'?'<span style="display:inline-block;margin-left:8px;padding:2px 8px;border-radius:10px;font-size:.72rem;font-weight:800;background:rgba(46,204,113,.18);color:#2ecc71;vertical-align:middle">💼 Capital próprio</span>':'');
 const trPFeito=c=>!!c.rin;
 const trPEnv=c=>(D.rotEnv||[]).indexOf(String(c.id))>=0;
-function delCaixa(id){const c=D.caixa.find(x=>x.id==id);if(!c)return;
+async function delCaixa(id){const c=D.caixa.find(x=>x.id==id);if(!c)return;
 if(trPFeito(c))return alert('🔒 Este movimento já foi concluído com a Bejoma Pessoal e não pode ser apagado.\n\n'+c.desc+' · '+(c.tipo==='entrada'?'+':'−')+money(c.valor)+'\n\nPara recomeçar tudo, use "Limpar atividade e recomeçar" (limpa também estes registos).');
 if(trPEnv(c))return alert('🔒 Esta retirada já foi enviada à Bejoma Pessoal e não pode ser apagada.\n\n'+c.desc+' · −'+money(c.valor)+'\n\nSe enviou por engano e AINDA NÃO escreveu o código na Bejoma Pessoal, use "Anular envio" em Dinheiro → Bejoma Pessoal → Enviar à Bejoma Pessoal. Depois já pode apagar.');
-if(c.troca){if(!confirm('Apagar esta troca de '+money(c.valor)+'?\nAs duas linhas (saída e entrada) são apagadas e o dinheiro volta a ficar como estava antes.\nSe já gastou o dinheiro trocado, a forma de pagamento pode ficar negativa.\n\nFica guardado em "Apagados".'))return;apLog({t:'troca',movs:JSON.parse(JSON.stringify(D.caixa.filter(x=>x.troca===c.troca)))});D.caixa=D.caixa.filter(x=>x.troca!==c.troca);save();return R()}
+if(c.troca){if(!(await confirmar('Apagar esta troca de '+money(c.valor)+'?\nAs duas linhas (saída e entrada) são apagadas e o dinheiro volta a ficar como estava antes.\nSe já gastou o dinheiro trocado, a forma de pagamento pode ficar negativa.\n\nFica guardado em "Apagados".',{ok:'Apagar',perigo:1})))return;apLog({t:'troca',movs:JSON.parse(JSON.stringify(D.caixa.filter(x=>x.troca===c.troca)))});D.caixa=D.caixa.filter(x=>x.troca!==c.troca);save();return R()}
 let m='Apagar este movimento?\n'+c.desc+' · '+(c.tipo==='entrada'?'+':'−')+money(c.valor)+'\nO saldo da caixa '+(c.tipo==='entrada'?'desce ':'sobe ')+money(c.valor)+'.';
 if(isEmp(c)||/d[ií]vida|emprest/i.test(c.desc||''))m+='\n\n⚠️ Este movimento parece ligado a uma dívida. Apagar aqui só tira o dinheiro da Caixa: a dívida continua em Dívidas.';
 m+='\n\nFica guardado em "Apagados" e pode ser restaurado.';
-if(!confirm(m))return;apLog({t:'caixa',mov:JSON.parse(JSON.stringify(c))});D.caixa=D.caixa.filter(x=>x.id!=id);save();R()}
+if(!(await confirmar(m,{ok:'Apagar',perigo:1})))return;apLog({t:'caixa',mov:JSON.parse(JSON.stringify(c))});D.caixa=D.caixa.filter(x=>x.id!=id);save();R()}
 
 async function backupMake(semFotos){let txt,nm='bejoma_backup_'+td();const rp=semFotos?((k,v)=>k==='img'&&typeof v==='string'&&v.indexOf('data:')===0?undefined:v):undefined;
 if(ENC){const d=pinData();txt=JSON.stringify({bjmEnc:1,it:d.it,ri:d.ri,s:d.s,rs:d.rs,ws:d.ws,wr:d.wr,data:await encBlob(JSON.stringify(D,rp),DEK)});nm+='_cifrado'}else txt=JSON.stringify(D,rp);
@@ -1058,15 +1097,15 @@ const SNAP='bejoma_snap';
 async function snapMake(m){try{const raw=JSON.stringify(D),en=!!(ENC&&DEK);await kvSet(SNAP,JSON.stringify({t:Date.now(),m,enc:en,b:en?await encBlob(raw,DEK):raw}));return true}catch(e){return false}}
 async function desfazImport(){if(LOCKED)return;let x=null;try{x=JSON.parse(kvGet(SNAP)||'null')}catch(e){}
 if(!x)return alert('Ainda não há nenhuma cópia guardada. O app guarda uma automaticamente antes de importar um backup ou de limpar.');
-if(!confirm('Voltar aos dados que tinha antes de '+x.m+' ('+new Date(x.t).toLocaleString('pt-PT')+')?\n\nOs dados actuais ficam guardados e pode voltar a trocar.'))return;
+if(!(await confirmar('Voltar aos dados que tinha antes de '+x.m+' ('+new Date(x.t).toLocaleString('pt-PT')+')?\n\nOs dados actuais ficam guardados e pode voltar a trocar.',{ok:'Voltar atrás'})))return;
 let d;try{d=JSON.parse(x.enc?await decBlob(x.b,DEK):x.b)}catch(e){return alert('Não foi possível abrir essa cópia (o PIN pode ter sido removido ou mudado depois de ela ser feita).')}
 if(!d||!Array.isArray(d.prods))return alert('A cópia está danificada.');
 await snapMake('voltar atrás');D=d;norm();fixL();save();R();alert('Pronto: voltou aos dados anteriores.')}
-function importar(ev){const f=ev.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>impTxt(r.result);r.readAsText(f);ev.target.value=''}
+function importar(ev){const f=ev.target.files[0];if(!f)return;if(f.size>60*1048576){ev.target.value='';return alert('Este ficheiro é demasiado grande para ser um backup desta app.')}const r=new FileReader();r.onload=async ()=>(await impTxt(r.result));r.readAsText(f);ev.target.value=''}
 async function impTxt(txt){try{let x=JSON.parse(String(txt).trim());
 if(x&&x.bjmEnc){const pw=await askPass('Backup cifrado. Escreva o PIN (ou a frase de recuperação) com que foi criado:');if(!pw)return;x=await openBackup(x,pw)}
-if(!Array.isArray(x.prods)||!Array.isArray(x.vendas)||!Array.isArray(x.caixa))throw 0;
-if(!confirm('Substituir todos os dados actuais pelo backup?\n\nO app guarda antes uma cópia dos dados actuais, para poder voltar atrás.'))return;if(!await snapMake('importar um backup')&&!confirm('Não foi possível guardar a cópia dos dados actuais (memória cheia). Continuar mesmo assim?'))return;try{const ci={},cn={};D.prods.forEach(q=>{if(q.img){ci[q.id]=q.img;cn[q.nome]=q.img}});x.prods.forEach(q=>{if(!q.img){const m=ci[q.id]||cn[q.nome];if(m)q.img=m}})}catch(e){}D=x;norm();fixL();save();R();{const t=$('bTxt');if(t)t.value=''}alert('Backup restaurado. As fotos dos produtos que já tinha no app foram mantidas. Se não era este, use "Voltar atrás" no separador Backup.')}catch(e){alert('Backup inválido (ficheiro ou texto incompleto), ou PIN/frase errado.')}}
+semProto(x,0);if(!x||typeof x!=='object'||!Array.isArray(x.prods)||!Array.isArray(x.vendas)||!Array.isArray(x.caixa)||!estOkG(x))throw 0;
+if(!(await confirmar('Substituir todos os dados actuais pelo backup?\n\nO app guarda antes uma cópia dos dados actuais, para poder voltar atrás.',{ok:'Substituir'})))return;if(!await snapMake('importar um backup')&&!(await confirmar('Não foi possível guardar a cópia dos dados actuais (memória cheia). Continuar mesmo assim?',{ok:'Continuar mesmo assim'})))return;try{const ci={},cn={};D.prods.forEach(q=>{if(q.img){ci[q.id]=q.img;cn[q.nome]=q.img}});x.prods.forEach(q=>{if(!q.img){const m=ci[q.id]||cn[q.nome];if(m)q.img=m}})}catch(e){}{const D0=D;try{D=x;norm();fixL()}catch(e){D=D0;throw e}}save();R();{const t=$('bTxt');if(t)t.value=''}alert('Backup restaurado. As fotos dos produtos que já tinha no app foram mantidas. Se não era este, use "Voltar atrás" no separador Backup.')}catch(e){alert('Backup inválido (ficheiro ou texto incompleto), ou PIN/frase errado.')}}
 async function pinOk(p){const d=pinData();if(!d)return true;let ok=false;
 if(d.v===3){try{await unwrapK(await kek('p|'+p,d.s,d.it),d.ws);ok=true}catch(e){}}else ok=await chkPin(d,p);
 if(ok)failClear();else failAdd();return ok}
@@ -1128,36 +1167,13 @@ return`<p class="empty" style="${bs}">Comparado com ${rg.lab}:<br>Receita ${mone
 function partilharSem(){const A=semData(dAgo(6),td()),t=`Bejoma Doces — Resumo semanal (${dm(dAgo(6))} a ${dm(td())})\nVendas: ${A.n}\nReceita: ${money(A.r)}\nLucro: ${money(A.l)}\nCompras de stock: ${money(A.comp)}\nDespesas: ${money(A.desp)}${A.perd?'\nPerdas e ofertas: '+money(A.perd):''}${A.capD?'\nTransporte de ida (sai do capital): '+money(A.capD):''}`;
 if(navigator.share)navigator.share({text:t}).catch(()=>{});else if(navigator.clipboard)navigator.clipboard.writeText(t).then(()=>alert('Resumo copiado.'));else alert(t)}
 const GT={},GM={};
-/* ===== Tabela do dia (toque num dia do gráfico "Receita e lucro por dia") ===== */
-function dayTbl(id,ds){const box=$('tt'+id.slice(1));if(!box)return;
-const ag={};let nv=0;D.vendas.filter(v=>v.data===ds).forEach(v=>{const a=ag[v.nome]||(ag[v.nome]={q:0,r:0,l:0});a.q+=v.qtd;a.r+=v.qtd*v.preco;a.l+=v.qtd*(v.preco-v.custo);if(v.qtd>0)nv++});
-const all=Object.entries(ag),T=all.reduce((s,e)=>({q:s.q+e[1].q,r:s.r+e[1].r,l:s.l+e[1].l}),{q:0,r:0,l:0});
-const L=all.filter(e=>e[1].q>0).sort((a,b)=>b[1].q-a[1].q||b[1].l-a[1].l||a[0].localeCompare(b[0],'pt',{sensitivity:'base'}));
-const WD=['Domingo','Segunda-feira','Terça-feira','Quarta-feira','Quinta-feira','Sexta-feira','Sábado'],wd=WD[new Date(ds+'T12:00:00').getDay()];
-const hd='<div class="dh"><b>📅 '+wd+'</b><span>'+dm(ds)+'</span></div>';
-if(!L.length){box.innerHTML='<div class="dtb">'+hd+'<p class="nt">Sem vendas neste dia.</p></div>';return}
-const k=x=>money(x).replace('\u00a0Kz',''),mg=T.r>0?Math.round(T.l/T.r*100):0;
-/* mesma divisão da Venda rápida, mas só com as vendas deste dia */
-const top=L.slice(0,3),r1=L.slice(3),bot=r1.slice(-3),r2=r1.slice(0,r1.length-bot.length),men=r2.slice(-3),med=r2.slice(0,r2.length-men.length);
-const row=e=>{const a=e[1];return'<tr><td class="pn">'+esc(e[0])+'</td><td>'+c2(a.q)+'</td><td>'+k(a.r)+'</td><td class="'+(a.l<0?'bad':'good')+'">'+k(a.l)+'</td></tr>'};
-const sc=(c,t)=>'<tr class="sc s'+c+'"><td colspan="4">'+t+'</td></tr>';
-box.innerHTML='<div class="dtb">'+hd
-+'<div class="dg"><div><i>Vendas</i><b>'+nv+'</b></div><div><i>Produtos</i><b>'+L.length+'</b></div><div><i>Margem bruta</i><b>'+mg+'%</b></div></div>'
-+'<table><colgroup><col class="c1"><col class="c2"><col class="c3"><col class="c4"></colgroup><thead><tr><th>Produto</th><th>Qtd</th><th>Receita</th><th>Lucro bruto</th></tr></thead><tbody>'
-+sc(1,'🔥 Mais vendidos')+top.map(row).join('')
-+(men.length?sc(2,'📉 Menos vendidos')+men.map(row).join(''):'')
-+(bot.length?sc(3,'🐌 Quase não saíram')+bot.map(row).join(''):'')
-+'</tbody><tfoot><tr><td class="pn">Total do dia</td><td>'+c2(T.q)+'</td><td>'+k(T.r)+'</td><td>'+k(T.l)+'</td></tr></tfoot></table>'
-+'<p class="nt">Valores em Kz, ordenados pela quantidade vendida só neste dia (como na Venda rápida). Lucro bruto = preço − custo, antes de despesas.'+(med.length?' '+med.length+' produto'+(med.length>1?'s':'')+' de venda média não aparece'+(med.length>1?'m':'')+' na lista, mas conta'+(med.length>1?'m':'')+' no total.':'')+' Para decidir compras, veja "Onde focar" (30 dias).</p></div>'}
-
-
 function scrub(e,id){const g=GM[id];if(!g)return;const r=e.currentTarget.getBoundingClientRect(),x=(e.clientX-r.left)/r.width*g.W;
-let i=g.mode==='b'?Math.floor((x-g.l)/g.st):Math.round((x-g.l)/g.st);i=Math.max(0,Math.min(g.N-1,i));$(id).textContent=GT[id][i];if(g.ds&&g.last!==i){g.last=i;dayTbl(id,g.ds[i])}const cx=g.l+g.st*i,h=$('h'+id);
+let i=g.mode==='b'?Math.floor((x-g.l)/g.st):Math.round((x-g.l)/g.st);i=Math.max(0,Math.min(g.N-1,i));$(id).textContent=GT[id][i];const cx=g.l+g.st*i,h=$('h'+id);
 if(g.mode==='b')h.setAttribute('x',cx);else{h.setAttribute('x1',cx);h.setAttribute('x2',cx);const c=$('hc'+id.slice(1));c.setAttribute('cx',cx);c.setAttribute('cy',g.ys[i])}}
 function G(){
 const N=gper,days=[];for(let k=N-1;k>=0;k--){const ds=dAgo(k),vs=D.vendas.filter(v=>v.data===ds);days.push({ds,r:vs.reduce((s,v)=>s+v.qtd*v.preco,0),l:vs.reduce((s,v)=>s+v.qtd*(v.preco-v.custo),0)})}
 const vp=D.vendas.filter(v=>v.data>=dAgo(N-1)),R_=days.reduce((s,d)=>s+d.r,0),L_=days.reduce((s,d)=>s+d.l,0);
-const sel=`<select onchange="setG(this.value)" style="margin-bottom:12px"><option value="7"${N===7?' selected':''}>Últimos 7 dias</option><option value="30"${N===30?' selected':''}>Últimos 30 dias</option></select>`;
+const sel=`<select onchange="setG(this.value)" aria-label="Período do gráfico" style="margin-bottom:12px"><option value="7"${N===7?' selected':''}>Últimos 7 dias</option><option value="30"${N===30?' selected':''}>Últimos 30 dias</option></select>`;
 const kp=(k,v,c)=>`<div class="stat"><div class="k">${k}</div><div class="v ${c||''}">${v}</div></div>`;
 const kpis=`<div class="grid" style="margin-bottom:13px">${kp('RECEITA',money(R_))}${kp('LUCRO',money(L_),L_<0?'bad':'good')}${kp('MARGEM',(R_?Math.round(L_/R_*100):0)+'%')}${kp('Nº DE VENDAS',vp.length)}</div>`+cmpLine(cmpRg('n',N),'margin:-6px 0 13px');
 let c1;
@@ -1165,8 +1181,8 @@ if(!R_)c1=empty('Sem vendas neste período.');else{
 const W=360,H=210,m={l:40,r:10,t:12,b:26},st=(W-m.l-m.r)/N,bw=Math.min(st*.62,26),hi=nice(Math.max(...days.map(d=>d.r))),mn_=Math.min(0,...days.map(d=>d.l)),lo=mn_<0?-nice(-mn_):0,f=frame(lo,hi,W,H,m),y0=f.y(0);
 const bars=days.map((d,i)=>{const x=m.l+st*i+(st-bw)/2,yy=f.y(d.r);return`<rect class="bar" x="${x}" y="${yy}" width="${bw}" height="${Math.max(y0-yy,0)}" rx="3" fill="url(#gR)" style="animation-delay:${i*18}ms"/>`+xl(i,N,m.l+st*i+st/2,H,d.ds)}).join('');
 const pts=days.map((d,i)=>[m.l+st*i+st/2,f.y(d.l)]);
-GT.t1=days.map(d=>dm(d.ds)+' — receita '+money(d.r)+' · lucro '+money(d.l));GM.t1={W,l:m.l,st,N,mode:'b',ds:days.map(d=>d.ds)};
-c1=`<div class="leg"><span><i class="dot" style="background:#d97800"></i>Receita</span><span><i class="dot" style="background:#16834a"></i>Lucro</span></div><div class="chart"><svg viewBox="0 0 ${W} ${H}" onpointerdown="scrub(event,'t1')" onpointermove="scrub(event,'t1')"><defs><linearGradient id="gR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3a93a"/><stop offset="1" stop-color="#d97800"/></linearGradient></defs><rect id="ht1" x="-100" y="${m.t}" width="${st}" height="${H-m.t-m.b}" rx="4" fill="#d97800" opacity=".12"/>${f.g}${bars}<polyline class="fade" points="${pts.map(p=>p.join(',')).join(' ')}" fill="none" stroke="#16834a" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>${N<=7?pts.map(p=>`<circle class="fade" cx="${p[0]}" cy="${p[1]}" r="3.6" fill="#fff" stroke="#16834a" stroke-width="2"/>`).join(''):''}</svg></div><div class="tipb" id="t1">Toque ou arraste sobre o gráfico para ver os valores de cada dia.</div><div id="tt1"></div>`}
+GT.t1=days.map(d=>dm(d.ds)+' — receita '+money(d.r)+' · lucro '+money(d.l));GM.t1={W,l:m.l,st,N,mode:'b'};
+c1=`<div class="leg"><span><i class="dot" style="background:#d97800"></i>Receita</span><span><i class="dot" style="background:#16834a"></i>Lucro</span></div><div class="chart"><svg viewBox="0 0 ${W} ${H}" onpointerdown="scrub(event,'t1')" onpointermove="scrub(event,'t1')"><defs><linearGradient id="gR" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#f3a93a"/><stop offset="1" stop-color="#d97800"/></linearGradient></defs><rect id="ht1" x="-100" y="${m.t}" width="${st}" height="${H-m.t-m.b}" rx="4" fill="#d97800" opacity=".12"/>${f.g}${bars}<polyline class="fade" points="${pts.map(p=>p.join(',')).join(' ')}" fill="none" stroke="#16834a" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>${N<=7?pts.map(p=>`<circle class="fade" cx="${p[0]}" cy="${p[1]}" r="3.6" fill="#fff" stroke="#16834a" stroke-width="2"/>`).join(''):''}</svg></div><div class="tipb" id="t1">Toque ou arraste sobre o gráfico para ver os valores de cada dia.</div>`}
 let run=D.caixa.reduce((a,c)=>c.data<dAgo(N-1)?a+(c.tipo==='entrada'?c.valor:-c.valor):a,0);
 const sd=days.map(d=>{D.caixa.filter(c=>c.data===d.ds).forEach(c=>run+=c.tipo==='entrada'?c.valor:-c.valor);return{ds:d.ds,v:run}});
 let c2;
@@ -1217,10 +1233,10 @@ let vManual=0;
 function vDataSet(){const e=$('vData'),i=$('vDataInfo');if(!e||!i)return;const v=e.value;if(v&&v>td()){e.value='';i.textContent='A data da venda não pode ser no futuro.';return}i.innerHTML=(v&&v<td())?'<b style="color:var(--bad)">📅 Esta venda vai ficar com a data de '+fmtD(v)+'.</b> <button class="mini sec" onclick="$(\'vData\').value=\'\';vDataSet()">Voltar a hoje</button>':'Deixe vazio para registar hoje. Use só se esqueceu de registar uma venda de outro dia.'}
 let _lk=0;const once=()=>{const t=Date.now();if(t-_lk<600)return false;_lk=t;return true};
 const cxSaldo=f=>D.caixa.reduce((a,c)=>(c.forma||'din')===f?a+(c.tipo==='entrada'?c.valor:-c.valor):a,0);
-const semSaldo=(v,f)=>{const a=cxSaldo(f);if(!(v>a+0.005))return false;
+const semSaldo=async (v,f)=>{const a=cxSaldo(f);if(!(v>a+0.005))return false;
 const o=(FP.find(x=>x[0]!==f)||[f])[0],ao=cxSaldo(o),falta=Math.round((v-a)*100)/100;
-if(o!==f&&ao>=falta-0.005&&confirm('Em '+fpN(f)+' só tem '+money(a)+' e esta saída é de '+money(v)+'.\n\n🔄 Trocar '+money(falta)+' do '+fpN(o)+' para '+fpN(f)+' e continuar?\n('+fpN(o)+' tem '+money(ao)+'. Assim o '+fpN(f)+' não fica negativo.)')){fazTroca(falta,o,f);return false}
-return !confirm('Atenção: em '+fpN(f)+' a caixa só tem '+money(a)+' e esta saída é de '+money(v)+'. O saldo ficaria em '+money(a-v)+'.\n\nContinuar mesmo assim?\n(Se usou dinheiro seu, registe primeiro um Investimento na Caixa.)')};
+if(o!==f&&ao>=falta-0.005&&(await confirmar('Em '+fpN(f)+' só tem '+money(a)+' e esta saída é de '+money(v)+'.\n\n🔄 Trocar '+money(falta)+' do '+fpN(o)+' para '+fpN(f)+' e continuar?\n('+fpN(o)+' tem '+money(ao)+'. Assim o '+fpN(f)+' não fica negativo.)'))){fazTroca(falta,o,f);return false}
+return !(await confirmar('Atenção: em '+fpN(f)+' a caixa só tem '+money(a)+' e esta saída é de '+money(v)+'. O saldo ficaria em '+money(a-v)+'.\n\nContinuar mesmo assim?\n(Se usou dinheiro seu, registe primeiro um Investimento na Caixa.)',{ok:'Continuar mesmo assim'}))};
 function fazTroca(v,de,para){const tid=uid(),b={data:td(),hora:hh(),cat:'Troca',troca:tid,desc:'Troca: '+fpN(de)+' → '+fpN(para)};
 D.caixa.push(Object.assign({id:uid(),tipo:'saida',valor:v,forma:de},b),Object.assign({id:uid(),tipo:'entrada',valor:v,forma:para},b))}
 const fmtD=ds=>ds.slice(8)+'/'+ds.slice(5,7)+'/'+ds.slice(0,4);const agora=()=>fmtD(td())+' às '+hh();
@@ -1248,7 +1264,7 @@ function cdVal(r,ds){const o=Object.assign({},r);if(ds===td()){if(r.c!=null){o.e
 function cdOk(){if(!once())return;const c=cdNum($('cdV').value),m=cdNum($('cdM').value);if(c===null&&m===null)return alert('Escreva o dinheiro que tem, o saldo do Multicaixa, ou os dois.');if((c!==null&&c<0)||(m!==null&&m<0))return alert('O valor não pode ser negativo.');
 const o={d:td(),h:hh()};if(c!==null){o.c=c;o.e=cdEsp();o.dif=Math.round((c-o.e)*100)/100}if(m!==null){o.m=m;o.em=cdEspM();o.mdif=Math.round((m-o.em)*100)/100}
 const a=cdL(),i=a.findIndex(x=>x.d===td());if(i>=0)a[i]=o;else a.push(o);a.sort((x,y)=>x.d<y.d?-1:1);if(a.length>90)a.splice(0,a.length-90);cdTmp='';cdTmpM='';save();F()}
-function cdDel(){if(!confirm('Apagar a contagem de hoje?'))return;D.contDin=cdL().filter(x=>x.d!==td());cdTmp='';cdTmpM='';save();F()}
+async function cdDel(){if(!(await confirmar('Apagar a contagem de hoje?',{ok:'Apagar',perigo:1})))return;D.contDin=cdL().filter(x=>x.d!==td());cdTmp='';cdTmpM='';save();F()}
 function cdCard(){try{const a=cdL(),hoje=fdia===td(),r0=a.find(x=>x.d===fdia),r=r0?cdVal(r0,fdia):null,ant=a.filter(x=>x.d<fdia).slice(-1)[0];
 const bloco=(nome,real,esp,dif,hf,hs)=>{const ok=Math.abs(dif)<0.005,h=dif<-0.005?hf:dif>0.005?hs:'';return`<div class="item"><div>${nome}: devia ter<small>pelo que registou${hoje?', agora':''}</small></div><b>${money(esp)}</b></div><div class="item"><div>${nome}: contou${hoje?'':' ('+esc(r.h||'')+')'}</div><b>${money(real)}</b></div><b style="display:block;font-size:1.05rem;margin:6px 0 10px;color:${ok?'var(--good)':'var(--bad)'}">${ok?'✅ Bate certo':dif>0?'⚠️ Sobram '+money(dif):'⚠️ Faltam '+money(-dif)}</b>${h?`<small style="display:block;color:var(--sub);margin:-6px 0 10px">${h}</small>`:''}`};
 let res='';if(r){res=`<div style="margin-top:10px;padding:10px;border-radius:12px;background:var(--soft)">`+(r.c!=null?bloco('💵 Dinheiro',r.c,r.e,r.dif,'Veja se falta registar uma despesa, uma compra ou uma retirada, ou se deu troco a mais.','Veja se falta registar uma venda, ou se entrou dinheiro que não registou.'):'')+(r.m!=null?bloco('📱 Multicaixa',r.m,r.em,r.mdif,'Veja se falta registar uma compra ou uma despesa paga por Multicaixa.','Veja se falta registar uma venda recebida por Multicaixa.'):'');
@@ -1405,11 +1421,11 @@ function lkShake(){const b=document.querySelector('#lock .lk');b.classList.remov
 function lkTick(){clearInterval(lkT);lkT=0;const run=()=>{const w=Math.ceil(wait()/1000),dis=w>0;['lkPin','lkWord','lkBtn','lkRecBtn'].forEach(i=>{const e=$(i);if(e)e.disabled=dis});if(dis)lkMsg('🔒 Demasiadas tentativas erradas. Aguarde '+fmt(w)+' para tentar de novo.',1);else if(lkT){clearInterval(lkT);lkT=0;lkMsg('')}};run();if(wait()>0)lkT=setInterval(run,500)}
 function PN(){const d=pinData(),on=!!d;$('pnOn').style.display=on?'block':'none';$('pnOff').style.display=on?'none':'block';$('pnLeg').style.display=(on&&d.v!==3)?'block':'none'}
 function unlock(){$('lock').style.display='none';document.body.classList.remove('locked');['lkPin','lkWord','lkN1','lkN2'].forEach(i=>$(i).value='');$('lkNew').style.display='none';lkMsg('')}
-function lockNow(){if(!pinData())return;
+function lockNow(){if(!pinData())return;try{window.dlgFecha&&dlgFecha();window.alertTudo&&alertTudo()}catch(e){}
 if(ENC&&!LOCKED){LOCKED=true;DEK=null;D=inicial();norm();fixL();R();$('printSheet').innerHTML=''}
 $('lkImg').src=document.querySelector('.hero img').src;$('lock').style.display='flex';document.body.classList.add('locked');$('lkPin').value='';$('lkRec').style.display='none';$('lkNew').style.display='none';lkMsg('');lkTick()}
 async function openData(dek){let raw=kvGet(K2),x=null;
-if(raw){try{x=JSON.parse(await decBlob(raw,dek))}catch(e){try{localStorage.setItem('bejoma_enc_copia',raw)}catch(_){}if(!confirm('Os dados cifrados estão danificados e não foi possível abri-los. Começar com dados vazios? (Depois pode importar um backup.)'))return false}}
+if(raw){try{x=JSON.parse(await decBlob(raw,dek))}catch(e){try{localStorage.setItem('bejoma_enc_copia',raw)}catch(_){}if(!(await confirmar('Os dados cifrados estão danificados e não foi possível abri-los. Começar com dados vazios? (Depois pode importar um backup.)',{ok:'Começar vazio',perigo:1})))return false}}
 D=x||inicial();norm();fixL();DEK=dek;ENC=true;LOCKED=false;try{R()}catch(e){console.error(e);try{toast('Erro ao mostrar um ecrã: '+e.message)}catch(_){}}try{check()}catch(e){}return true}
 async function lkTry(){if(busy)return;if(wait()>0)return lkTick();const d=pinData(),p=$('lkPin').value;if(!d)return unlock();if(!p)return;
 if(d.v===3&&!HASSUB){lkMsg('Este navegador não consegue abrir dados cifrados (precisa de ligação segura HTTPS).',1);return}
@@ -1417,7 +1433,7 @@ busy=1;lkMsg('A verificar…');$('lkBtn').disabled=true;
 try{let ok=false,dek=null;
 if(d.v===3){try{dek=await dekFrom(await unwrapK(await kek('p|'+p,d.s,d.it),d.ws))}catch(e){}ok=!!dek}else ok=await chkPin(d,p);
 if(ok){failClear();
-if(dek){if(!await openData(dek)){lkMsg('');$('lkPin').value='';return}}
+if(dek){if(!await (await openData(dek))){lkMsg('');$('lkPin').value='';return}}
 else if(d.v!==2&&HASSUB){const s=rnd(16);localStorage.setItem(PK,JSON.stringify({v:2,m:'pb',s,h:await kdf('p|'+p,s,'pb'),r:d.r,rl:1}))}
 unlock()}
 else{const f=failAdd();$('lkPin').value='';lkShake();if(wait()>0)lkTick();else lkMsg('PIN errado. '+(3-f.n)+' tentativa(s) antes do bloqueio.',1)}}
@@ -1437,7 +1453,7 @@ async function lkNewPin(){if(!tmpDek||busy)return;const a=$('lkN1').value,b=$('l
 if(!/^[0-9]{6,12}$/.test(a))return lkMsg('O PIN deve ter 6 a 12 números.',1);if(a!==b)return lkMsg('Os dois PIN não são iguais.',1);if(weakPin(a))return lkMsg('PIN fácil de adivinhar. Escolha outro.',1);
 busy=1;lkMsg('A guardar…');
 try{const raw=new Uint8Array(await crypto.subtle.exportKey('raw',tmpDek)),s=rnd(16);d.s=s;d.it=PIT;d.ws=await wrapK(await kek('p|'+a,s,PIT),raw);localStorage.setItem(PK,JSON.stringify(d));
-const dek=tmpDek;tmpDek=null;if(await openData(dek))unlock();else lkMsg('')}
+const dek=tmpDek;tmpDek=null;if(await (await openData(dek)))unlock();else lkMsg('')}
 finally{busy=0}}
 async function pinSet(){const a=$('pnA').value,b=$('pnB').value,w=$('pnW').value.trim().toLowerCase();
 if(!/^[0-9]{6,12}$/.test(a))return alert('O PIN deve ter 6 a 12 números.');if(a!==b)return alert('Os dois PIN não são iguais.');
@@ -1457,7 +1473,7 @@ async function pinOff(){const d=pinData();if(!d)return;if(wait()>0)return alert(
 try{let ok=false;
 if(d.v===3){try{await unwrapK(await kek('p|'+$('pnC').value,d.s,d.it),d.ws);ok=true}catch(e){}}else ok=await chkPin(d,$('pnC').value);
 if(!ok){failAdd();$('pnC').value='';return alert('PIN actual errado.')}
-if(d.v===3){if(!confirm('Remover o PIN também retira a cifra dos dados neste aparelho. Continuar?'))return;await wq;await kvSet(K,JSON.stringify(D));ENC=false;DEK=null;kvDel(K2);localStorage.removeItem('bejoma_rem')}
+if(d.v===3){if(!(await confirmar('Remover o PIN também retira a cifra dos dados neste aparelho. Continuar?',{ok:'Remover',perigo:1})))return;await wq;await kvSet(K,JSON.stringify(D));ENC=false;DEK=null;kvDel(K2);localStorage.removeItem('bejoma_rem')}
 failClear();localStorage.removeItem(PK);$('pnC').value='';PN();alert('PIN removido.')}
 finally{busy=0}}
 document.addEventListener('visibilitychange',()=>{if(document.hidden)away=Date.now();else if(pinData()&&away&&Date.now()-away>60000)lockNow()});
@@ -1567,7 +1583,7 @@ function vfDv(d,x,nm){const rec=d.tipo==='receber',sd=dvF(d)<0.005;vFesta(x,[nm|
 /* ===== Sair da app (pede licença + espera 2 s) ===== */
 let exI=0,exT=0,exDone=false;
 function exShow(w){['exAsk','exCnt','exBye'].forEach(i=>$(i).style.display=i===w?'block':'none');$('ex').style.display='flex'}
-function sairAsk(){if($('splash')||$('sv')||$('fe')||$('vf')||$('tfOk')||$('ex').style.display==='flex')return;exShow('exAsk')}
+function sairAsk(){if($('splash')||$('sv')||$('fe')||$('vf')||$('tfOk')||$('ex').style.display==='flex'||(window.dlgAberto&&dlgAberto()))return;exShow('exAsk')}
 function exNo(){clearInterval(exI);clearTimeout(exT);$('exRingBox').classList.remove('run');$('ex').style.display='none'}
 function exGo(){if(!LOCKED&&D.bkForce!==false&&D.bkOk!==td()){bkpForce();return}exShow('exCnt');const r=$('exRingBox');r.classList.remove('run');void r.offsetWidth;r.classList.add('run');let s=2;$('exNum').textContent=s;$('exSec').textContent=s;clearInterval(exI);
 exI=setInterval(()=>{s--;if(s<=0){clearInterval(exI);exEnd();return}$('exNum').textContent=s;$('exSec').textContent=s},1000)}
@@ -1583,7 +1599,7 @@ window.addEventListener('beforeunload',e=>{if(exDone)return;e.preventDefault();e
 let bjFresh=false;
 function bjPush(){try{history.pushState({bj:1},'',location.href)}catch(e){}}
 try{bjPush();
-window.addEventListener('popstate',()=>{bjFresh=false;bjPush();sairAsk()});
+window.addEventListener('popstate',()=>{bjFresh=false;bjPush();if(window.dlgFecha&&dlgFecha())return;if(window.alertFecha&&alertFecha())return;sairAsk()});
 window.addEventListener('pageshow',ev=>{if(ev.persisted)bjPush()});
 ['touchstart','pointerdown','mousedown','keydown','click'].forEach(ev=>document.addEventListener(ev,()=>{if(!bjFresh){bjFresh=true;bjPush()}},{passive:true,capture:true}))}catch(e){}
 (()=>{const g=document.querySelector('.hero img');if(!g)return;let t=0;const s=()=>{clearTimeout(t);t=setTimeout(sairAsk,1000)},c=()=>clearTimeout(t);
@@ -1610,11 +1626,11 @@ try{p.img=await imgFile(f);save();R()}catch(e){alert('Não foi possível usar es
 function I(){
 const f=fechoData(td()),tot=D.caixa.reduce((s,c)=>s+(c.tipo==='entrada'?c.valor:-c.valor),0),cd=(t,b)=>`<div class="card"><h2>${t}</h2>${b}</div>`;
 const dias=D.ultBackup?Math.floor((new Date(td()+'T12:00:00')-new Date(D.ultBackup+'T12:00:00'))/864e5):null;
-const hoje2=D.vendas.some(v=>v.data===td())||D.compras.some(c=>c.data===td())||D.caixa.some(c=>c.data===td());
+const hoje2=D.vendas.some(v=>v.data===td())||D.compras.some(c=>c.data===td())||D.caixa.some(c=>c.data===td()),bk=xBkBar();
 const st=(k,v,c)=>`<div class="stat"><div class="k">${k}</div><div class="v ${c||''}">${v}</div></div>`;
 const top=Object.entries(f.ag).sort((a,b)=>b[1].q-a[1].q).slice(0,3).map(([k,a],i)=>{const p=D.prods.find(x=>x.nome===k);return`<div class="item"><div class="pi"><span class="rk">${i+1}</span>${p?av(p,40):''}<div>${esc(k)}<small>${money(a.r)}</small></div></div><b>${c2(a.q)} un.</b></div>`}).join('');
 const low=D.prods.filter(p=>p.stock<=mn(p)).sort((a,b)=>a.stock-b.stock),lw=low.slice(0,5).map(p=>`<div class="item"><div class="pi">${av(p,40)}<div>${esc(p.nome)}<small>Mínimo ${mn(p)} un.${repSugT(p)}</small></div></div><b class="${p.stock<=0?'bad':'warn'}">${p.stock} un.</b></div>`).join('');
-$('iBox').innerHTML=storCard()+reporCard()+dvIni()+focoCard()+promoCard()+valCard()+xCapCard()
+$('iBox').innerHTML=storCard()+reporCard()+bk+dvIni()+focoCard()+promoCard()+valCard()+xCapCard()
 +cd('🏠 Hoje · '+fmtD(td()),`<div class="grid">${st('VENDAS',f.n)}${st('RECEITA',money(f.rec))}${st('LUCRO BRUTO',money(f.bruto),f.bruto<0?'bad':'good')}${st('SALDO DA CAIXA',money(tot),tot<0?'bad':'')}</div><div class="two" style="margin-top:12px"><button onclick="goTab('vendas')">🛍️ Registar venda</button><button class="sec" onclick="goTab('fecho')">📒 Fecho do dia</button></div>`)
 +cd('🏆 Mais vendidos hoje',top||empty('Ainda sem vendas hoje.'))
 +(low.length?cd('⚠️ Repor stock ('+low.length+')',lw+(low.length>5?`<small style="display:block;color:var(--sub);margin-top:6px">e mais ${low.length-5}… veja no Armazém</small>`:'')):'')}
@@ -1660,8 +1676,8 @@ b.innerHTML='<div class="card" style="border-color:#e4bd7d;background:var(--soft
 function toast(t){let e=document.getElementById('toast');if(!e){e=document.createElement('div');e.id='toast';document.body.appendChild(e)}e.textContent=t;e.classList.add('on');clearTimeout(e._t);e._t=setTimeout(()=>e.classList.remove('on'),2600)}
 const adD=(ds,n)=>{const d=new Date(ds+'T12:00:00');d.setDate(d.getDate()+n);return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0')};
 const sdForma=f=>(D.caixa||[]).reduce((q,c)=>fpK(c)===f?q+(c.tipo==='entrada'?c.valor:-c.valor):q,0);
-function svHoje(){const h=td();if(confirm('Hoje não vendeu nada?\n\nOK = Sim, hoje não houve vendas\nCancelar = Não, vou registar uma venda')){D.sv=D.sv||{};D.sv[h]=1;save();R();toast('Anotado: hoje sem vendas.')}else goTab('vendas')}
-function confSaldo(){const h=td(),rs=[];for(const f of FP){const t=prompt(f[2]+': quanto tem agora?\n(a app diz '+money(sdForma(f[0]))+')\n\nDeixe vazio para saltar.');if(t===null)return;const q=String(t).replace(/\s/g,'').replace(',','.');if(q==='')continue;const n=parseFloat(q);if(isNaN(n)||n<0)return alert('Valor inválido.');rs.push([f,n-sdForma(f[0])])}
+async function svHoje(){const h=td();if((await confirmar("Hoje não vendeu nada?",{ok:'Sim, hoje não houve vendas',no:'Não, vou registar uma venda'}))){D.sv=D.sv||{};D.sv[h]=1;save();R();toast('Anotado: hoje sem vendas.')}else goTab('vendas')}
+async function confSaldo(){const h=td(),rs=[];for(const f of FP){const t=(await perguntar(f[2]+': quanto tem agora?\n(a app diz '+money(sdForma(f[0]))+')\n\nDeixe vazio para saltar.',{im:'decimal'}));if(t===null)return;const q=String(t).replace(/\s/g,'').replace(',','.');if(q==='')continue;const n=parseFloat(q);if(isNaN(n)||n<0)return alert('Valor inválido.');rs.push([f,n-sdForma(f[0])])}
 if(!rs.length)return;const dif=rs.filter(x=>Math.abs(x[1])>0.005);D.confCx=h;save();R();alert(dif.length?dif.map(x=>x[0][2]+': tem '+(x[1]>0?'mais ':'menos ')+money(Math.abs(x[1]))+' do que a app diz.').join('\n')+'\n\nProcure o movimento que falta ou registe a diferença na Caixa.':'Os saldos estão certos. ✅')}
 {const _g=goTab;goTab=function(n,s){if(n==='fecho'){try{D.fv=td();save()}catch(e){}}return _g.apply(this,arguments)}}
 const stockAl=()=>{const h=td(),P=D.prods,ativo=p=>D.vendas.some(v=>v.pid===p.id&&Math.round((new Date(h+'T12:00:00')-new Date(v.data+'T12:00:00'))/864e5)<=30),ng=P.filter(p=>p.stock<0),z=P.filter(p=>p.stock===0&&ativo(p)),bx=P.filter(p=>p.stock>0&&p.stock<=mn(p));return{ng:ng,z:z,bx:bx,rep:z.concat(bx)}};
@@ -1685,8 +1701,8 @@ function mtUsarSug(){const v=mtSugG($('mtT').value);if(v===null)return alert('Ai
 function mtSaveG(){const t=String($('mtV').value).replace(/\s/g,'').replace(',','.');const n=t===''?0:parseFloat(t);if(isNaN(n)||n<0)return alert('Valor inválido.');const mv=mtV();mv.tipo=$('mtT').value;mv.geral=n;const ok=msBal(-1);save();R();toast(n>0?(ok?'Meta guardada e metas diárias recalculadas.':'Meta guardada.'):'Meta geral removida.')}
 function mtSugP(){const pid=$('mtPr').value,v=mtSugPr(pid),pp=D.prods.find(x=>x.id===pid);if($('mtPrImg'))$('mtPrImg').innerHTML=pp?av(pp,64):'';$('mtPS').textContent=!pid?'':v===null?'Sem sugestão para este produto (poucas vendas nas últimas semanas).':'Sugestão: '+c2(v)+' un. no mês (média das últimas semanas).';if(v!==null&&!$('mtQ').value)$('mtQ').value=v}
 function mtAddP(){const pid=$('mtPr').value,q=parseInt(String($('mtQ').value).replace(/\s/g,''),10);if(!pid)return alert('Escolha um produto.');if(!(q>0))return alert('Indique a quantidade.');mtV().prods[pid]=q;$('mtQ').value='';save();R();toast('Meta do produto guardada.')}
-function mtEdit(pid){const p=D.prods.find(x=>x.id===pid);if(!p)return;const t=prompt('Nova meta de '+p.nome+' (unidades no mês):',mtV().prods[pid]);if(t===null)return;const q=parseInt(String(t).replace(/\s/g,''),10);if(!(q>0))return alert('Indique a quantidade.');mtV().prods[pid]=q;save();R()}
-function mtDel(pid){const p=D.prods.find(x=>x.id===pid);if(!confirm('Remover a meta de '+(p?p.nome:'este produto')+'?'))return;apLog({t:'meta',pid,nome:p?p.nome:'produto',m:JSON.parse(JSON.stringify(mtV().prods[pid]===undefined?null:mtV().prods[pid]))});delete mtV().prods[pid];save();R()}
+async function mtEdit(pid){const p=D.prods.find(x=>x.id===pid);if(!p)return;const t=(await perguntar('Nova meta de '+p.nome+' (unidades no mês):',{im:'decimal',val:bjPv(mtV().prods[pid])}));if(t===null)return;const q=parseInt(String(t).replace(/\s/g,''),10);if(!(q>0))return alert('Indique a quantidade.');mtV().prods[pid]=q;save();R()}
+async function mtDel(pid){const p=D.prods.find(x=>x.id===pid);if(!(await confirmar('Remover a meta de '+(p?p.nome:'este produto')+'?',{ok:'Remover',perigo:1})))return;apLog({t:'meta',pid,nome:p?p.nome:'produto',m:JSON.parse(JSON.stringify(mtV().prods[pid]===undefined?null:mtV().prods[pid]))});delete mtV().prods[pid];save();R()}
 function mtTop(){const hd=mtHist();if(hd<14)return alert('Ainda não há vendas suficientes (precisa de 2 semanas).');const h=td(),ini=adD(h,-hd),m={};D.vendas.forEach(v=>{if(v.data>=ini&&v.data<h)m[v.pid]=(m[v.pid]||0)+v.qtd});const ks=Object.keys(m).filter(k=>m[k]>0&&D.prods.some(p=>p.id===k)).sort((a,b)=>m[b]-m[a]).slice(0,5);if(!ks.length)return alert('Sem vendas recentes.');ks.forEach(k=>{const q=mtSugPr(k);if(q)mtV().prods[k]=q});save();R();toast('Criadas '+ks.length+' metas.')}
 function MT(){if(!$('mtG'))return;const mv=mtV(),S=mtStats();$('mtH').textContent='Meta de '+MESN[+S.ym.slice(5,7)-1]+' '+S.ym.slice(0,4);
 if(mv.geral>0){const at=mv.tipo==='lucro'?S.lu:S.rc,st=mtSt(at,mv.geral,S);$('mtG').innerHTML=mtRow((mv.tipo==='lucro'?'Lucro':'Vendas')+': '+money(at)+' de '+money(mv.geral),st,money(Math.ceil(st.pd))+' por dia','')}else $('mtG').innerHTML='<div class="empty">Ainda sem meta geral. Defina uma abaixo.</div>';
@@ -1752,7 +1768,7 @@ const repSugT=p=>{const k=D.vendas.length+'|'+td()+'|'+(D.repDias||7);if(_rk!==k
 function rpEntradaM(id,c,m,q){goTab('armazem','ent');const s=$('aProd');if(s){s.value=id;if(typeof fillEmb==='function')fillEmb()}if($('aEmb'))$('aEmb').value=c||'';if($('aMeia'))$('aMeia').value=m||'';if($('aQua'))$('aQua').value=q||'';if(typeof emSoma==='function')emSoma();window.scrollTo(0,0)}
 var RPS=new Set(),RPQ=[],RPA=0,RPN=0,RPC='';
 function rpFeitoBar(){const f=D.repFeito||{},nm=Object.keys(f).filter(k=>f[k]===td()).map(k=>{const q=D.prods.find(x=>x.id===k);return q?q.nome:null}).filter(Boolean);if(!nm.length)return '';return '<div class="card" style="margin:10px 0 0"><b>✅ Já repostos hoje ('+nm.length+')</b><small style="display:block;color:var(--sub);margin:3px 0 6px">'+nm.map(esc).join(', ')+'. Voltam à lista amanhã.</small><button class="mini sec" style="width:auto;margin:0" onclick="rpFeitoLimpa()">Mostrar de novo</button></div>'}
-function rpFeitoLimpa(){if(!confirm('Mostrar de novo na lista os produtos que já tiveram entrada hoje?'))return;D.repFeito={};save();R()}
+async function rpFeitoLimpa(){if(!(await confirmar('Mostrar de novo na lista os produtos que já tiveram entrada hoje?',{ok:'Mostrar'})))return;D.repFeito={};save();R()}
 function rpSel(id){if(RPS.has(id))RPS.delete(id);else RPS.add(id);RP()}
 function rpSelTodos(){const on=repMC().all.filter(x=>!x.skip);if(on.every(x=>RPS.has(x.p.id)))RPS.clear();else on.forEach(x=>RPS.add(x.p.id));RP()}
 function rpSelBar(r){const on=r.all.filter(x=>!x.skip),n=on.filter(x=>RPS.has(x.p.id)).length;return '<div class="card" style="margin:10px 0 0;border-color:#e4bd7d;background:var(--soft)"><b>📦 Dar entrada de vários de uma vez</b><small style="display:block;color:var(--sub);margin:3px 0 8px">Toque em "☐ Selecionar" nos produtos que comprou. Depois toque no botão abaixo: a app abre um produto de cada vez, já com as quantidades sugeridas, e passa ao seguinte quando der entrada.</small><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="mini sec" style="width:auto;margin:0" onclick="rpSelTodos()">☑ Todos ('+on.length+')</button><button class="mini sec" style="width:auto;margin:0" onclick="RPS.clear();RP()">Limpar</button></div><button style="margin:10px 0 0'+(n?'':';opacity:.5')+'" onclick="rpLote()">➡️ Dar entrada nos selecionados ('+n+')</button></div>'}
@@ -1763,8 +1779,8 @@ function rpParar(){RPQ=[];RPA=0;RPC='';rpBar();toast('Lote parado.')}
 function rpEntrada(id,packs){goTab('armazem','ent');const s=$('aProd');if(s){s.value=id;if(typeof fillEmb==='function')fillEmb()}if(packs&&$('aEmb'))$('aEmb').value=packs;if($('aMeia'))$('aMeia').value='';if($('aQua'))$('aQua').value='';if(typeof emSoma==='function')emSoma();window.scrollTo(0,0)}
 let RPF='';
 const rpCk=id=>!!(D.repChk&&D.repChk[id]===td()),rpFn=p=>p.fornH||fnN(fnUlt(p))||'Sem fornecedor';
-function rpMark(id){if(!D.repChk)D.repChk={};const on=D.repChk[id]!==td();if(on)D.repChk[id]=td();else delete D.repChk[id];save();R();
-if(on){const x=repMC().L.find(y=>y.p.id===id);if(x&&confirm('Marcado como comprado.\n\nDar entrada de '+x.p.nome+' agora ('+repQ(x)+')?\nAssim o stock da app sobe logo.'))rpEntradaM(id,x.c,x.m,x.q)}}
+async function rpMark(id){if(!D.repChk)D.repChk={};const on=D.repChk[id]!==td();if(on)D.repChk[id]=td();else delete D.repChk[id];save();R();
+if(on){const x=repMC().L.find(y=>y.p.id===id);if(x&&(await confirmar('Marcado como comprado.\n\nDar entrada de '+x.p.nome+' agora ('+repQ(x)+')?\nAssim o stock da app sobe logo.',{ok:'Dar entrada',no:'Agora não'})))rpEntradaM(id,x.c,x.m,x.q)}}
 function rpPend(){if(!D.repChk)return[];return D.prods.filter(p=>D.repChk[p.id]===td()&&!D.compras.some(c=>(c.pid===p.id||(!c.pid&&c.nome===p.nome))&&(c.ent||c.data)===td()))}
 function rpPendCard(nb){const l=rpPend();if(!l.length)return'';return'<div class="card" style="border-color:#e4bd7d;background:var(--soft)"><b>⏳ Marcou como comprado, mas ainda sem entrada</b><small style="display:block;color:var(--sub);margin:3px 0 0">'+l.map(p=>esc(p.nome)).join(', ')+'. Sem a entrada, o stock da app não sobe.</small>'+(nb?'':'<button onclick="goTab(\'armazem\',\'repor\')">Ir ao Repor stock</button>')+'</div>'}
 function rpSetF(v){RPF=v;RP()}
@@ -1781,21 +1797,21 @@ let left=sd-taxi;const fit={},map={};items.forEach(i=>{map[i.x.p.id]=i;if(i.c<=l
 const tt=Math.round(items.reduce((a,i)=>a+i.c,0)+taxi);
 return{sd,rest,A,items,map,fit,taxi,paid,reg:Math.max(0,taxiAll-paid),tt,falta:tt-Math.round(sd),nfit:Object.keys(fit).length,gasto:Math.round(sd-left),nC:rest.reduce((a,x)=>a+x.c,0),nM:rest.reduce((a,x)=>a+x.m,0)}}
 function rpTroca(id){const i=rpPlan(repMC()).map[id];if(!i)return;if(!D.repEsc)D.repEsc={};D.repEsc[id]={d:td(),f:i.fo==='K'?'V':'K'};save();RP()}
-function rpTaxi(){const c=rpCfg(),a=prompt('Táxi só para a Vila (Kz):',c.tv);if(a===null)return;const b=prompt('Táxi Kikolo e depois Vila (Kz):',c.tk);if(b===null)return;D.repCfg=Object.assign({},D.repCfg,{tv:Math.max(0,n(a)),tk:Math.max(0,n(b))});save();R()}
-function rpShare(){const r=repMC(),pl=rpPlan(r);let L=pl.items;if(RPF)L=L.filter(i=>i.fo===RPF);if(!L.length)return alert('Não há nada a enviar.');
+async function rpTaxi(){const c=rpCfg(),a=(await perguntar('Táxi só para a Vila (Kz):',{im:'decimal',val:bjPv(c.tv)}));if(a===null)return;const b=(await perguntar('Táxi Kikolo e depois Vila (Kz):',{im:'decimal',val:bjPv(c.tk)}));if(b===null)return;D.repCfg=Object.assign({},D.repCfg,{tv:Math.max(0,n(a)),tk:Math.max(0,n(b))});save();R()}
+async function rpShare(){const r=repMC(),pl=rpPlan(r);let L=pl.items;if(RPF)L=L.filter(i=>i.fo===RPF);if(!L.length)return alert('Não há nada a enviar.');
 const nm={K:KN,V:VN},ln=i=>'• '+i.x.p.nome+' — '+repQ(i.x)+(i.x.u?' ('+c2(i.x.un)+' un.)':'')+' ~ '+money(Math.round(i.c))+(pl.falta>0&&!pl.fit[i.x.p.id]?' (depois)':'');
 let t='🛒 Repor stock — '+fmtD(td())+'\n',tot=0;
 ['K','V'].forEach(f=>{const l=L.filter(i=>i.fo===f);if(!l.length)return;const c=Math.round(l.reduce((a,i)=>a+i.c,0));tot+=c;t+='\n📦 '+nm[f]+'\n'+l.map(ln).join('\n')+'\nSubtotal: '+money(c)+'\n'});
 if(!RPF){t+='\nTáxi: '+money(pl.taxi);tot+=pl.taxi}
 t+='\nTotal: '+money(tot);
-if(navigator.share){navigator.share({text:t}).catch(()=>{})}else if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(()=>toast('Lista copiada.'),()=>prompt('Copie a lista:',t))}else prompt('Copie a lista:',t)}
+if(navigator.share){navigator.share({text:t}).catch(()=>{})}else if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(t).then(()=>toast('Lista copiada.'),async ()=>dlgCopia(t,'Copie a lista:'))}else dlgCopia(t,'Copie a lista:')}
 function rpBadge(n){const b=document.querySelector('#tb button[data-g="armazem"]');if(!b)return;let i=b.querySelector('.bdg');if(n>0){if(!i){i=document.createElement('i');i.className='bdg';b.appendChild(i)}i.textContent=n>99?'99+':n}else if(i)i.remove()}
 const rpCfg2=()=>Object.assign({dm:3,dc:7},D.repCfg||{});
 function vMes(p){const ym=td().slice(0,7);return D.vendas.filter(v=>v.pid===p.id&&(v.data||'').slice(0,7)===ym).reduce((a,v)=>a+v.qtd,0)}
 function sugMI(p,rates){const c=rpCfg2();let rate=0,src='';if(p.meta>0){rate=p.meta/30;src='previsão de '+c2(p.meta)+' por mês'}else if(rates&&rates[p.id]>0){rate=rates[p.id];src='vendas das últimas 4 semanas'}if(!(rate>0))return null;
 const mi=Math.max(1,Math.ceil(rate*c.dm)),u=p.unEmb>0?p.unEmb:0,ide=u?mi+Math.max(1,Math.round(rate*c.dc/u))*u:mi+Math.ceil(rate*c.dc);return{rate,src,min:mi,ideal:ide}}
 function rpSugForm(){const p=P(editId);if(!p)return alert('Escolha primeiro o produto.');const q=Object.assign({},p),m=n($('eMeta').value);if(m>0)q.meta=m;else delete q.meta;q.unEmb=n($('eUn').value)||p.unEmb;const s=sugMI(q,rpDados().rates);if(!s)return alert('Sem previsão mensal nem vendas registadas para calcular.');$('eMin').value=s.min;$('eIdeal').value=s.ideal;toast('Pela '+s.src+': mínimo '+s.min+', ideal '+s.ideal+'. Toque em Guardar para aceitar.')}
-function rpDias(){const c=rpCfg2(),a=prompt('Quantos dias de vendas o MÍNIMO deve cobrir? (os dias até ir à loja, com folga)',c.dm);if(a===null)return;const b=prompt('De quantos em quantos dias compra? (o IDEAL cobre este tempo)',c.dc);if(b===null)return;D.repCfg=Object.assign({},D.repCfg,{dm:Math.max(1,n(a)),dc:Math.max(1,n(b))});save();R()}
+async function rpDias(){const c=rpCfg2(),a=(await perguntar('Quantos dias de vendas o MÍNIMO deve cobrir? (os dias até ir à loja, com folga)',{im:'decimal',val:bjPv(c.dm)}));if(a===null)return;const b=(await perguntar('De quantos em quantos dias compra? (o IDEAL cobre este tempo)',{im:'decimal',val:bjPv(c.dc)}));if(b===null)return;D.repCfg=Object.assign({},D.repCfg,{dm:Math.max(1,n(a)),dc:Math.max(1,n(b))});save();R()}
 function rpSugL(){const d=rpDados(),L=[];if(d.poucos&&!D.prods.some(p=>p.meta>0))return L;D.prods.forEach(p=>{if(D.sugIgn&&D.sugIgn[p.id]===td().slice(0,7))return;const s=sugMI(p,p.meta>0||!d.poucos?d.rates:null);if(!s)return;const mi=mn(p),ide=p.ideal>mi?p.ideal:0,dm=Math.abs(s.min-mi)/Math.max(s.min,mi),di=ide?Math.abs(s.ideal-ide)/Math.max(s.ideal,ide):1;if((dm>=0.3&&Math.abs(s.min-mi)>=2)||(ide&&di>=0.3&&Math.abs(s.ideal-ide)>=2)||(!ide&&s.ideal>s.min))L.push({p,s,mi,ide,k:Math.max(dm,di)})});return L.sort((a,b)=>b.k-a.k)}
 function rpSugR(){const e=$('rpSug'),c=$('rpSugC');if(!e||!c)return;const L=rpSugL();c.style.display=L.length?'':'none';
 e.innerHTML=L.slice(0,8).map(x=>'<div class="item" style="align-items:flex-start;gap:12px"><div style="flex:1;min-width:0"><b>'+esc(x.p.nome)+'</b><small style="display:block;color:var(--sub)">Vende ~'+c2(Math.round(x.s.rate*10)/10)+' por dia ('+x.s.src+')</small><small style="display:block">Mínimo '+c2(x.mi)+' → <b>'+x.s.min+'</b> · ideal '+(x.ide?c2(x.ide):'sem')+' → <b>'+x.s.ideal+'</b></small><button class="mini" style="margin:6px 6px 0 0;width:auto" onclick="rpSugOk(\''+x.p.id+'\')">Aceitar</button><button class="mini sec" style="margin:6px 0 0;width:auto" onclick="rpSugNo(\''+x.p.id+'\')">Ignorar</button></div></div>').join('')+(L.length>8?'<p class="empty">+ '+(L.length-8)+' produto(s). Aceite ou ignore estes para ver os outros.</p>':'')+'<button class="sec mini" style="margin-top:8px;width:auto" onclick="rpDias()">⚙️ Mudar os dias (mínimo '+rpCfg2().dm+' · compra a cada '+rpCfg2().dc+')</button>'}
@@ -1804,7 +1820,7 @@ function rpSugNo(id){if(!D.sugIgn)D.sugIgn={};D.sugIgn[id]=td().slice(0,7);save(
 function rpAlt(){const L=[],lim=dAgo(45);D.prods.forEach(p=>{const h=rpPrH(p),f=p.unEmb>0?p.unEmb:1;['K','V'].forEach(k=>{const a=h[k];if(a.length<2)return;const l=a[a.length-1],pr=a[a.length-2],d=(l.u-pr.u)*f;if(d<=0||l.d<lim)return;if(d<50&&d/(pr.u*f)<0.03)return;const o=h[k==='K'?'V':'K'],ou=o.length?o[o.length-1].u:0;L.push({p,k,pr:pr.u*f,l:l.u*f,d,flip:ou>0&&pr.u<ou&&l.u>ou,o:k==='K'?'Vila':'Kikolo'})})});return L.sort((a,b)=>b.d-a.d)}
 function rpAltR(){const e=$('rpPS'),c=$('rpPSc');if(!e||!c)return;const L=rpAlt();c.style.display=L.length?'':'none';
 e.innerHTML=L.slice(0,8).map(x=>'<div class="item"><div style="flex:1;min-width:0"><b>'+esc(x.p.nome)+'</b><small style="display:block;color:var(--sub)">'+(x.k==='K'?'Kikolo':'Vila')+': '+money(Math.round(x.pr))+' → '+money(Math.round(x.l))+(x.p.unEmb>0?' por embalagem':' por unidade')+'</small>'+(x.flip?'<small style="display:block;color:var(--bad);font-weight:700">Agora a '+x.o+' é mais barata</small>':'')+'</div><b class="bad">+'+money(Math.round(x.d))+'</b></div>').join('')}
-function rpTaxiReg(){const pl=rpPlan(repMC());if(pl.reg<=0)return alert('O táxi de hoje já está registado.');if(!confirm('Registar '+money(pl.reg)+' de táxi como transporte de IDA, pago em dinheiro?\n\nSai da Caixa e do capital (não baixa o lucro).'))return;
+async function rpTaxiReg(){const pl=rpPlan(repMC());if(pl.reg<=0)return alert('O táxi de hoje já está registado.');if(!(await confirmar('Registar '+money(pl.reg)+' de táxi como transporte de IDA, pago em dinheiro?\n\nSai da Caixa e do capital (não baixa o lucro).',{ok:'Registar'})))return;
 D.caixa.push({id:uid(),data:td(),hora:hh(),tipo:'saida',desc:'Táxi: compras de reposição',valor:pl.reg,cat:'Despesa',dc:'Transporte',forma:'din',cap:true,tr:'ida'});D.repTx={d:td(),v:pl.paid+pl.reg};save();R();try{orAviso(D.caixa[D.caixa.length-1])}catch(e){}toast('Táxi registado: '+money(pl.reg)+'.');vFesta(pl.reg,['Táxi: compras de reposição'],null,'',{lb:'🚕 Táxi registado',sg:'−',fr:VF_TX})}
 const RPO={};function rpTg(id,o){RPO[id]=!!o}
 function rpTgClick(ev,id,el){ev.preventDefault();const d=el.parentNode;RPO[id]=!RPO[id];if(RPO[id])d.setAttribute('open','');else d.removeAttribute('open')}
@@ -1885,11 +1901,10 @@ if(pd.length>ap.length)R.push([1,(pd.length-ap.length)+' pedido(s) seu(s) ainda 
 if(nr)R.push([1,nr+' retirada(s) da Bejoma Pessoal por importar: '+money(vr),0]);
 S.push({ic:'🔗',n:'Bejoma Pessoal',g:"goTab('caixa','bp')",ok:'Nada pendente',R})}
 {const R=[],dias_=D.ultBackup?dd(D.ultBackup,h):null;if(dias_===null||dias_>=2)R.push([dias_===null||dias_>=7?2:1,dias_===null?'Ainda não fez backup neste telemóvel':'Sem backup há '+dias(dias_),0]);
-{const ex=D.bkExt?dd(D.bkExt,h):null;if(ex===null||ex>=3)R.push([1,ex===null?'Nenhuma cópia saiu do telemóvel: se ele se perder, perde tudo. Partilhe o backup (WhatsApp, Drive ou e-mail)':'Última cópia fora do telemóvel há '+dias(ex),0,'partilharBackup()'])}S.push({ic:'💾',n:'Cópia de segurança',g:"goTab('backup')",ok:'Backup recente',R,bk:1})}
+{const ex=D.bkExt?dd(D.bkExt,h):null;if(ex===null||ex>=3)R.push([1,ex===null?'Nenhuma cópia saiu do telemóvel: se ele se perder, perde tudo. Partilhe o backup (WhatsApp, Drive ou e-mail)':'Última cópia fora do telemóvel há '+dias(ex),0,'partilharBackup()'])}S.push({ic:'💾',n:'Cópia de segurança',g:"goTab('backup')",ok:'Backup recente',R})}
 let u=0,a=0;S.forEach(x=>{x.R.sort((p,q)=>q[0]-p[0]||q[2]-p[2]);x.R.forEach(r=>{if(r[0]===2)u++;else if(r[0]===1)a++})});
-const bkX=()=>{try{const d=D.ultBackup?xDD(D.ultBackup,h):null,e=D.bkExt?xDD(D.bkExt,h):null,pr=d===null||d>=1||e===null||e>=3;return'<div class="empty" style="margin:2px 0 0;font-size:.82rem">Último backup no telemóvel: <b>'+xQuando(d)+'</b><br>Cópia fora do telemóvel (WhatsApp, Drive, e-mail): <b>'+xQuando(e)+'</b></div><button class="'+(pr?'':'sec')+'" style="margin-top:8px" onclick="partilharBackup()">📤 '+(pr?'Enviar backup agora':'Enviar outro backup')+'</button>'}catch(err){return''}};
 const col=sv=>sv===2?'var(--bad)':sv===1?'#e0a000':'var(--sub)',ic=sv=>sv===2?'🔴':sv===1?'🟡':'⚪';
-const html='<div class="card"><h2>🛡️ Controlo</h2><p class="empty" style="margin:-6px 0 6px">'+(u||a?(u?'<b style="color:var(--bad)">'+u+' urgente(s)</b>':'')+(u&&a?' · ':'')+(a?'<b style="color:#e0a000">'+a+' a precisar de atenção</b>':''):'✅ Tudo em ordem.')+'</p>'+S.map(x=>{const pr=x.R.filter(r=>r[0]>0).length,top=x.R.slice(0,4);return '<div style="margin-top:10px;cursor:pointer" onclick="'+x.g+'"><b>'+x.ic+' '+x.n+'</b> <span style="font-size:.8rem;color:'+(pr?col(x.R[0][0]):'var(--good)')+'">'+(pr?'':'✅ '+x.ok)+'</span></div>'+top.map(r=>'<div class="item" style="padding:6px 0;cursor:pointer" onclick="'+(r[3]||x.g)+'"><div style="font-size:.88rem;color:'+col(r[0])+'">'+ic(r[0])+' '+r[1]+'</div></div>').join('')+(x.R.length>4?'<div class="empty" style="margin:2px 0 0">+ '+(x.R.length-4)+' mais…</div>':'')+(x.bk?bkX():'')}).join('')+'</div>';
+const html='<div class="card"><h2>🛡️ Controlo</h2><p class="empty" style="margin:-6px 0 6px">'+(u||a?(u?'<b style="color:var(--bad)">'+u+' urgente(s)</b>':'')+(u&&a?' · ':'')+(a?'<b style="color:#e0a000">'+a+' a precisar de atenção</b>':''):'✅ Tudo em ordem.')+'</p>'+S.map(x=>{const pr=x.R.filter(r=>r[0]>0).length,top=x.R.slice(0,4);return '<div style="margin-top:10px;cursor:pointer" onclick="'+x.g+'"><b>'+x.ic+' '+x.n+'</b> <span style="font-size:.8rem;color:'+(pr?col(x.R[0][0]):'var(--good)')+'">'+(pr?'':'✅ '+x.ok)+'</span></div>'+top.map(r=>'<div class="item" style="padding:6px 0;cursor:pointer" onclick="'+(r[3]||x.g)+'"><div style="font-size:.88rem;color:'+col(r[0])+'">'+ic(r[0])+' '+r[1]+'</div></div>').join('')+(x.R.length>4?'<div class="empty" style="margin:2px 0 0">+ '+(x.R.length-4)+' mais…</div>':'')}).join('')+'</div>';
 if(b.dataset.h!==html){b.dataset.h=html;b.innerHTML=html}}
 function fsGet(){try{return localStorage.getItem('bejoma_fs')||'g'}catch(e){return'g'}}
 function fsSet(v){try{localStorage.setItem('bejoma_fs',v)}catch(e){}document.documentElement.style.fontSize={p:'12px',m:'14px',g:'16px'}[v]||'16px'}
@@ -1909,7 +1924,7 @@ s.m=s.m.map((x,k)=>k===fix||!(x>0)?x:Math.max(100,Math.round(x*f/100)*100));retu
 function msAutoSet(v){const s=mS();s.auto=!!v;if(v)msBal(-1);save();R()}
 function msSet(i,k,t){const s=mS();s[k][i]=k==='d'?Math.min(31,Math.round(msP(t))):msP(t);msBal(i);save();MSem();MD()}
 function msPct(f){const s=mS();s.m=s.m.map(x=>x>0?Math.max(0,Math.round(x*(1+f)/500)*500):0);save();MSem();MD()}
-function msToMes(){const s=mS(),t=s.m.reduce((a,x,k)=>a+x*s.d[k],0);if(!(t>0))return alert('As metas diárias estão a zero.');const mv=mtV();if(mv.tipo==='lucro'&&mv.geral>0&&!confirm('A meta do mês de lucro ('+money(mv.geral)+') passa a meta de vendas de '+money(t)+'. Continuar?'))return;mv.tipo='vendas';mv.geral=t;save();R()}
+async function msToMes(){const s=mS(),t=s.m.reduce((a,x,k)=>a+x*s.d[k],0);if(!(t>0))return alert('As metas diárias estão a zero.');const mv=mtV();if(mv.tipo==='lucro'&&mv.geral>0&&!(await confirmar('A meta do mês de lucro ('+money(mv.geral)+') passa a meta de vendas de '+money(t)+'. Continuar?',{ok:'Continuar'})))return;mv.tipo='vendas';mv.geral=t;save();R()}
 function msAj(){const s=mS(),mv=mtV(),t=s.m.reduce((a,x,k)=>a+x*s.d[k],0);if(!(mv.geral>0)||!(t>0))return;const f=mv.geral/t;s.m=s.m.map(x=>x>0?Math.max(100,Math.round(x*f/100)*100):0);save();R()}
 function msOn(v){mS().on=!!v;save();MSem();MD()}
 function MSem(){const b=$('msBox');if(!b)return;const s=mS(),h=td(),vd=msVend(h.slice(0,7)),hj=new Date(h+'T12:00:00').getDay();let tot=0,fe=0;
@@ -1990,11 +2005,11 @@ b.innerHTML=PL_.length?PL_.map(p=>`<option value="${p.id}">${esc(p.nome)} (stock
 if(v1&&L.some(d=>d.id===v1))a.value=v1;if(v2&&PL_.some(p=>p.id===v2))b.value=v2;dmInfo()}
 function dmInfo(){const p=P($('dmProd').value),e=$('dmInfo');if(e)e.textContent=p?'Custo '+money(custo(p))+' por un. · venda '+money(p.venda)+' por un.':''}
 function dmCalc(){const p=P($('dmProd').value),q=n($('dmQtd').value);dmInfo();if(p&&q>0)$('dmVal').value=Math.round(custo(p)*q*100)/100}
-function dmPagar(){if(!once())return;const d=dvGet($('dmDiv').value),p=P($('dmProd').value),q=n($('dmQtd').value),x=n($('dmVal').value);
+async function dmPagar(){if(!once())return;const d=dvGet($('dmDiv').value),p=P($('dmProd').value),q=n($('dmQtd').value),x=n($('dmVal').value);
 if(!d)return alert('Escolha a dívida.');if(!p||q<=0)return alert('Escolha o produto e a quantidade.');
 if(q>p.stock)return alert('Só tem '+p.stock+' un. de '+p.nome+' em stock.');
 const f=dvF(d);if(x<=0)return alert('Indique o valor a abater.');if(x>f)return alert('Esse valor é maior do que o que falta ('+money(f)+').');
-if(!confirm('Pagar '+d.pessoa+' com '+c2(q)+' × '+p.nome+'?\nA dívida desce '+money(x)+'. O stock baixa. A Caixa não mexe.'))return;
+if(!(await confirmar('Pagar '+d.pessoa+' com '+c2(q)+' × '+p.nome+'?\nA dívida desce '+money(x)+'. O stock baixa. A Caixa não mexe.',{ok:'Pagar'})))return;
 const pid=uid(),pdId=uid();
 pdL().push({id:pdId,data:td(),hora:hh(),pid:p.id,nome:p.nome,qtd:q,custo:custo(p),mot:'pag',obs:'Pagamento a '+d.pessoa,dv:d.id});
 p.stock-=q;d.pagtos=d.pagtos||[];d.pagtos.push({id:pid,data:td(),hora:hh(),valor:x,forma:'merc',merc:{pid:p.id,nome:p.nome,qtd:q},perda:pdId});d.pago=(d.pago||0)+x;
@@ -2044,29 +2059,29 @@ let dvFPv='din';
 function dvFPset(k){dvFPv=k;dvDraw()}
 const dvOutra=()=>(FP.find(f=>f[0]!==dvFPv)||[dvFPv])[0];
 const dvSp=x=>{const e=$('dvSplit'),v=e?n(e.value):0;return v>0?Math.min(v,x):0};
-const dvBloq=x=>{const sp=dvSp(x),m=x-sp;return(m>0&&semSaldo(m,dvFPv))||(sp>0&&semSaldo(sp,dvOutra()))};
+const dvBloq=async x=>{const sp=dvSp(x),m=x-sp;return(m>0&&(await semSaldo(m,dvFPv)))||(sp>0&&(await semSaldo(sp,dvOutra())))};
 function dvReg(d,x){const pid=uid(),rec=d.tipo==='receber',sp=dvSp(x),o=dvOutra(),m=x-sp,dois=sp>0&&m>0;
 d.pagtos=d.pagtos||[];d.pagtos.push(Object.assign({id:pid,data:td(),hora:hh(),valor:x,forma:m>0?dvFPv:o},dois?{forma2:o,v2:sp}:{}));d.pago=(d.pago||0)+x;
 const mk=(v,f)=>D.caixa.push({id:uid(),data:td(),hora:hh(),tipo:rec?'entrada':'saida',desc:(rec?'Recebido de ':'Pago a ')+d.pessoa+(d.desc?' ('+d.desc+')':'')+' · dívida'+(dois?' ['+fpN(f)+']':''),valor:v,cat:'Dívida',forma:f,dv:pid,pess:(!rec&&!!d.pess)||undefined});
 if(m>0)mk(m,dvFPv);if(sp>0)mk(sp,o);const e=$('dvSplit');if(e)e.value=''}
-function dvPaga(id){const d=dvGet(id);if(!d)return;const f=dvF(d);if(!f)return;
-const sp0=dvSp(f);if(!confirm('Marcar como '+(d.tipo==='receber'?'recebido':'pago')+': '+d.pessoa+' · '+money(f)+'?\n'+(d.tipo==='receber'?'Entra':'Sai')+' da Caixa ('+(sp0>0?(f-sp0>0?fpN(dvFPv)+' '+money(f-sp0)+' + ':'')+fpN(dvOutra())+' '+money(sp0):fpN(dvFPv))+').'))return;
-if(d.tipo==='pagar'&&dvBloq(f))return;dvReg(d,f);save();R();vfDv(d,f)}
-function dvParc(id){const d=dvGet(id);if(!d)return;const f=dvF(d),v=prompt((d.tipo==='receber'?'Quanto recebeu agora de ':'Quanto pagou agora a ')+d.pessoa+'? (em falta '+money(f)+')\n'+(d.tipo==='receber'?'Entra':'Sai')+' da Caixa ('+fpN(dvFPv)+').');
+async function dvPaga(id){const d=dvGet(id);if(!d)return;const f=dvF(d);if(!f)return;
+const sp0=dvSp(f);if(!(await confirmar('Marcar como '+(d.tipo==='receber'?'recebido':'pago')+': '+d.pessoa+' · '+money(f)+'?\n'+(d.tipo==='receber'?'Entra':'Sai')+' da Caixa ('+(sp0>0?(f-sp0>0?fpN(dvFPv)+' '+money(f-sp0)+' + ':'')+fpN(dvOutra())+' '+money(sp0):fpN(dvFPv))+').',{ok:'Marcar'})))return;
+if(d.tipo==='pagar'&&(await dvBloq(f)))return;dvReg(d,f);save();R();vfDv(d,f)}
+async function dvParc(id){const d=dvGet(id);if(!d)return;const f=dvF(d),v=(await perguntar((d.tipo==='receber'?'Quanto recebeu agora de ':'Quanto pagou agora a ')+d.pessoa+'? (em falta '+money(f)+')\n'+(d.tipo==='receber'?'Entra':'Sai')+' da Caixa ('+fpN(dvFPv)+').',{im:'decimal'}));
 if(v===null)return;const x=n(v);if(x<=0)return;if(x>f)return alert('Esse valor é maior do que o que falta ('+money(f)+').');
-if(dvDupPg(d,x))return;if(d.tipo==='pagar'&&dvBloq(x))return;dvReg(d,x);save();R();vfDv(d,x)}
-function dvDesf(id){const d=dvGet(id);if(!d||!d.pagtos||!d.pagtos.length)return;const u=d.pagtos[d.pagtos.length-1];
-if(!confirm('Desfazer o último pagamento de '+money(u.valor)+' ('+fmtD(u.data)+')?'+(u.perda?' A mercadoria volta ao stock.':' O movimento da Caixa também é apagado.')))return;
+if(dvDupPg(d,x))return;if(d.tipo==='pagar'&&(await dvBloq(x)))return;dvReg(d,x);save();R();vfDv(d,x)}
+async function dvDesf(id){const d=dvGet(id);if(!d||!d.pagtos||!d.pagtos.length)return;const u=d.pagtos[d.pagtos.length-1];
+if(!(await confirmar('Desfazer o último pagamento de '+money(u.valor)+' ('+fmtD(u.data)+')?'+(u.perda?' A mercadoria volta ao stock.':' O movimento da Caixa também é apagado.'),{ok:'Desfazer'})))return;
 d.pagtos.pop();d.pago=Math.max(0,(d.pago||0)-u.valor);if(u.id)D.caixa=D.caixa.filter(c=>c.dv!==u.id);dmUndo(u);save();R()}
-function dvDel(id){const d=dvGet(id);if(!d)return;const ids=(d.pagtos||[]).map(x=>x.id).filter(Boolean);
-if(!confirm('Apagar a dívida de '+d.pessoa+'?'+(ids.length?'\nOs pagamentos já registados na Caixa também serão apagados.':'')+(d.venda?'\nAtenção: a venda continua registada. Para a desfazer, apague-a em Vendas.':'')+(d.emp?'\nAtenção: o dinheiro do empréstimo continua na Caixa. Para o tirar, apague-o em Dinheiro.':'')+'\n\nFica guardada em "Apagados" (na Caixa) e pode ser restaurada.'))return;
+async function dvDel(id){const d=dvGet(id);if(!d)return;const ids=(d.pagtos||[]).map(x=>x.id).filter(Boolean);
+if(!(await confirmar('Apagar a dívida de '+d.pessoa+'?'+(ids.length?'\nOs pagamentos já registados na Caixa também serão apagados.':'')+(d.venda?'\nAtenção: a venda continua registada. Para a desfazer, apague-a em Vendas.':'')+(d.emp?'\nAtenção: o dinheiro do empréstimo continua na Caixa. Para o tirar, apague-o em Dinheiro.':'')+'\n\nFica guardada em "Apagados" (na Caixa) e pode ser restaurada.',{ok:'Apagar',perigo:1})))return;
 const cx=ids.length?D.caixa.filter(c=>ids.indexOf(c.dv)>=0):[];
 const pd=(d.pagtos||[]).filter(u=>u.perda).map(u=>pdL().find(y=>y.id===u.perda)).filter(Boolean);
 apLog({t:'divida',d:JSON.parse(JSON.stringify(d)),cx:JSON.parse(JSON.stringify(cx)),pd:JSON.parse(JSON.stringify(pd))});
 if(ids.length)D.caixa=D.caixa.filter(c=>ids.indexOf(c.dv)<0);(d.pagtos||[]).forEach(dmUndo);D.dividas=dvL().filter(x=>x.id!==id);save();R()}
-function dvPagaCesto(cid,tp){const L=dvL().filter(d=>d.cesto===cid&&d.tipo===tp&&dvF(d)>0);if(!L.length)return;const tot=L.reduce((s,d)=>s+dvF(d),0),rec=tp==='receber';
-if(!confirm('Marcar como '+(rec?'recebido':'pago')+' o cesto de '+L[0].pessoa+' ('+L.length+' produtos): '+money(tot)+'?\n'+(rec?'Entra':'Sai')+' da Caixa ('+fpN(dvFPv)+').'))return;
-if(!rec&&dvBloq(tot))return;
+async function dvPagaCesto(cid,tp){const L=dvL().filter(d=>d.cesto===cid&&d.tipo===tp&&dvF(d)>0);if(!L.length)return;const tot=L.reduce((s,d)=>s+dvF(d),0),rec=tp==='receber';
+if(!(await confirmar('Marcar como '+(rec?'recebido':'pago')+' o cesto de '+L[0].pessoa+' ('+L.length+' produtos): '+money(tot)+'?\n'+(rec?'Entra':'Sai')+' da Caixa ('+fpN(dvFPv)+').',{ok:'Marcar'})))return;
+if(!rec&&(await dvBloq(tot)))return;
 const e=$('dvSplit'),old=e?e.value:'';if(e)e.value='';L.forEach(d=>dvReg(d,dvF(d)));if(e)e.value=old;save();R();vFesta(tot,[L[0].pessoa+' ('+L.length+' produtos)'],null,'',{lb:rec?'✅ Cesto recebido':'✅ Cesto pago',sg:rec?'+':'−',fr:rec?VF_RC:VF_DV,h:'Conseguiu!'})}
 function dvPrazo(id,v){const d=dvGet(id);if(!d)return;d.prazo=v||'';save();R()}
 function dvRows(L,rec){
@@ -2099,8 +2114,8 @@ function perder(){if(!once())return;const p=P($('pProd').value),q=n($('pQtd').va
 if(!p||q<=0)return alert('Escolha o produto e a quantidade.');
 if(q>p.stock)return alert('Só tem '+p.stock+' un. de '+p.nome+' em stock.');
 pdL().push({id:uid(),data:td(),hora:hh(),pid:p.id,nome:p.nome,qtd:q,custo:custo(p),mot:m,obs:$('pObs').value.trim()});p.stock-=q;save();$('pQtd').value='';$('pObs').value='';R()}
-function delPerda(id){const x=pdL().find(y=>y.id===id);if(!x)return;if(x.mot==='pag')return alert('Esta saída foi um pagamento de dívida com mercadoria.\nPara desfazer, vá a Dívidas e use ↩️ Desfazer.');const p=(x.pid&&P(x.pid))||D.prods.find(z=>z.nome===x.nome);
-if(!confirm('Desfazer este registo ('+x.nome+' ×'+x.qtd+', '+pmN(x)+')?'+(p?' O stock volta.':'')+'\n\nFica guardado em "Apagados" (Dinheiro → Caixa).'))return;apLog({t:'perda',x:JSON.parse(JSON.stringify(x)),pid:p?p.id:null,ds:p?x.qtd:0});if(p)p.stock+=x.qtd;D.perdas=pdL().filter(y=>y.id!==id);save();R()}
+async function delPerda(id){const x=pdL().find(y=>y.id===id);if(!x)return;if(x.mot==='pag')return alert('Esta saída foi um pagamento de dívida com mercadoria.\nPara desfazer, vá a Dívidas e use ↩️ Desfazer.');const p=(x.pid&&P(x.pid))||D.prods.find(z=>z.nome===x.nome);
+if(!(await confirmar('Desfazer este registo ('+x.nome+' ×'+x.qtd+', '+pmN(x)+')?'+(p?' O stock volta.':'')+'\n\nFica guardado em "Apagados" (Dinheiro → Caixa).',{ok:'Desfazer'})))return;apLog({t:'perda',x:JSON.parse(JSON.stringify(x)),pid:p?p.id:null,ds:p?x.qtd:0});if(p)p.stock+=x.qtd;D.perdas=pdL().filter(y=>y.id!==id);save();R()}
 function PL(){if(!$('pLista'))return;const L=pdL().slice().reverse();
 $('pLista').innerHTML=L.length?'<b style="font-size:.85rem">Registos</b>'+pastas(L,x=>x.data,x=>`<div class="item"><div>${pmI(x)} ${esc(x.nome)} ×${c2(x.qtd)}<small>${fmtD(x.data)}${x.hora?' '+x.hora:''} · ${pmN(x)} · custo ${money(pdV(x))}${x.obs?' · '+esc(x.obs):''}</small></div><button class="mini dng" onclick="delPerda('${x.id}')">✕</button></div>`):empty('Ainda sem perdas, estragos ou ofertas.')}
 function pdPrintSec(L){if(!L.length)return'';const t=L.filter(x=>x.mot!=='con'&&x.mot!=='pag').reduce((s,x)=>s+pdV(x),0);return`<h3 style="margin:16px 0 6px;color:#a93425">Perdas, estragos e ofertas (${L.length})</h3><table><tr><th>Data</th><th class="l">Produto</th><th>Qtd</th><th class="l">Motivo</th><th>Custo</th></tr>`+L.map(x=>`<tr><td class="l">${fmtD(x.data)}${x.hora?' '+x.hora:''}</td><td class="l">${esc(x.nome)}</td><td>${c2(x.qtd)}</td><td class="l">${pmN(x)}</td><td>${money(pdV(x))}</td></tr>`).join('')+`<tr class="t"><td class="l" colspan="4">Total que desconta do lucro (sem consumo próprio nem dívidas pagas com mercadoria)</td><td>${money(t)}</td></tr></table>`}
@@ -2116,7 +2131,7 @@ e.innerHTML=L.length?L.map(p=>{const v=CN[p.id],r=cnTxt(p,v);return`<div class="
 const H=cnL().slice().reverse();
 $('cnHist').innerHTML=H.length?'<b style="font-size:.85rem">Contagens</b>'+pastas(H,h=>h.data,h=>{const dif=h.itens.filter(x=>x.dif!==0),fv=dif.filter(x=>x.dif<0).reduce((s,x)=>s-x.dif*x.custo,0),so=dif.filter(x=>x.dif>0).reduce((s,x)=>s+x.dif,0);
 return`<div class="item"><div>${fmtD(h.data)} · ${h.itens.length} produto(s)<small>${dif.length?dif.length+' com diferença'+(fv?' · faltas custaram '+money(fv):'')+(so?' · sobraram '+c2(so)+' un.':''):'tudo certo ✅'}</small></div></div>`}):'';{const u=cnL()[cnL().length-1];if($('cnRes'))$('cnRes').textContent=u?'Última contagem: '+fmtD(u.data):'Ainda sem contagem'}}
-function cnAplicar(){const L=D.prods.filter(p=>CN[p.id]!==undefined&&CN[p.id]!=='').map(p=>{const real=n(CN[p.id]);return{p,real,dif:Math.round((real-p.stock)*1000)/1000,app:p.stock}});
+async function cnAplicar(){const L=D.prods.filter(p=>CN[p.id]!==undefined&&CN[p.id]!=='').map(p=>{const real=n(CN[p.id]);return{p,real,dif:Math.round((real-p.stock)*1000)/1000,app:p.stock}});
 if(!L.length)return alert('Escreva a quantidade contada em pelo menos um produto.');
 if(L.some(x=>x.real<0))return alert('A quantidade contada não pode ser negativa.');
 const dif=L.filter(x=>x.dif!==0),falta=dif.filter(x=>x.dif<0),sobra=dif.filter(x=>x.dif>0),vf=falta.reduce((s,x)=>s-x.dif*custo(x.p),0);
@@ -2126,7 +2141,7 @@ let m='Acertar o stock de '+dif.length+' produto(s)?\n';
 falta.forEach(x=>{m+='\n• '+x.p.nome+': faltam '+c2(-x.dif)+' un. (custo '+money(-x.dif*custo(x.p))+')'});
 sobra.forEach(x=>{m+='\n• '+x.p.nome+': sobram '+c2(x.dif)+' un.'});
 if(falta.length)m+='\n\nAs faltas descontam '+money(vf)+' do lucro e ficam em Perdas, como "Falta na contagem".';
-if(!confirm(m))return;
+if(!(await confirmar(m,{ok:'Aplicar'})))return;
 dif.forEach(x=>{if(x.dif<0)pdL().push({id:uid(),data:td(),hora:hh(),pid:x.p.id,nome:x.p.nome,qtd:-x.dif,custo:custo(x.p),mot:'dif',obs:'Contagem de stock'});x.p.stock=x.real});
 cnL().push({id:uid(),data:td(),hora:hh(),itens});CN={};$('cnBusca').value='';save();R()}
 function cnPrintSec(){const A=[];cnL().forEach(h=>h.itens.filter(x=>x.dif!==0).forEach(x=>A.push([h.data,x])));if(!A.length)return'';
@@ -2168,7 +2183,7 @@ function orSave(){const o=orcD(),t=$('ordT').value.trim(),nt=t===''?0:parseFloat
 for(let i=0;i<dcL().length;i++){const e=$('ordC'+i);if(!e)continue;const x=e.value.trim();if(x==='')continue;const v=parseFloat(x.replace(',','.'));if(!(v>0))return alert('Valor inválido em "'+dcL()[i]+'".');c[dcL()[i]]=v}
 Object.keys(o.c).forEach(k=>{if(dcL().indexOf(k)<0)c[k]=o.c[k]});D.orcD={tot:nt,c};save();R();toast('Orçamento guardado.')}
 function dcAdd(){const n0=$('dcN').value.trim().slice(0,30);if(!n0)return alert('Escreva o nome da categoria.');if(dcL().some(k=>k.toLowerCase()===n0.toLowerCase()))return alert('Essa categoria já existe.');dcL().push(n0);$('dcN').value='';save();R()}
-function dcDel(i){const k=dcL()[i];if(k===undefined)return;if(!confirm('Tirar a categoria "'+k+'" da lista?\n\nAs despesas já marcadas com ela continuam como estão, mas o orçamento desta categoria deixa de contar.'))return;apLog({t:'cat',k,ix:i,o:orcD().c[k]});dcL().splice(i,1);delete orcD().c[k];save();R()}
+async function dcDel(i){const k=dcL()[i];if(k===undefined)return;if(!(await confirmar('Tirar a categoria "'+k+'" da lista?\n\nAs despesas já marcadas com ela continuam como estão, mas o orçamento desta categoria deixa de contar.',{ok:'Tirar',perigo:1})))return;apLog({t:'cat',k,ix:i,o:orcD().c[k]});dcL().splice(i,1);delete orcD().c[k];save();R()}
 function dcSet(id,k){const c=D.caixa.find(x=>x.id==id);if(!c)return;if(k)c.dc=k;else delete c.dc;save();R();if(k)toast('Despesa marcada: '+k+'.')}
 function orAviso(c){if(!c||!isDesp(c)||(c.data||'').slice(0,7)!==td().slice(0,7))return;const o=orcD(),m=dMes(),k=dcOf(c);
 const chk=(nm,l,g)=>{if(!(l>0))return false;const a=g/l,b=(g-c.valor)/l;if(a>1&&b<=1){toast('⚠️ '+nm+': passou o orçamento do mês ('+Math.round(a*100)+'%).');return true}if(a>=.8&&b<.8){toast('💸 '+nm+': já gastou '+Math.round(a*100)+'% do orçamento.');return true}return false};
@@ -2184,9 +2199,9 @@ e.innerHTML='<div class="grid"><div class="stat"><div class="k">GUARDADO</div><d
 +(rp.L.length?'<p style="margin:12px 0 4px">📦 Para repor os <b>'+rp.L.length+'</b> produto(s) em falta precisa de cerca de <b>'+money(tot)+'</b> (com táxi)'+(r.g>=tot?' · ✅ a reserva chega.':' · faltam <b>'+money(tot-r.g)+'</b> na reserva.')+'</p>'+(tot!==r.meta?'<button class="sec" onclick="rsMeta('+tot+')">Usar '+money(tot)+' como meta</button>':''):'<p class="empty" style="margin:10px 0 0">Não há produtos a repor agora.</p>');
 const H=$('rsH');if(H)H.innerHTML=r.mov.length?r.mov.slice(-8).reverse().map(m=>'<div class="item"><div>'+(m.valor>0?'＋ Guardado':'− Usado')+'<small>'+fmtD(m.data)+(m.hora?' '+m.hora:'')+(m.cx?' · Caixa atualizada':' · só acompanhamento')+'</small></div><b class="'+(m.valor>0?'good':'bad')+'">'+(m.valor>0?'+':'−')+money(Math.abs(m.valor))+'</b></div>').join(''):'<div class="empty">Ainda sem movimentos.</div>'}
 function rsMeta(v){const r=resD(),x=v!==undefined?v:parseFloat(String($('rsM').value).replace(',','.')||0);if(!(x>=0))return alert('Valor inválido.');r.meta=x;save();R();toast(x>0?'Meta guardada.':'Meta retirada.')}
-function rsMov(sg){if(!once())return;const r=resD(),v=n($('rsV').value),f=$('rsF').value||'din',cx=$('rsC').value==='1';
+async function rsMov(sg){if(!once())return;const r=resD(),v=n($('rsV').value),f=$('rsF').value||'din',cx=$('rsC').value==='1';
 if(!(v>0))return alert('Indique o valor.');if(sg<0&&v>r.g+0.005)return alert('A reserva só tem '+money(r.g)+'.');
-if(cx&&sg>0&&semSaldo(v,f))return;
+if(cx&&sg>0&&(await semSaldo(v,f)))return;
 r.g=Math.max(0,r.g+sg*v);r.mov.push({id:uid(),data:td(),hora:hh(),valor:sg*v,cx:cx});if(r.mov.length>200)r.mov.splice(0,r.mov.length-200);
 if(cx)D.caixa.push({id:uid(),data:td(),hora:hh(),tipo:sg>0?'saida':'entrada',desc:sg>0?'Reserva para repor stock':'Da reserva para repor stock',valor:v,cat:'Reserva',forma:f,dv:'res',rs:1});
 save();$('rsV').value='';R();toast((sg>0?'Guardado na reserva':'Retirado da reserva')+(cx?' e Caixa atualizada.':'.')+(r.meta>0&&sg>0&&r.g>=r.meta?' 🎉 Meta atingida!':''));{const ob=r.meta>0&&sg>0&&r.g>=r.meta;vFesta(v,['Reserva para repor stock'],null,ob?'🎉 Meta atingida!':'',{lb:ob?'🏆 Meta da reserva atingida':(sg>0?'🐷 Guardado na reserva':'🐷 Retirado da reserva'),sg:sg>0?'+':'−',fr:VF_RS,h:ob?'Conseguiu!':null})}}
@@ -2194,41 +2209,41 @@ save();$('rsV').value='';R();toast((sg>0?'Guardado na reserva':'Retirado da rese
 const apL=()=>{if(!Array.isArray(D.apagados))D.apagados=[];return D.apagados};
 function apLog(o){const l=apL();l.unshift(Object.assign({id:uid(),qd:td(),qh:hh()},o));if(l.length>100)l.length=100}
 function apIns(c){if(c.ref&&D.caixa.some(x=>x.ref===c.ref&&x.tipo===c.tipo&&x.forma===c.forma&&Math.abs(x.valor-c.valor)<.005))return;let i=D.caixa.length;const k=(c.data||'')+(c.hora||'');while(i>0&&((D.caixa[i-1].data||'')+(D.caixa[i-1].hora||''))>k)i--;D.caixa.splice(i,0,c)}
-function apRest(id){const l=apL(),i=l.findIndex(x=>x.id===id);if(i<0)return;const a=l[i];
+async function apRest(id){const l=apL(),i=l.findIndex(x=>x.id===id);if(i<0)return;const a=l[i];
 if(a.t==='caixa'){if(D.caixa.some(c=>c.id===a.mov.id)){l.splice(i,1);save();return R()}
-if(!confirm('Restaurar "'+a.mov.desc+'" ('+(a.mov.tipo==='entrada'?'+':'−')+money(a.mov.valor)+')?\nO saldo da caixa '+(a.mov.tipo==='entrada'?'sobe ':'desce ')+money(a.mov.valor)+'.'))return;
+if(!(await confirmar('Restaurar "'+a.mov.desc+'" ('+(a.mov.tipo==='entrada'?'+':'−')+money(a.mov.valor)+')?\nO saldo da caixa '+(a.mov.tipo==='entrada'?'sobe ':'desce ')+money(a.mov.valor)+'.',{ok:'Restaurar'})))return;
 apIns(a.mov)}
 else if(a.t==='troca'){if(a.movs.some(m=>D.caixa.some(c=>c.id===m.id))){l.splice(i,1);save();return R()}
-if(!confirm('Restaurar esta troca de '+money(a.movs[0].valor)+' ('+a.movs[0].desc.replace('Troca: ','')+')?'))return;a.movs.forEach(apIns)}
+if(!(await confirmar('Restaurar esta troca de '+money(a.movs[0].valor)+' ('+a.movs[0].desc.replace('Troca: ','')+')?',{ok:'Restaurar'})))return;a.movs.forEach(apIns)}
 else if(a.t==='venda'){const v=a.v;if(D.vendas.some(x=>x.id==v.id)){l.splice(i,1);save();return R()}
-const p=P(a.pid);if(!confirm('Restaurar a venda de '+v.nome+' ×'+c2(v.qtd)+' ('+money(v.qtd*v.preco)+')?'+(a.ds&&p?'\nO stock de '+p.nome+' desce '+c2(a.ds)+'.':'')+(a.dv?'\nA dívida do cliente volta.':'')+(a.cx.length?'\n'+a.cx.length+' movimento(s) voltam à Caixa.':'')))return;
+const p=P(a.pid);if(!(await confirmar('Restaurar a venda de '+v.nome+' ×'+c2(v.qtd)+' ('+money(v.qtd*v.preco)+')?'+(a.ds&&p?'\nO stock de '+p.nome+' desce '+c2(a.ds)+'.':'')+(a.dv?'\nA dívida do cliente volta.':'')+(a.cx.length?'\n'+a.cx.length+' movimento(s) voltam à Caixa.':''),{ok:'Restaurar'})))return;
 let j=D.vendas.length;const k=(v.data||'')+(v.hora||'');while(j>0&&((D.vendas[j-1].data||'')+(D.vendas[j-1].hora||''))>k)j--;D.vendas.splice(j,0,v);
 if(p&&a.ds)p.stock=a.ds>0?Math.max(0,p.stock-a.ds):p.stock-a.ds;
 if(a.pd&&!pdL().some(y=>y.id===a.pd.id))pdL().push(a.pd);if(a.dv&&!dvGet(a.dv.id))dvL().push(a.dv);a.cx.forEach(c=>{if(!D.caixa.some(y=>y.id===c.id))apIns(c)})}
 else if(a.t==='perda'){if(pdL().some(y=>y.id===a.x.id)){l.splice(i,1);save();return R()}
-const p=a.pid&&P(a.pid);if(!confirm('Restaurar este registo ('+a.x.nome+' ×'+c2(a.x.qtd)+')?'+(p&&a.ds?'\nO stock de '+p.nome+' desce '+c2(a.ds)+'.':'')))return;
+const p=a.pid&&P(a.pid);if(!(await confirmar('Restaurar este registo ('+a.x.nome+' ×'+c2(a.x.qtd)+')?'+(p&&a.ds?'\nO stock de '+p.nome+' desce '+c2(a.ds)+'.':''),{ok:'Restaurar'})))return;
 pdL().push(a.x);if(p&&a.ds)p.stock=Math.max(0,p.stock-a.ds)}
 else if(a.t==='prod'){if(P(a.p.id)){l.splice(i,1);save();return R()}
-if(!confirm('Restaurar o produto '+a.p.nome+'?\nO stock e o preço ficam como estavam quando o apagou.'))return;D.prods.push(a.p)}
+if(!(await confirmar('Restaurar o produto '+a.p.nome+'?\nO stock e o preço ficam como estavam quando o apagou.',{ok:'Restaurar'})))return;D.prods.push(a.p)}
 else if(a.t==='compra'){const c=a.c;if(D.compras.some(x=>x.id===c.id)){l.splice(i,1);save();return R()}
 const p=(c.pid&&P(c.pid))||D.prods.find(x=>x.nome===c.nome);if(!p)return alert('O produto desta compra já não existe. Restaure primeiro o produto (aqui na Reciclagem) e depois a compra.');
-if(!confirm('Restaurar a compra de '+c.nome+' ×'+(c.sem?c2(c.un)+' un.':embC(c))+' ('+money(c.total)+')?\nO stock de '+p.nome+' sobe '+c2(c.un)+' un.'+(a.cx.length?'\n'+a.cx.length+' movimento(s) voltam à Caixa.':'')))return;
+if(!(await confirmar('Restaurar a compra de '+c.nome+' ×'+(c.sem?c2(c.un)+' un.':embC(c))+' ('+money(c.total)+')?\nO stock de '+p.nome+' sobe '+c2(c.un)+' un.'+(a.cx.length?'\n'+a.cx.length+' movimento(s) voltam à Caixa.':''),{ok:'Restaurar'})))return;
 {const stk0=Math.max(0,p.stock),c0=custo(p);p.stock+=c.un;if(!c.sem&&c.total>0&&stk0+c.un>0)p.cm=(stk0*c0+c.total)/(stk0+c.un);if(c.val&&(stk0<=0||!p.val||c.val<p.val))p.val=c.val}
 let j=D.compras.length;const k=(c.data||'')+(c.hora||'');while(j>0&&((D.compras[j-1].data||'')+(D.compras[j-1].hora||''))>k)j--;D.compras.splice(j,0,c);
 a.cx.forEach(x=>{if(!D.caixa.some(y=>y.id===x.id))apIns(x)})}
 else if(a.t==='meta'){if(mtV().prods[a.pid]!==undefined){l.splice(i,1);save();return R()}
-if(!confirm('Restaurar a meta de '+a.nome+'?'))return;mtV().prods[a.pid]=a.m}
+if(!(await confirmar('Restaurar a meta de '+a.nome+'?',{ok:'Restaurar'})))return;mtV().prods[a.pid]=a.m}
 else if(a.t==='cat'){if(dcL().includes(a.k)){l.splice(i,1);save();return R()}
-if(!confirm('Restaurar a categoria "'+a.k+'"?'+(a.o!==undefined?'\nO orçamento dela volta.':'')))return;dcL().splice(Math.min(Math.max(0,a.ix|0),dcL().length),0,a.k);if(a.o!==undefined)orcD().c[a.k]=a.o}
+if(!(await confirmar('Restaurar a categoria "'+a.k+'"?'+(a.o!==undefined?'\nO orçamento dela volta.':''),{ok:'Restaurar'})))return;dcL().splice(Math.min(Math.max(0,a.ix|0),dcL().length),0,a.k);if(a.o!==undefined)orcD().c[a.k]=a.o}
 else{if(dvGet(a.d.id)){l.splice(i,1);save();return R()}
-if(!confirm('Restaurar a dívida de '+a.d.pessoa+' ('+money(dvF(a.d))+' em falta)?'+(a.cx.length?'\n'+a.cx.length+' pagamento(s) voltam à Caixa.':'')+(a.pd.length?'\nA mercadoria dada em pagamento volta a sair do stock.':'')))return;
+if(!(await confirmar('Restaurar a dívida de '+a.d.pessoa+' ('+money(dvF(a.d))+' em falta)?'+(a.cx.length?'\n'+a.cx.length+' pagamento(s) voltam à Caixa.':'')+(a.pd.length?'\nA mercadoria dada em pagamento volta a sair do stock.':''),{ok:'Restaurar'})))return;
 dvL().push(a.d);a.cx.forEach(apIns);
 a.pd.forEach(x=>{const p=(x.pid&&P(x.pid))||D.prods.find(z=>z.nome===x.nome);if(p)p.stock=Math.max(0,p.stock-x.qtd);pdL().push(x)})}
 l.splice(i,1);save();R()}
-function apClear(){if(!apL().length)return;if(!confirm('Esvaziar a Reciclagem? Já não poderá restaurar nada do que está lá.'))return;D.apagados=[];save();R()}
+async function apClear(){if(!apL().length)return;if(!(await confirmar('Esvaziar a Reciclagem? Já não poderá restaurar nada do que está lá.',{ok:'Esvaziar',perigo:1})))return;D.apagados=[];save();R()}
 let apFil='';
 function apFiltro(v){apFil=v;AP()}
-function apDrop(id){const l=apL(),i=l.findIndex(x=>x.id===id);if(i<0)return;if(!confirm('Apagar de vez este item da Reciclagem?\n\nJá não poderá restaurá-lo.'))return;l.splice(i,1);save();R()}
+async function apDrop(id){const l=apL(),i=l.findIndex(x=>x.id===id);if(i<0)return;if(!(await confirmar('Apagar de vez este item da Reciclagem?\n\nJá não poderá restaurá-lo.',{ok:'Apagar',perigo:1})))return;l.splice(i,1);save();R()}
 function AP(){const e=$('apBox');if(!e)return;const all=apL();
 const gr=a=>a.t==='caixa'||a.t==='troca'?'caixa':a.t==='meta'||a.t==='cat'?'outros':a.t;
 const lab=a=>a.t==='caixa'?esc(a.mov.desc):a.t==='troca'?'🔄 '+esc(a.movs[0].desc):a.t==='venda'?'🛍️ '+esc(a.v.nome)+' ×'+c2(a.v.qtd):a.t==='perda'?'📉 '+esc(a.x.nome)+' ×'+c2(a.x.qtd):a.t==='prod'?'📦 '+esc(a.p.nome):a.t==='compra'?'🛒 Compra: '+esc(a.c.nome)+' ×'+(a.c.sem?c2(a.c.un)+' un.':embC(a.c)):a.t==='meta'?'🎯 Meta: '+esc(a.nome):a.t==='cat'?'🏷️ Categoria: '+esc(a.k):'🤝 Dívida: '+esc(a.d.pessoa)+(a.d.desc?' · '+esc(a.d.desc):'');
@@ -2255,15 +2270,15 @@ function vhLimpar(){['vhQ','vhF','vhA','vhB'].forEach(i=>{const e=$(i);if(e)e.va
 const fnN=t=>String(t==null?'':t).replace(/\s+/g,' ').trim(),fnK=t=>nz(fnN(t));
 let FNL=[],FNO={};
 function fnAbre(i){const f=FNL[i];if(!f)return;FNO[f.k]=!FNO[f.k];FN()}
-function fnProd(f){const dd={},ks=new Set();D.compras.forEach(c=>{if(c.sem||fnK(c.forn)!==f.k)return;const dt=c.data||'',k=c.pid||c.nome,p=c.pid?P(c.pid):null,g=dd[dt]||(dd[dt]={}),o=g[k]||(g[k]={nome:p?p.nome:c.nome,n:0,un:0,tot:0});ks.add(k);o.n++;o.un+=c.un||0;o.tot+=c.total||0});
-const ds=Object.keys(dd).sort().reverse();
-return`<div style="margin:0 0 10px 10px;padding:4px 10px;border-left:3px solid var(--line)"><small style="display:block;color:var(--sub);margin:4px 0">${ks.size} produto(s) comprados a ${esc(f.nome)}</small>`+ds.map(dt=>{const L=Object.values(dd[dt]).sort((a,b)=>b.tot-a.tot||a.nome.localeCompare(b.nome,'pt',{sensitivity:'base'})),T=L.reduce((a,o)=>a+o.tot,0);return`<small style="display:block;margin:10px 0 2px;font-weight:700;color:var(--accent)">📅 ${dt?fmtD(dt):'Sem data'} · ${money(T)}</small>`+L.map(o=>`<div class="item"><div>${esc(o.nome)}<small>${o.n} compra(s) · ${c2(o.un)} un.${o.un>0&&o.tot>0?' · '+money(o.tot/o.un)+'/un.':''}</small></div><b>${money(o.tot)}</b></div>`).join('')}).join('')+'</div>'}
+function fnProd(f){const m={};D.compras.forEach(c=>{if(c.sem||fnK(c.forn)!==f.k)return;const k=c.pid||c.nome,p=c.pid?P(c.pid):null,o=m[k]||(m[k]={nome:p?p.nome:c.nome,n:0,un:0,tot:0,ult:'',pu:0,dt:''});o.n++;o.un+=c.un||0;o.tot+=c.total||0;const d=(c.data||'')+(c.hora||'');if(d>=o.ult){o.ult=d;o.pu=c.un>0?(c.total||0)/c.un:0;o.dt=c.data||''}});
+const L=Object.values(m).sort((a,b)=>a.ult<b.ult?1:a.ult>b.ult?-1:b.tot-a.tot);let pd=null;
+return`<div style="margin:0 0 10px 10px;padding:4px 10px;border-left:3px solid var(--line)"><small style="display:block;color:var(--sub);margin:4px 0">${L.length} produto(s) comprados a ${esc(f.nome)}</small>`+L.map(o=>`${o.dt!==pd?(pd=o.dt,'<small style="display:block;margin:10px 0 2px;font-weight:700;color:var(--accent)">📅 '+(o.dt?fmtD(o.dt):'Sem data')+'</small>'):''}<div class="item"><div>${esc(o.nome)}<small>${o.n} compra(s) · ${c2(o.un)} un. · última em ${o.dt?fmtD(o.dt):'—'}${o.pu>0?' · '+money(o.pu)+'/un.':''}</small></div><b>${money(o.tot)}</b></div>`).join('')+'</div>'}
 function fnList(){const m={};D.compras.forEach(c=>{const n=fnN(c.forn);if(!n||c.sem)return;const k=fnK(n),o=m[k]||(m[k]={k,nome:n,tot:0,mes:0,qt:0,ult:''}),d=c.data||'';if(d>=o.ult)o.nome=n;o.tot+=c.total||0;if(d.slice(0,7)===td().slice(0,7))o.mes+=c.total||0;o.qt++;if(d>o.ult)o.ult=d});return Object.values(m).sort((a,b)=>b.tot-a.tot)}
 function fnUlt(p){const l=D.compras.filter(c=>c.forn&&!c.sem&&((c.pid&&c.pid===p.id)||(!c.pid&&c.nome===p.nome))).sort((a,b)=>((a.data||'')+(a.hora||''))<((b.data||'')+(b.hora||''))?-1:1);return l.length?l[l.length-1].forn:''}
-function setForn(id){const c=D.compras.find(x=>x.id===id);if(!c)return;const ex=fnList().map(f=>f.nome),v=prompt('Comprado a quem? ('+c.nome+')'+(ex.length?'\nJá usados: '+ex.slice(0,6).join(', '):'')+'\nDeixe vazio para tirar o fornecedor.',c.forn||'');if(v===null)return;const nv=fnN(v),ok=ex.find(x=>fnK(x)===fnK(nv));if(nv)c.forn=ok||nv;else delete c.forn;save();R()}
-function fnRen(i){const f=FNL[i];if(!f)return;const v=prompt('Novo nome para "'+f.nome+'"?\nDeixe vazio para tirar este fornecedor das compras (as compras ficam).',f.nome);if(v===null)return;const nv=fnN(v);
-if(!nv){if(!confirm('Tirar "'+f.nome+'" de todas as compras? As compras ficam, só deixam de ter fornecedor.'))return}
-else if(fnK(nv)!==f.k&&fnList().some(x=>x.k===fnK(nv))&&!confirm('Já existe "'+nv+'". Juntar os dois no mesmo fornecedor?'))return;
+async function setForn(id){const c=D.compras.find(x=>x.id===id);if(!c)return;const ex=fnList().map(f=>f.nome),v=(await perguntar('Comprado a quem? ('+c.nome+')'+(ex.length?'\nJá usados: '+ex.slice(0,6).join(', '):'')+'\nDeixe vazio para tirar o fornecedor.',{im:'text',val:bjPv(c.forn||'')}));if(v===null)return;const nv=fnN(v),ok=ex.find(x=>fnK(x)===fnK(nv));if(nv)c.forn=ok||nv;else delete c.forn;save();R()}
+async function fnRen(i){const f=FNL[i];if(!f)return;const v=(await perguntar('Novo nome para "'+f.nome+'"?\nDeixe vazio para tirar este fornecedor das compras (as compras ficam).',{im:'text',val:bjPv(f.nome)}));if(v===null)return;const nv=fnN(v);
+if(!nv){if(!(await confirmar('Tirar "'+f.nome+'" de todas as compras? As compras ficam, só deixam de ter fornecedor.',{ok:'Tirar',perigo:1})))return}
+else if(fnK(nv)!==f.k&&fnList().some(x=>x.k===fnK(nv))&&!(await confirmar('Já existe "'+nv+'". Juntar os dois no mesmo fornecedor?')))return;
 D.compras.forEach(c=>{if(fnK(c.forn)===f.k){if(nv)c.forn=nv;else delete c.forn}});save();R()}
 function FN(){const dl=$('fornList'),e=$('fnBox');FNL=fnList();if(dl)dl.innerHTML=FNL.map(f=>'<option value="'+esc(f.nome)+'"></option>').join('');if(!e)return;
 const sem=D.compras.filter(c=>!c.forn&&!c.sem&&c.total>0).length;
@@ -2293,20 +2308,20 @@ try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist()}
 /* ===== Ligação à Bejoma Pessoal (enviar retiradas) ===== */
 var ROTL=[];
 function rotPend(){const e=D.rotEnv||[],g=D.rotIgn||[];return D.caixa.filter(c=>isRet(c)&&c.valor>0&&!c.rin&&e.indexOf(String(c.id))<0&&g.indexOf(String(c.id))<0)}
-function rotEsc(ids,msg){if(!ids.length)return;if(!confirm(msg))return;const g=D.rotIgn||[];D.rotIgn=g.concat(ids.map(String).filter(i=>g.indexOf(i)<0));save();R()}
-function rotNao(k){const c=ROTL[k];if(!c)return;rotEsc([c.id],'Esconder esta retirada da lista?\n\n'+(c.desc||'Retirada')+' · '+money(c.valor)+'\n\nContinua na Caixa. Só deixa de aparecer aqui e não é enviada à Bejoma Pessoal.')}
-function rotNaoDes(){const ids=ROTL.filter((c,k)=>{const e=$('rq'+k);return e&&!e.checked}).map(c=>c.id);if(!ids.length)return alert('Não há retiradas desmarcadas.');rotEsc(ids,'Esconder '+ids.length+' retirada(s) desmarcada(s)?\n\nContinuam na Caixa. Só deixam de aparecer aqui e não são enviadas à Bejoma Pessoal.')}
-function rotMostrar(){const n=(D.rotIgn||[]).length;if(!n)return;if(!confirm('Voltar a mostrar as '+n+' retirada(s) escondida(s)?'))return;D.rotIgn=[];save();R()}
+async function rotEsc(ids,msg){if(!ids.length)return;if(!(await confirmar(msg,{ok:'Esconder'})))return;const g=D.rotIgn||[];D.rotIgn=g.concat(ids.map(String).filter(i=>g.indexOf(i)<0));save();R()}
+async function rotNao(k){const c=ROTL[k];if(!c)return;(await rotEsc([c.id],'Esconder esta retirada da lista?\n\n'+(c.desc||'Retirada')+' · '+money(c.valor)+'\n\nContinua na Caixa. Só deixa de aparecer aqui e não é enviada à Bejoma Pessoal.'))}
+async function rotNaoDes(){const ids=ROTL.filter((c,k)=>{const e=$('rq'+k);return e&&!e.checked}).map(c=>c.id);if(!ids.length)return alert('Não há retiradas desmarcadas.');(await rotEsc(ids,'Esconder '+ids.length+' retirada(s) desmarcada(s)?\n\nContinuam na Caixa. Só deixam de aparecer aqui e não são enviadas à Bejoma Pessoal.'))}
+async function rotMostrar(){const n=(D.rotIgn||[]).length;if(!n)return;if(!(await confirmar('Voltar a mostrar as '+n+' retirada(s) escondida(s)?',{ok:'Mostrar'})))return;D.rotIgn=[];save();R()}
 function rotIgnL(){const n=(D.rotIgn||[]).length;return n?'<button class="sec" onclick="rotMostrar()">↩️ Mostrar as '+n+' escondida(s)</button>':''}
 function rotComida(c){return c.sub==='comida'||isPess(c)}
-function rotDesenv(ids,msg){ids=ids.map(String);if(!ids.length)return;if(!confirm(msg))return;
+async function rotDesenv(ids,msg){ids=ids.map(String);if(!ids.length)return;if(!(await confirmar(msg,{ok:'Confirmar'})))return;
 D.rotEnv=(D.rotEnv||[]).filter(i=>ids.indexOf(String(i))<0);
 D.rotCod=(D.rotCod||[]).map(x=>{if(!x.ids)return x;const r=x.ids.filter(i=>ids.indexOf(i)<0);if(r.length===x.ids.length)return x;return Object.assign({},x,{ids:r,n:r.length,total:r.reduce((q,i)=>{const c=D.caixa.find(y=>String(y.id)===i);return q+(c?c.valor:0)},0)})}).filter(x=>!x.ids||x.ids.length>0);
 try{const a=JSON.parse(localStorage.getItem('rotina_inbox')||'[]')||[];localStorage.setItem('rotina_inbox',JSON.stringify(a.filter(i=>i&&ids.indexOf(String(i.id))<0)))}catch(e){}
 save();R()}
 const rotAviso='\n\nFaça isto só se AINDA NÃO escreveu o código na Bejoma Pessoal. Se já o escreveu, o dinheiro já entrou lá: apague-o também na Bejoma Pessoal. Depois de anular, não escreva o código antigo.';
-function rotAnula(lote){const x=(D.rotCod||[]).find(y=>y.lote===lote);if(!x||!x.ids)return;rotDesenv(x.ids,'Anular o envio de '+money(x.total)+' ('+x.ids.length+' retirada(s))? Voltam à lista para enviar.'+rotAviso)}
-function rotVolta(id){const c=D.caixa.find(y=>String(y.id)===String(id));rotDesenv([id],'Voltar a pôr na lista de envio: '+(c?(c.desc||'Retirada')+' · '+money(c.valor):'esta retirada')+'?'+rotAviso)}
+async function rotAnula(lote){const x=(D.rotCod||[]).find(y=>y.lote===lote);if(!x||!x.ids)return;(await rotDesenv(x.ids,'Anular o envio de '+money(x.total)+' ('+x.ids.length+' retirada(s))? Voltam à lista para enviar.'+rotAviso))}
+async function rotVolta(id){const c=D.caixa.find(y=>String(y.id)===String(id));(await rotDesenv([id],'Voltar a pôr na lista de envio: '+(c?(c.desc||'Retirada')+' · '+money(c.valor):'esta retirada')+'?'+rotAviso))}
 function rotEnvL(){const L=(D.rotEnv||[]).slice(-10).reverse().map(i=>D.caixa.find(c=>String(c.id)===String(i))).filter(Boolean);if(!L.length)return'';
 return'<details class="pasta"><summary><span>📜 Retiradas já enviadas ('+L.length+')</span><small>para desfazer um engano</small></summary><div>'+L.map(c=>`<div class="item"><div>${esc(c.desc||'Retirada')}<small>${c.data} · ${money(c.valor)}</small></div><button class="mini sec" onclick="rotVolta('${c.id}')">↩️ Desfazer envio</button></div>`).join('')+'</div></details>'}
 function rotCods(){const B=(D.rotCod||[]).slice(-5).reverse(),cov=new Set();(D.rotCod||[]).forEach(x=>(x.ids||[]).forEach(i=>cov.add(String(i))));
@@ -2339,9 +2354,9 @@ const cxChave=c=>c.rin?'rin:'+c.rin:c.ref?'ref:'+c.ref:c.dv?'dv:'+c.dv:'';
 function cxDups(){const v={},ex=[];D.caixa.forEach(c=>{const k=cxChave(c);if(!k)return;const kk=k+'|'+c.tipo+'|'+c.forma+'|'+Math.round(c.valor*100);if(v[kk])ex.push(c);else v[kk]=1});return ex}
 function dupHTML(){if(LOCKED)return'';const L=cxDups();if(!L.length)return'';const ent=L.filter(c=>c.tipo==='entrada').reduce((a,c)=>a+c.valor,0);
 return`<div class="card" style="border:2px solid #b3261e;background:var(--soft)"><b>⚠️ ${L.length} valor(es) registado(s) em duplicado na Caixa</b><p class="empty" style="margin:4px 0 8px">${L.slice(0,5).map(c=>esc(c.desc)+' · '+money(c.valor)+' · '+c.data).join('<br>')}${L.length>5?'<br>…':''}<br>${ent>0?'Estão a contar '+money(ent)+' de entradas a mais. ':''}Fica 1 de cada. As repetidas vão para "Apagados" e pode restaurá-las.</p><button onclick="dupRem()">Remover duplicados</button></div>`}
-function dupRem(){const L=cxDups();if(!L.length)return;if(!confirm('Remover '+L.length+' valor(es) duplicado(s) da Caixa?\nFica 1 de cada. Os removidos ficam em "Apagados".'))return;L.forEach(c=>apLog({t:'caixa',mov:JSON.parse(JSON.stringify(c))}));const ids=new Set(L.map(c=>c.id));D.caixa=D.caixa.filter(c=>!ids.has(c.id));save();R()}
-async function rinOk(){if(RBUSY)return;RBUSY=1;try{await rinOk0()}finally{RBUSY=0}}
-async function pedReceber(id){if(RBUSY)return;RBUSY=1;try{await pedReceber0(id)}finally{RBUSY=0}}
+async function dupRem(){const L=cxDups();if(!L.length)return;if(!(await confirmar('Remover '+L.length+' valor(es) duplicado(s) da Caixa?\nFica 1 de cada. Os removidos ficam em "Apagados".',{ok:'Remover',perigo:1})))return;L.forEach(c=>apLog({t:'caixa',mov:JSON.parse(JSON.stringify(c))}));const ids=new Set(L.map(c=>c.id));D.caixa=D.caixa.filter(c=>!ids.has(c.id));save();R()}
+async function rinOk(){if(RBUSY)return;RBUSY=1;try{await (await rinOk0())}finally{RBUSY=0}}
+async function pedReceber(id){if(RBUSY)return;RBUSY=1;try{await (await pedReceber0(id))}finally{RBUSY=0}}
 function dvDupPg(d,x){const u=(d.pagtos||[]).slice(-1)[0];if(!u||u.data!==td()||!u.hora||!(Math.abs(u.valor-x)<.005))return false;const jm=m=>+m.slice(0,2)*60+ +m.slice(3,5);if(Math.abs(jm(hh())-jm(u.hora))>2)return false;alert('Já registou este pagamento de '+money(x)+' há instantes ('+u.hora+'). Não foi registado outra vez.');return true}
 /* ===== Receber da Bejoma Pessoal ===== */
 var RINL=[];
@@ -2358,11 +2373,11 @@ const a=rinIn();n.forEach(i=>{if(!a.some(y=>y.id===i.id))a.push(i)});rinPut(a);R
 function rinSeen(ids){D.rotIn=(D.rotIn||[]).concat(ids.filter(i=>(D.rotIn||[]).indexOf(i)<0));rinPut(rinIn().filter(i=>D.rotIn.indexOf(i.id)<0))}
 var RINT={n:0,until:0};
 async function rinOk0(){if(LOCKED)return;const w=Math.ceil((RINT.until-Date.now())/1000);if(w>0)return alert('Aguarde '+w+' s para tentar de novo.');const sel0=RINL.filter((i,k)=>{const e=$('ri'+k);return e&&e.checked&&!e.disabled});if(!sel0.length)return alert('Nenhum valor marcado.');const cod=String(($('rinC')||{}).value||'').trim();if(!cod)return alert('Escreva o código de confirmação que a Bejoma Pessoal mostrou ao enviar.');const sel=[],mau=[];for(const i of sel0)((await aprHash(cod,'tr'+i.lote))===i.h?sel:mau).push(i);if(!sel.length){RINT.n++;if(RINT.n>=3){RINT.n=0;RINT.until=Date.now()+30000;return alert('Código errado 3 vezes. Aguarde 30 s.')}return alert('Código errado. Veja o código na Bejoma Pessoal e tente de novo.')}RINT.n=0;
-if(typeof cxSaldo==='function'){for(const f of ['din','mcx']){const q=sel.filter(i=>i.tipo==='retirada'&&i.forma===f).reduce((a,i)=>a+i.valor,0);if(q>0&&q>cxSaldo(f)+0.005&&!confirm('Em '+fpN(f)+' a Caixa só tem '+money(cxSaldo(f))+' e vai sair '+money(q)+'.\n\nImportar mesmo assim?'))return}}
+if(typeof cxSaldo==='function'){for(const f of ['din','mcx']){const q=sel.filter(i=>i.tipo==='retirada'&&i.forma===f).reduce((a,i)=>a+i.valor,0);if(q>0&&q>cxSaldo(f)+0.005&&!(await confirmar('Em '+fpN(f)+' a Caixa só tem '+money(cxSaldo(f))+' e vai sair '+money(q)+'.\n\nImportar mesmo assim?',{ok:'Importar mesmo assim'})))return}}
 {const ja=[];for(let k=sel.length-1;k>=0;k--)if(rinJa(sel[k].id))ja.push(sel.splice(k,1)[0]);if(ja.length){rinSeen(ja.map(i=>i.id));save();if(!sel.length){R();return alert('Estes valores já estavam registados na Caixa. Não foram registados outra vez.')}}}
 let ne=0,nr=0;sel.forEach(i=>{if(i.tipo==='retirada'){nr+=i.valor;D.caixa.push({id:uid(),data:i.data,hora:hh(),tipo:'saida',desc:i.desc||'Retirada',valor:i.valor,cat:'Retirada',forma:i.forma,rin:i.id})}else{ne+=i.valor;D.caixa.push({id:uid(),data:i.data,hora:hh(),tipo:'entrada',desc:'Dinheiro da Bejoma Pessoal'+(i.desc?' · '+i.desc:''),valor:i.valor,forma:i.forma,rin:i.id})}});
 rinSeen(sel.map(i=>i.id));save();R();tfOk({ic:'💰',tit:(ne&&!nr)?'Dinheiro recebido':'Transferência registada',val:money(ne||nr),linhas:['Código certo. Registado na Caixa: '+sel.length+' movimento(s).'].concat(nr&&ne?['Retiradas (saíram): '+money(nr),'Entradas: '+money(ne)]:nr?['Retirada (saiu da Caixa).']:['Entrada na Caixa.']).concat(mau.length?[mau.length+' ficaram por importar (código diferente).']:[])})}
-function rinIgn(){if(LOCKED||!confirm('Ignorar estes valores? Não voltam a aparecer.'))return;rinSeen(RINL.map(i=>i.id));save();R()}
+async function rinIgn(){if(LOCKED||!(await confirmar('Ignorar estes valores? Não voltam a aparecer.',{ok:'Ignorar'})))return;rinSeen(RINL.map(i=>i.id));save();R()}
 document.addEventListener('visibilitychange',()=>{if(!document.hidden&&!LOCKED)RIN()});
 /* ===== Pedir dinheiro à Bejoma Pessoal (só entra após aprovação + código) ===== */
 var PEDL={n:0,until:0};
@@ -2383,18 +2398,18 @@ function UP(){const i=$('upI'),t=$('upT');if(i&&document.activeElement!==i)i.val
 function pedAbrir(id){if(LOCKED)return;const p=(D.pedidos||[]).find(x=>x.id===id);if(!p)return;
 if(!D.urlP){alert('Pedido guardado.\n\nPara a Bejoma Pessoal abrir sozinha, cole primeiro o endereço dela em "Endereço da Bejoma Pessoal" (neste mesmo cartão).\n\nPor agora vai ser enviado por ficheiro.');return pedEnviar(id)}
 location.href=D.urlP.split('#')[0]+'#pedidog='+b64e({id:p.id,valor:p.valor,forma:p.forma,desc:p.desc,data:p.data,volta:location.href.split('#')[0]})}
-function aprVoltou(t){let a;try{a=b64d(t)}catch(e){a=null}
+async function aprVoltou(t){let a;try{a=b64d(t)}catch(e){a=null}
 if(!a||typeof a.id!=='string'||!a.id||a.id.length>40||!(+a.valor>0)||typeof a.h!=='string'||!a.h)return alert('A aprovação recebida não é válida.');
 if(a.pessoal&&/^https?:\/\//i.test(a.pessoal)&&!D.urlP){D.urlP=String(a.pessoal).slice(0,300);save()}
 const x=aprIn();if(!x.some(y=>y.id===a.id)){x.push({id:a.id,valor:+a.valor,forma:a.forma==='mcx'?'mcx':'din',h:a.h});aprPut(aprClean(x))}
 PED();goTab('caixa');
 const p=(D.pedidos||[]).find(q=>q.id===a.id&&q.estado==='pendente'&&Math.abs(q.valor-(+a.valor))<0.005);
 if(!p)return alert('Aprovação recebida, mas não encontrei nenhum pedido pendente com esse valor.');
-alert('✅ A Bejoma Pessoal aprovou '+money(p.valor)+'.\n\nEscreva agora o código que ela mostrou.');pedReceber(p.id)}
-function pedCancelar(id){if(!confirm('Cancelar este pedido?'))return;const p=(D.pedidos||[]).find(x=>x.id===id);if(p){p.estado='cancelado';save();R()}}
+(await alertar('✅ A Bejoma Pessoal aprovou '+money(p.valor)+'.\n\nEscreva agora o código que ela mostrou.'));(await pedReceber(p.id))}
+async function pedCancelar(id){if(!(await confirmar('Cancelar este pedido?',{ok:'Sim, cancelar',no:'Não'})))return;const p=(D.pedidos||[]).find(x=>x.id===id);if(p){p.estado='cancelado';save();R()}}
 async function pedReceber0(id){if(LOCKED)return;const p=(D.pedidos||[]).find(x=>x.id===id&&x.estado==='pendente');if(!p)return;const a=aprOf(p);if(!a)return alert('Ainda não há aprovação da Bejoma Pessoal para este pedido.');
 const w=Math.ceil((PEDL.until-Date.now())/1000);if(w>0)return alert('Aguarde '+w+' s para tentar de novo.');
-const c=prompt('Escreva o código de aprovação que a Bejoma Pessoal mostrou:');if(c===null)return;
+const c=(await perguntar('Escreva o código de aprovação que a Bejoma Pessoal mostrou:',{im:'numeric'}));if(c===null)return;
 if((await aprHash(c.trim(),'ap'+p.id))!==a.h){PEDL.n++;if(PEDL.n>=3){PEDL.n=0;PEDL.until=Date.now()+30000;return alert('Código errado 3 vezes. Aguarde 30 s.')}return alert('Código errado. Tente de novo.')}
 PEDL.n=0;if(p.estado!=='pendente'||rinJa('ap'+p.id)){p.estado='recebido';save();R();return alert('Este pedido já foi recebido. Não foi registado outra vez.')}D.caixa.push({id:uid(),data:td(),hora:hh(),tipo:'entrada',desc:'Dinheiro da Bejoma Pessoal'+(p.desc?' · '+p.desc:''),valor:p.valor,forma:p.forma,rin:'ap'+p.id});p.estado='recebido';aprPut(aprIn().filter(x=>x.id!==p.id));save();R();tfOk({ic:'💰',tit:'Dinheiro recebido',val:money(p.valor),linhas:['Código certo. Já está na Caixa.']})}
 function PED(){const b=$('pedBox'),t=$('pedTop'),L=LOCKED?[]:(D.pedidos||[]).filter(p=>p.estado==='pendente');
@@ -2403,8 +2418,8 @@ const ap=L.filter(aprOf);if(t)t.innerHTML=ap.length?`<div class="card" style="bo
 /* ===== Pedidos vindos da Bejoma Pessoal (aprovar aqui) ===== */
 const b64e=o=>btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
 const b64d=t=>JSON.parse(decodeURIComponent(escape(atob(String(t).replace(/-/g,'+').replace(/_/g,'/')))));
-function HASHIN(){try{const h=location.hash||'';if(h.indexOf('#pedido=')===0){sessionStorage.setItem('bej_ped_hash',h.slice(8));history.replaceState(null,'',location.pathname+location.search)}else if(h.indexOf('#aprov=')===0){sessionStorage.setItem('bej_apr_hash',h.slice(7));history.replaceState(null,'',location.pathname+location.search)}}catch(e){}
-if(LOCKED)return;{let ta=null;try{ta=sessionStorage.getItem('bej_apr_hash')}catch(e){}if(ta){try{sessionStorage.removeItem('bej_apr_hash')}catch(e){}aprVoltou(ta)}}
+async function HASHIN(){try{const h=location.hash||'';if(h.indexOf('#pedido=')===0){sessionStorage.setItem('bej_ped_hash',h.slice(8));history.replaceState(null,'',location.pathname+location.search)}else if(h.indexOf('#aprov=')===0){sessionStorage.setItem('bej_apr_hash',h.slice(7));history.replaceState(null,'',location.pathname+location.search)}}catch(e){}
+if(LOCKED)return;{let ta=null;try{ta=sessionStorage.getItem('bej_apr_hash')}catch(e){}if(ta){try{sessionStorage.removeItem('bej_apr_hash')}catch(e){}(await aprVoltou(ta))}}
 let t=null;try{t=sessionStorage.getItem('bej_ped_hash')}catch(e){}if(!t)return;try{sessionStorage.removeItem('bej_ped_hash')}catch(e){}
 let p;try{p=b64d(t)}catch(e){p=null}if(!p||typeof p.id!=='string'||!p.id||p.id.length>40||!(+p.valor>0))return alert('O pedido recebido não é válido.');
 D.pedP=D.pedP||[];if(!D.pedP.some(x=>x.id===p.id)){D.pedP.push({id:p.id,data:/^\d{4}-\d\d-\d\d$/.test(p.data||'')?p.data:td(),desc:String(p.desc||'').slice(0,60),valor:+p.valor,forma:p.forma==='mcx'?'mcx':'din',volta:/^https?:\/\//i.test(p.volta||'')?String(p.volta):'',estado:'pendente'});if(!D.urlP&&/^https?:\/\//i.test(p.volta||''))D.urlP=String(p.volta).slice(0,300);save()}
@@ -2413,16 +2428,16 @@ function PG(){const b=$('pgBox'),t=$('pgTop'),u=$('pgUrl');if(u)u.value=location
 if(b)b.innerHTML=LOCKED?'':(L.length?L.map(p=>`<div class="item"><div style="flex:1"><b>${esc(p.desc||'Pedido da Bejoma Pessoal')}</b><small>${p.data} · ${fpI(p.forma)} ${fpN(p.forma)} · a Caixa tem ${money(cxSaldo(p.forma))}</small></div><div style="text-align:right"><b>${money(p.valor)}</b><br><button onclick="pgAprovar('${p.id}')">Aprovar</button><button class="sec" onclick="pgRecusar('${p.id}')">Recusar</button></div></div>`).join(''):'<div class="empty">Sem pedidos por aprovar.</div>')+(A.length?'<small class="empty">Aprovados (códigos)</small>'+A.map(p=>`<div class="item"><div style="flex:1"><b>✅ ${money(p.valor)}</b><small>${p.data} · código <b>${esc(p.code)}</b></small></div>${p.volta?`<button class="sec" onclick="pgVoltar('${p.id}')">Abrir Bejoma Pessoal</button>`:''}</div>`).join(''):'');
 if(t)t.innerHTML=L.length?`<div class="card" style="border:2px solid var(--accent)"><b>🔔 ${L.length} pedido(s) de dinheiro da Bejoma Pessoal</b><p class="empty" style="margin:4px 0 8px">${money(L.reduce((q,p)=>q+p.valor,0))} para aprovar.</p><button onclick="goTab('caixa')">Ver na Caixa</button></div>`:''}
 async function pgAprovar(id){if(LOCKED)return;const p=(D.pedP||[]).find(x=>x.id===id&&x.estado==='pendente');if(!p)return;const sd=cxSaldo(p.forma);
-if(p.valor>sd+0.005){if(!confirm('A Caixa só tem '+money(sd)+' em '+fpN(p.forma)+' e o pedido é de '+money(p.valor)+'.\n\nAprovar mesmo assim?'))return}
-else if(!confirm('Aprovar a retirada de '+money(p.valor)+' ('+fpN(p.forma)+') para a Bejoma Pessoal?\n\nA Caixa desce '+money(p.valor)+'.'))return;
+if(p.valor>sd+0.005){if(!(await confirmar('A Caixa só tem '+money(sd)+' em '+fpN(p.forma)+' e o pedido é de '+money(p.valor)+'.\n\nAprovar mesmo assim?',{ok:'Aprovar mesmo assim'})))return}
+else if(!(await confirmar('Aprovar a retirada de '+money(p.valor)+' ('+fpN(p.forma)+') para a Bejoma Pessoal?\n\nA Caixa desce '+money(p.valor)+'.',{ok:'Aprovar'})))return;
 let c;try{c=1000+(crypto.getRandomValues(new Uint32Array(1))[0]%9000)}catch(e){c=1000+Math.floor(Math.random()*9000)}const code=String(c),h=await aprHash(code,'ap'+p.id);
 D.caixa.push({id:uid(),data:td(),hora:hh(),tipo:'saida',desc:'Retirada · pedido da Bejoma Pessoal'+(p.desc?' · '+p.desc:''),valor:p.valor,cat:'Retirada',forma:p.forma,rin:'pd'+p.id});p.estado='aprovado';p.code=code;p.h=h;save();R();
 tfOk({ic:'✅',tit:'Retirada aprovada',val:money(p.valor),cod:code,linhas:['A Caixa desceu '+money(p.valor)+'.','Guarde este código. Vai escrevê-lo na Bejoma Pessoal.'],onOk:()=>{if(p.volta)pgVoltar(p.id)}})}
 function pgVoltar(id){const p=(D.pedP||[]).find(x=>x.id===id);if(!p||!p.volta)return;location.href=p.volta.split('#')[0]+'#aprov='+b64e({id:p.id,valor:p.valor,forma:p.forma,h:p.h,gestao:location.href.split('#')[0]})}
-function pgRecusar(id){if(LOCKED||!confirm('Recusar este pedido?\n\nA Bejoma Pessoal continua a mostrá-lo como pendente até o cancelar lá.'))return;const p=(D.pedP||[]).find(x=>x.id===id);if(p){p.estado='recusado';save();R()}}
-function pgCopiar(){const u=location.href.split('#')[0];try{navigator.clipboard.writeText(u).then(()=>alert('Endereço copiado. Cole-o na Bejoma Pessoal, em Mais → Ligação à Bejoma Gestão.')).catch(()=>prompt('Copie este endereço:',u))}catch(e){prompt('Copie este endereço:',u)}}
+async function pgRecusar(id){if(LOCKED||!(await confirmar('Recusar este pedido?\n\nA Bejoma Pessoal continua a mostrá-lo como pendente até o cancelar lá.',{ok:'Recusar'})))return;const p=(D.pedP||[]).find(x=>x.id===id);if(p){p.estado='recusado';save();R()}}
+async function pgCopiar(){const u=location.href.split('#')[0];try{navigator.clipboard.writeText(u).then(()=>alert('Endereço copiado. Cole-o na Bejoma Pessoal, em Mais → Ligação à Bejoma Gestão.')).catch(async ()=>dlgCopia(u,'Copie este endereço:'))}catch(e){dlgCopia(u,'Copie este endereço:')}}
 window.addEventListener('hashchange',()=>{HASHIN()});
-if("serviceWorker" in navigator&&location.protocol.startsWith("http"))navigator.serviceWorker.register("sw.js").catch(()=>{});
+if("serviceWorker" in navigator&&location.protocol.startsWith("http")){const tinha=!!navigator.serviceWorker.controller;navigator.serviceWorker.addEventListener('controllerchange',()=>{if(tinha&&!window.__swRec){window.__swRec=1;try{const d=document.createElement('div');d.id='bejNova';d.setAttribute('role','status');d.style.cssText='position:fixed;left:12px;right:12px;bottom:calc(86px + env(safe-area-inset-bottom,0px));z-index:100001;background:#2d6a4f;color:#fff;border-radius:14px;padding:12px 14px;font:600 15px/1.35 sans-serif;text-align:center;box-shadow:0 6px 20px rgba(0,0,0,.35)';d.appendChild(document.createTextNode('🔄 Há uma versão nova da app. '));const b=document.createElement('button');b.type='button';b.textContent='Atualizar';b.style.cssText='margin-left:6px;padding:6px 12px;border:0;border-radius:8px;font-weight:700;width:auto;margin-top:0';b.onclick=()=>location.reload();d.appendChild(b);document.body.appendChild(d)}catch(e){}}});navigator.serviceWorker.register("sw.js",{updateViaCache:'none'}).then(r=>{window.__swReg=r}).catch(()=>{});document.addEventListener('visibilitychange',()=>{if(!document.hidden&&window.__swReg&&Date.now()-(window.__swUp||0)>3600000){window.__swUp=Date.now();window.__swReg.update().catch(()=>{})}})}
 /* ===== Melhorias v2 (backup, capital parado, avisos, margens, relatório mensal) ===== */
 const XBUILD='2026-11-25';
 const xDD=(a,c)=>Math.round((new Date(c+'T12:00:00')-new Date(a+'T12:00:00'))/864e5);
@@ -2447,7 +2462,7 @@ D.prods.forEach(p=>{if(!(p.stock>0))return;if(ult[p.id]&&xDD(ult[p.id],h)<7)retu
 const ref=ls[p.id]||pri[p.id]||hi,dias=xDD(ref,h);if(dias<N)return;
 const valor=p.stock*custo(p);L.push({p:p,dias:dias,nunca:!ls[p.id],valor:valor});tot+=valor});
 L.sort((a,b)=>b.valor-a.valor);return{L:L,tot:tot,N:N}}
-function xCapCfg(){const a=prompt('Avisar de produtos parados depois de quantos dias sem vendas? (7 a 90)',D.cpDias>0?D.cpDias:14);if(a===null)return;const x=Math.round(n(a));if(!(x>=7&&x<=90))return alert('Escreva um número entre 7 e 90.');D.cpDias=x;save();R()}
+async function xCapCfg(){const a=(await perguntar('Avisar de produtos parados depois de quantos dias sem vendas? (7 a 90)',{im:'decimal',val:bjPv(D.cpDias>0?D.cpDias:14)}));if(a===null)return;const x=Math.round(n(a));if(!(x>=7&&x<=90))return alert('Escreva um número entre 7 e 90.');D.cpDias=x;save();R()}
 function xCapCard(){try{const c=xCapPar();if(!c.L.length)return'';
 return `<div class="card"><h2>💤 Capital parado: ${money(c.tot)}</h2><p class="empty" style="margin:-6px 0 6px">${c.L.length} produto(s) com stock e sem vendas há ${c.N} dias ou mais. Dinheiro que não roda.</p>`+
 c.L.slice(0,5).map(x=>`<div class="item"><div class="pi">${av(x.p,40)}<div>${esc(x.p.nome)}<small>${c2(x.p.stock)} un. · ${x.nunca?'ainda sem vendas':'sem vendas há '+x.dias+' dias'}</small></div></div><b>${money(x.valor)}</b></div>`).join('')+
@@ -2456,7 +2471,7 @@ c.L.slice(0,5).map(x=>`<div class="item"><div class="pi">${av(x.p,40)}<div>${esc
 /* --- D. Data errada, fecho por fazer, madrugada --- */
 function xDataSusp(){const h=td();let mx='';[D.vendas,D.caixa,D.compras].forEach(a=>(a||[]).forEach(x=>{const d=x&&x.data;if(typeof d==='string'&&d.length===10&&d>mx)mx=d}));
 if(h<XBUILD)return{h:h,t:'é anterior a '+fmtD(XBUILD)};if(mx&&mx>h)return{h:h,t:'é anterior a registos já feitos ('+fmtD(mx)+')'};return null}
-function xDataOk(){const s=xDataSusp();if(!s)return true;return confirm('⚠️ A data do telemóvel parece errada: mostra '+fmtD(s.h)+' e '+s.t+'.\n\nO app usa essa data como «hoje». A venda ficaria no dia errado e o lucro e o Fecho do dia saem trocados.\n\nCorrija em Definições do telemóvel → Data e hora (automática) e volte.\n\nRegistar mesmo assim?')}
+async function xDataOk(){const s=xDataSusp();if(!s)return true;return (await confirmar('⚠️ A data do telemóvel parece errada: mostra '+fmtD(s.h)+' e '+s.t+'.\n\nO app usa essa data como «hoje». A venda ficaria no dia errado e o lucro e o Fecho do dia saem trocados.\n\nCorrija em Definições do telemóvel → Data e hora (automática) e volte.\n\nRegistar mesmo assim?',{ok:'Registar mesmo assim'}))}
 const xDia=v=>{const k=Math.max(1,Math.round(v));return k+(k===1?' dia':' dias')};
 const xFch=ds=>!!(D.fch&&D.fch[ds]);
 function xFchMark(){try{if(fdia!==td())return;if(!D.vendas.some(v=>v.data===td()))return;D.fch=D.fch||{};if(!D.fch[td()]){D.fch[td()]=1;save()}}catch(e){}}
@@ -2553,8 +2568,8 @@ try{bjSave({kind:'file',blob:xXlsx(S),nm:'bejoma_relatorio_'+d.ym+'.xlsx',mime:'
 {const _fd=fechaDia;fechaDia=function(){const r=_fd.apply(this,arguments);xFchMark();return r}}
 {const _pf=printFecho;printFecho=function(){xFchMark();return _pf.apply(this,arguments)}}
 {const _sf=partilharFecho;partilharFecho=function(){xFchMark();return _sf.apply(this,arguments)}}
-{const _v=vender;vender=function(){if(!xDataOk())return;return _v.apply(this,arguments)}}
-{const _q=qvOk;qvOk=function(){if(!xDataOk())return;return _q.apply(this,arguments)}}
+{const _v=vender;vender=async function(){if(!(await xDataOk()))return;return (await _v.apply(this,arguments))}}
+{const _q=qvOk;qvOk=async function(){if(!(await xDataOk()))return;return (await _q.apply(this,arguments))}}
 {const _g2=goTab;goTab=function(n){const r=_g2.apply(this,arguments);try{if(n==='backup')xDiag();if(n==='margens')xMg();if(n==='resumo')xRmBox()}catch(e){console.error(e)}return r}}
 {const _R=R;R=function(){const r=_R.apply(this,arguments);try{xMig();xAv();xMg();xRmBox();xDiag()}catch(e){console.error(e)}return r}}
 {const _m=msgL;msgL=function(t){if(t==='fecho2'){const v=D.vendas.filter(x=>x.data===td()&&x.qtd>0);return v.length&&!xFch(td())?'Ainda não fechou o dia: vendeu '+money(v.reduce((a,x)=>a+x.qtd*x.preco,0))+'. Feche antes da meia-noite, senão as vendas passam para o dia seguinte.':''}return _m.apply(this,arguments)}}
@@ -2563,6 +2578,8 @@ function xMig(){if(LOCKED||D.fecho2V1)return;D.fecho2V1=1;if(!D.lembretes.some(l
 setInterval(()=>{try{xAv()}catch(e){}},60000);
 /* arranque: só depois de todas as funções e constantes existirem */
 R();PN();lockNow();check();splashRun();
+
+try{a11yInit()}catch(e){}
 </script>
 </body>
 </html>

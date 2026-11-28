@@ -1,0 +1,392 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Testes da Bejoma Gestão</title>
+<style>
+  :root{--bg:#faf6f1;--card:#fff;--tx:#2a2220;--mut:#7a6b66;--ok:#1f8a4c;--bad:#c4332b;--ln:#eadfd6}
+  @media (prefers-color-scheme:dark){:root{--bg:#1c1816;--card:#2a2422;--tx:#f3ebe6;--mut:#b3a39c;--ok:#4cc27e;--bad:#ff7b72;--ln:#3b3330}}
+  *{box-sizing:border-box}
+  body{margin:0;font:16px/1.45 system-ui,Segoe UI,Roboto,sans-serif;background:var(--bg);color:var(--tx);padding:16px;max-width:760px;margin-inline:auto}
+  h1{font-size:1.3rem;margin:.2em 0}
+  .card{background:var(--card);border:1px solid var(--ln);border-radius:14px;padding:14px;margin:12px 0}
+  .mut{color:var(--mut);font-size:.92rem}
+  button{font:inherit;padding:10px 16px;border:0;border-radius:10px;background:#2d6a4f;color:#fff;font-weight:600;margin:4px 6px 4px 0}
+  button.sec{background:var(--ln);color:var(--tx)}
+  button:disabled{opacity:.5}
+  #resumo{font-size:1.15rem;font-weight:700}
+  #resumo.ok{color:var(--ok)} #resumo.mau{color:var(--bad)}
+  .grupo{margin:16px 0 4px;font-weight:700;font-size:.95rem;color:var(--mut);text-transform:uppercase;letter-spacing:.04em}
+  .t{display:flex;gap:8px;padding:6px 0;border-bottom:1px solid var(--ln)}
+  .t .i{flex:none;width:1.5em}
+  .t .e{color:var(--bad);font-size:.9rem;word-break:break-word}
+  .t.mau .n{font-weight:600}
+  #mundo{position:fixed;left:-9999px;top:0;width:390px;height:780px;border:0}
+</style>
+</head>
+<body>
+<h1>🧪 Testes da Bejoma Gestão</h1>
+<div class="card">
+  <p class="mut" style="margin-top:0">Esta página abre o <b>index.html</b> da Gestão numa cópia escondida e experimenta as funções mais importantes: avisos e confirmações, vendas, devoluções, dívidas, importar backup, PIN e bloqueio, o botão Voltar e a acessibilidade.
+  Usa um espaço de dados <b>separado</b> (nomes começam por <code>tgest_</code>), por isso <b>os seus dados reais, os pedidos da Bejoma Pessoal e as notificações não são tocados</b>. No fim, este teste confirma isso.</p>
+  <button id="bIr">▶ Executar os testes</button>
+  <button id="bCop" class="sec" disabled>Copiar resultado</button>
+  <div id="resumo" class="mut">Ainda não executou.</div>
+  <div id="end" class="mut" style="margin-top:8px;font-size:.85rem;word-break:break-all"></div>
+</div>
+<div id="res"></div>
+<iframe id="mundo" title="Cópia de teste da app" aria-hidden="true"></iframe>
+
+<script>
+const SEED = "(()=>{\n const day=n=>adD(td(),-n),pr=D.prods;\n pr.slice(0,12).forEach((p,i)=>p.stock=5+i*3);\n pr.slice(0,8).forEach((p,i)=>D.compras.push({id:uid(),data:day(10+i),ent:day(10+i),hora:'09:00',pid:p.id,nome:p.nome,emb:2,un:p.unEmb*2,total:p.precoEmb*2,cmp:p.precoEmb/p.unEmb,forn:i%2?'Vila':'Kikolo'}));\n for(let d=0;d<25;d++)for(let k=0;k<4;k++){const p=pr[(d+k)%12];D.vendas.push({id:uid(),data:day(d),hora:'1'+k+':00',pid:p.id,nome:p.nome,qtd:1+((d+k)%4),preco:p.venda,lista:p.venda,custo:custo(p),forma:k%2?'mcx':'din'})}\n for(let d=0;d<25;d++){D.caixa.push({id:uid(),data:day(d),hora:'18:00',tipo:'entrada',desc:'Vendas do dia',valor:3000+d*100,cat:'Vendas',forma:'din'});D.caixa.push({id:uid(),data:day(d),hora:'19:00',tipo:'saida',desc:'Transporte',valor:500,cat:'Transporte',forma:'din'})}\n D.dividas.push({id:uid(),tipo:'receber',pessoa:'Maria',desc:'Fiado',valor:3500,pago:0,pagtos:[],data:day(5),hora:'10:00',prazo:day(-3),pess:false});\n D.dividas.push({id:uid(),tipo:'pagar',pessoa:'Fornecedor Vila',desc:'Mercadoria',valor:20000,pago:0,pagtos:[],data:day(7),hora:'10:00',prazo:day(-1),pess:false});\n save();R();return D.vendas.length})()";
+const FUZZ = "(()=>{const P=\"<img src=x onerror=\\\"window.__x=(window.__x||0)+1\\\">\",K=/^(nome|desc|pessoa|forn|obs|nota|mot|motivo|texto|tit|titulo|cli|cliente|cat|un|emb)$/;let n=0;\n const w=(o,d)=>{if(!o||typeof o!=='object'||d>6)return;if(Array.isArray(o)){o.forEach((v,i)=>{if(typeof v==='string'&&o===D.dcats){o[i]=v+P;n++}else w(v,d+1)});return}\n  for(const k of Object.keys(o)){const v=o[k];if(typeof v==='string'&&K.test(k)&&v.length>1){o[k]=v+P;n++}else w(v,d+1)}};\n w(D,0);save();R();return n})()";
+const PREF = 'tgest_';
+let W = null, textoHtml = '';
+const $ = s => document.querySelector(s);
+const esp = ms => new Promise(r => setTimeout(r, ms));
+
+/* ---------- ajudantes ---------- */
+const E  = js => W.eval(js);
+const EA = js => W.eval('(async()=>{' + js + '})()');
+const q  = s => W.document.querySelector(s);
+const clicar = s => { const e = q(s); if (!e) throw new Error('não encontrei ' + s); e.click() };
+const ver = (c, m) => { if (!c) throw new Error(m || 'falhou') };
+const igual = (a, b, m) => { if (JSON.stringify(a) !== JSON.stringify(b)) throw new Error((m ? m + ': ' : '') + 'esperado ' + JSON.stringify(b) + ', obtido ' + JSON.stringify(a)) };
+const dlg = () => { const e = q('#ac.on #acT'); return e ? e.textContent : null };
+const aviso = () => { const e = q('#am.on #amT'); return e ? e.textContent : null };
+const tecla = (s, k) => q(s).dispatchEvent(new W.KeyboardEvent('keydown', { key: k, bubbles: true }));
+const botoes = () => [q('#acO').textContent, q('#acN').textContent];
+const limparFestas = () => { for (const s of ['tfOk', 'vf', 'fe', 'sv']) { const e = W.document.getElementById(s); if (e && e.parentNode) e.remove() } };
+
+/* ---------- cópia de teste da app ---------- */
+function transformar(h) {
+  h = h.replace(/(['"`])(bejoma_|bej_|rotina_)/g, '$1' + PREF + '$2');            // todas as chaves
+  h = h.split("indexedDB.open('bejoma',1)").join("indexedDB.open('tgest_bejoma',1)"); // base de dados
+  h = h.split('navigator.serviceWorker.register(').join('Promise.reject(');
+  const guarda = '<script>window.__erros=[];window.addEventListener("error",function(e){window.__erros.push(String(e.message))});window.addEventListener("unhandledrejection",function(e){window.__erros.push("rejeição: "+(e.reason&&e.reason.message||e.reason))});' +
+    'try{Object.defineProperty(window,"Notification",{value:Object.assign(function(){},{permission:"denied",requestPermission:function(){return Promise.resolve("denied")}})})}catch(e){}<\/script>';
+  return h.replace('<head>', '<head>' + guarda);
+}
+function chavesTeste() { return Object.keys(localStorage).filter(k => k.startsWith(PREF)) }
+function limparTeste() {
+  for (const k of chavesTeste()) localStorage.removeItem(k);
+  for (const k of Object.keys(sessionStorage)) if (k.startsWith(PREF)) sessionStorage.removeItem(k);
+}
+function apagarIDB() {
+  return new Promise(r => { try { const x = indexedDB.deleteDatabase('tgest_bejoma'); x.onsuccess = x.onerror = x.onblocked = () => r() } catch (e) { r() } });
+}
+async function esperarApp() {
+  for (let i = 0; i < 100; i++) {
+    await esp(150);
+    try { if (E("typeof D!=='undefined'&&typeof goTab==='function'&&typeof a11yPass==='function'&&!document.getElementById('splash')")) { await esp(250); return } } catch (e) {}
+  }
+  throw new Error('a app não arrancou a tempo');
+}
+async function carregar() {
+  const f = $('#mundo');
+  await new Promise(r => { f.onload = r; f.srcdoc = transformar(textoHtml) });
+  W = f.contentWindow;
+  await esperarApp();
+}
+async function novoApp(semear) {
+  $('#mundo').srcdoc = '<p></p>'; await esp(300);
+  limparTeste(); await apagarIDB();
+  await carregar();
+  if (semear) { E(SEED); await esp(500) }
+}
+
+/* ---------- os dados reais não podem ser tocados ---------- */
+function hash(t) { let h = 5381; for (let i = 0; i < t.length; i++) h = ((h << 5) + h + t.charCodeAt(i)) | 0; return String(h) + ':' + t.length }
+function lsReal() { return JSON.stringify(Object.keys(localStorage).filter(k => !k.startsWith(PREF)).sort().map(k => [k, localStorage.getItem(k)])) }
+async function idbReal() {
+  const rep = (k, v) => v instanceof ArrayBuffer ? Array.from(new Uint8Array(v)) : (ArrayBuffer.isView(v) ? Array.from(v) : v);
+  const ler = async () => {
+    if (!indexedDB.databases) return 'indisponível';
+    const dbs = await indexedDB.databases();
+    if (!dbs.some(d => d.name === 'bejoma')) return 'sem-base';
+    return await new Promise(res => {
+      const o = indexedDB.open('bejoma'); o.onerror = () => res('erro');
+      o.onsuccess = () => {
+        const db = o.result;
+        try {
+          const st = db.transaction('kv').objectStore('kv'), ks = st.getAllKeys(), vs = st.getAll(); let k = null, v = null;
+          const fim = () => { if (k && v) { db.close(); res(hash(JSON.stringify([k[0], v[0]], rep))) } };
+          ks.onsuccess = () => { k = [ks.result]; fim() }; vs.onsuccess = () => { v = [vs.result]; fim() };
+          ks.onerror = vs.onerror = () => { db.close(); res('erro') };
+        } catch (e) { db.close(); res('sem-kv') }
+      };
+    });
+  };
+  try { return await Promise.race([ler(), esp(6000).then(() => 'tempo-esgotado')]) } catch (e) { return 'erro' }
+}
+
+/* ---------- motor de testes ---------- */
+const lista = []; let feitos = 0, falhas = 0;
+function grupo(nome) { const d = document.createElement('div'); d.className = 'grupo'; d.textContent = nome; $('#res').appendChild(d); lista.push('\n## ' + nome) }
+async function teste(nome, fn) {
+  const d = document.createElement('div'); d.className = 't';
+  let erro = null;
+  try { await fn() } catch (e) { erro = (e && e.message) || String(e); try { E('window.dlgFecha&&dlgFecha();window.alertTudo&&alertTudo()'); limparFestas() } catch (x) {} }
+  feitos++; if (erro) falhas++;
+  d.classList.add(erro ? 'mau' : 'ok');
+  d.innerHTML = '<span class="i">' + (erro ? '❌' : '✅') + '</span><div><div class="n"></div>' + (erro ? '<div class="e"></div>' : '') + '</div>';
+  d.querySelector('.n').textContent = nome;
+  if (erro) d.querySelector('.e').textContent = erro;
+  $('#res').appendChild(d);
+  lista.push((erro ? '❌ ' : '✅ ') + nome + (erro ? ' — ' + erro : ''));
+  $('#resumo').textContent = 'A executar… ' + feitos + ' feitos' + (falhas ? ', ' + falhas + ' com falha' : '');
+}
+const paginas = () => JSON.parse(E('JSON.stringify(NAVB.flatMap(g=>g[3].map(i=>[i[0],i[1]])))'));
+const vis = e => e.checkVisibility ? e.checkVisibility({ checkVisibilityCSS: true, contentVisibilityAuto: true }) : e.getClientRects().length > 0;
+
+async function correr() {
+  const ls0 = lsReal(), idb0 = await idbReal();
+  limparTeste(); await apagarIDB();
+
+  /* ===== 1. Arranque, páginas, segurança dos textos ===== */
+  await novoApp(true);
+  grupo('Arranque e todas as páginas');
+  await teste('A app arranca sem erros e com dados de exemplo', () => { igual(W.__erros, []); igual(E('D.vendas.length'), 100) });
+  await teste('As ' + paginas().length + ' páginas abrem sem erros e sem valores estranhos (NaN, undefined…)', async () => {
+    const maus = [];
+    for (const [n, s] of paginas()) {
+      E("goTab('" + n + "','" + s + "')"); await esp(300);
+      const painel = q('.panel:not(.hidden)') || W.document.body;
+      const m = painel.innerText.match(/\bNaN\b|\bundefined\b|\[object|Infinity/); if (m) maus.push(n + '/' + s + ': "' + m[0] + '"');
+    }
+    igual(W.__erros, []); igual(maus, []);
+  });
+  await teste('Texto malicioso nos nomes e descrições não executa em nenhuma página', async () => {
+    const n = E(FUZZ); ver(n > 100, 'poucos campos alterados: ' + n);
+    for (const [a, b] of paginas()) { E("goTab('" + a + "','" + b + "')"); await esp(250) }
+    igual(E('window.__x||0'), 0, 'código injetado executou'); igual(W.__erros, []);
+  });
+
+  /* ===== 2. Janelas ===== */
+  await novoApp(true);
+  grupo('Janelas da app (avisos, confirmações, perguntas)');
+  await teste('Aviso abre numa janela da app, devolve nada (como o nativo) e fecha com OK', async () => {
+    E("window.__ret='x';window.__ret=alert('Teste')"); await esp(100);
+    igual(aviso(), 'Teste'); igual(E('window.__ret'), undefined); clicar('#amB'); await esp(100); ver(!aviso(), 'não fechou');
+  });
+  await teste('"alertar" espera pelo OK e vários avisos ficam em fila', async () => {
+    E("window.__a=[];alertar('um').then(()=>__a.push(1));alertar('dois').then(()=>__a.push(2))"); await esp(100);
+    clicar('#amB'); await esp(100); igual(E('__a'), [1]); clicar('#amB'); await esp(100); igual(E('__a'), [1, 2]);
+  });
+  await teste('Confirmar: OK = sim; Cancelar e Escape = não', async () => {
+    E("window.__r=[];confirmar('Posso?',{ok:'Sim'}).then(v=>__r.push(v))"); await esp(100); igual(dlg(), 'Posso?'); clicar('#acO'); await esp(100);
+    E("confirmar('Posso?').then(v=>__r.push(v))"); await esp(100); clicar('#acN'); await esp(100);
+    E("confirmar('Posso?').then(v=>__r.push(v))"); await esp(100); tecla('#ac', 'Escape'); await esp(100);
+    igual(E('__r'), [true, false, false]);
+  });
+  await teste('Perguntar mostra o valor inicial e devolve o texto escrito (nulo se cancelar)', async () => {
+    E("window.__p=[];perguntar('Qt?',{im:'decimal',val:'5'}).then(v=>__p.push(v))"); await esp(100);
+    igual(q('#acI').value, '5'); q('#acI').value = '12'; clicar('#acO'); await esp(100);
+    E("perguntar('Qt?',{im:'decimal'}).then(v=>__p.push(v))"); await esp(100); clicar('#acN'); await esp(100);
+    igual(E('__p'), ['12', null]);
+  });
+
+  /* ===== 3. Vendas ===== */
+  grupo('Vendas, devoluções e Reciclagem');
+  const nv0 = E('D.vendas.length');
+  await teste('Apagar uma venda: pergunta, cancelar não mexe, confirmar apaga e devolve ao stock', async () => {
+    const v = JSON.parse(E("JSON.stringify((()=>{const v=D.vendas[0];return {id:v.id,pid:v.pid,qtd:v.qtd}})())")); const st0 = E("P('" + v.pid + "').stock");
+    E("delVenda('" + v.id + "')"); await esp(100); ver((dlg() || '').startsWith('Apagar esta venda'), dlg());
+    clicar('#acN'); await esp(100); igual(E('D.vendas.length'), nv0);
+    E("delVenda('" + v.id + "')"); await esp(100); clicar('#acO'); await esp(150);
+    igual([E('D.vendas.length'), E("P('" + v.pid + "').stock")], [nv0 - 1, st0 + v.qtd]);
+  });
+  await teste('A venda apagada vai para a Reciclagem e pode ser restaurada', async () => {
+    ver(E('D.apagados.length') >= 1, 'não está na Reciclagem'); const id = E('D.apagados[0].id');
+    E("apRest('" + id + "')"); await esp(100); ver((dlg() || '').startsWith('Restaurar'), dlg());
+    clicar('#acN'); await esp(100); ver(E('D.apagados.length') >= 1);
+    E("apRest('" + id + "')"); await esp(100); clicar('#acO'); await esp(150); igual(E('D.vendas.length'), nv0);
+  });
+  await teste('Devolução: dois diálogos, o segundo com botões "Sim, volta ao stock" / "Não, conta como perda"', async () => {
+    await esp(700); limparFestas();
+    const pid = E('D.prods[1].id'); E("$('vProd').value='" + pid + "';$('vQtd').value='1';$('vPreco').value=String(P('" + pid + "').venda);$('vData').value=''");
+    const stk = E("P('" + pid + "').stock"), n0 = E('D.vendas.length'), p0 = E('D.perdas.length');
+    E('devolver()'); await esp(100); ver((dlg() || '').startsWith('Registar a devolução'), dlg()); clicar('#acO'); await esp(100);
+    igual(dlg(), 'A mercadoria está boa para voltar a vender?'); igual(botoes()[0], 'Sim, volta ao stock'); ver(botoes()[1].startsWith('Não, conta como perda'), 'botão 2: ' + botoes()[1]);
+    clicar('#acO'); await esp(400); igual([E("P('" + pid + "').stock"), E('D.vendas.length')], [stk + 1, n0 + 1]);
+    limparFestas(); await esp(700);
+    E("$('vProd').value='" + pid + "';$('vQtd').value='1';$('vPreco').value=String(P('" + pid + "').venda);$('vData').value=''");
+    E('devolver()'); await esp(100); clicar('#acO'); await esp(100); clicar('#acN'); await esp(400);
+    igual(E('D.perdas.length'), p0 + 1, 'não registou a perda'); limparFestas();
+  });
+  await teste('"Hoje não vendeu nada?" tem botões claros e regista', async () => {
+    E('D.sv={};svHoje()'); await esp(100); igual(dlg(), 'Hoje não vendeu nada?');
+    igual(botoes(), ['Sim, hoje não houve vendas', 'Não, vou registar uma venda']); clicar('#acO'); await esp(100); igual(E('(D.sv||{})[td()]'), 1);
+  });
+
+  /* ===== 4. Dívidas ===== */
+  grupo('Dívidas');
+  await teste('Receber uma dívida: pergunta, cancelar não mexe, confirmar regista', async () => {
+    await esp(700); const d = E("D.dividas.find(x=>x.tipo==='receber').id");
+    E("dvPaga('" + d + "')"); await esp(100); ver((dlg() || '').startsWith('Marcar como recebido'), dlg());
+    clicar('#acN'); await esp(100); igual(E("dvGet('" + d + "').pago"), 0);
+    E("dvPaga('" + d + "')"); await esp(100); clicar('#acO'); await esp(400); ver(E("dvGet('" + d + "').pago") > 0, 'não registou'); limparFestas();
+  });
+  await teste('Pagamento parcial a um fornecedor pergunta o valor e regista', async () => {
+    await esp(700); const d = E("D.dividas.find(x=>x.tipo==='pagar').id");
+    E("dvParc('" + d + "')"); await esp(100); ver((dlg() || '').includes('Quanto pagou agora'), dlg());
+    q('#acI').value = '5000'; clicar('#acO'); await esp(400); igual(E("dvGet('" + d + "').pago"), 5000); limparFestas();
+  });
+  await teste('Apagar uma dívida avisa dos pagamentos já registados', async () => {
+    await esp(700); const d = E("D.dividas.find(x=>x.tipo==='pagar').id"), n = E('D.dividas.length');
+    E("dvDel('" + d + "')"); await esp(100); ver((dlg() || '').startsWith('Apagar a dívida de') && dlg().includes('pagamentos já registados'), dlg());
+    clicar('#acO'); await esp(200); igual(E('D.dividas.length'), n - 1);
+  });
+
+  /* ===== 5. Caixa, preços e stock ===== */
+  grupo('Caixa, preços e stock');
+  await teste('Saída maior que o saldo: cancelar bloqueia, confirmar deixa passar', async () => {
+    E("window.__s=[];semSaldo(1e9,'din').then(v=>__s.push(v))"); await esp(100); ver((dlg() || '').includes('Continuar mesmo assim'), dlg());
+    clicar('#acN'); await esp(100); E("semSaldo(1e9,'din').then(v=>__s.push(v))"); await esp(100); clicar('#acO'); await esp(100); igual(E('__s'), [true, false]);
+  });
+  await teste('Conferir saldo: duas perguntas seguidas e um aviso com as diferenças', async () => {
+    E('confSaldo()'); await esp(100); ver((dlg() || '').includes('quanto tem agora'), dlg()); q('#acI').value = '100'; clicar('#acO'); await esp(100);
+    ver((dlg() || '').includes('quanto tem agora'), '2ª pergunta'); clicar('#acO'); await esp(150);
+    ver((aviso() || '').includes('do que a app diz'), aviso()); clicar('#amB'); await esp(100);
+  });
+  await teste('Mudar o preço de venda: a pergunta mostra o preço atual e grava o novo', async () => {
+    const pid = E('D.prods[0].id'); E("editVenda('" + pid + "')"); await esp(100);
+    ver((dlg() || '').includes('Novo preço de venda'), dlg()); igual(q('#acI').value, String(E("P('" + pid + "').venda")));
+    q('#acI').value = '777'; clicar('#acO'); await esp(150); igual(E("P('" + pid + "').venda"), 777);
+  });
+  await teste('Compra mais cara avisa e deixa escolher "Mudar o preço" ou "Manter"', async () => {
+    await esp(700); const p = E('D.prods[3].id'), v0 = E("P('" + p + "').venda");
+    E("{const p=P('" + p + "');$('aProd').value=p.id;$('aEmb').value='1';$('aMeia').value='0';$('aQua').value='0';$('aPreco').value=String(Math.round(p.precoEmb*1.4))}");
+    E('entrada()'); await esp(200); ver((dlg() || '').includes('Compra mais cara'), dlg()); igual(botoes(), ['Mudar o preço', 'Manter']);
+    clicar('#acN'); await esp(400); igual(E("P('" + p + "').venda"), v0, 'mudou o preço sem querer'); limparFestas();
+  });
+  await teste('Contagem de stock pede confirmação e aplica', async () => {
+    const ps = JSON.parse(E("JSON.stringify(D.prods.slice(0,2).map(p=>[p.id,p.stock]))")); E("D.prods.slice(0,2).forEach(p=>{CN[p.id]=String((p.stock||0)+2)})");
+    E('cnAplicar()'); await esp(100); ver(dlg(), 'sem pergunta'); clicar('#acO'); await esp(300);
+    for (const [id, s] of ps) igual(E("P('" + id + "').stock"), s + 2, id);
+  });
+
+  /* ===== 6. Backups ===== */
+  grupo('Importar backup');
+  const j = E('JSON.stringify(D)'), nv = E('D.vendas.length');
+  const imp = async (t) => { W.__t = t; E('impTxt(__t)'); await esp(250) };
+  await teste('Texto que não é um backup é recusado', async () => { await imp('isto não é json'); ver((aviso() || '').startsWith('Backup inválido'), aviso()); clicar('#amB'); await esp(100) });
+  await teste('Estrutura errada ou registos que não são objetos são recusados, sem mexer nos dados', async () => {
+    await imp(JSON.stringify({ prods: [], vendas: [], caixa: 'x' })); ver((aviso() || '').startsWith('Backup inválido'), '1: ' + aviso()); clicar('#amB'); await esp(100);
+    await imp(JSON.stringify({ prods: [null], vendas: [], caixa: [] })); ver((aviso() || '').startsWith('Backup inválido'), '2: ' + aviso()); clicar('#amB'); await esp(100);
+    igual(E('D.vendas.length'), nv);
+  });
+  await teste('Ficheiro grande demais (mais de 60 MB) é recusado', async () => {
+    E("importar({target:{files:[{size:70*1048576}],value:'x'}})"); await esp(150); ver((aviso() || '').includes('demasiado grande'), aviso()); clicar('#amB'); await esp(100);
+  });
+  await teste('Backup válido: pergunta, cancelar não mexe, confirmar substitui e avisa', async () => {
+    await imp(j); ver((dlg() || '').startsWith('Substituir todos os dados'), dlg()); clicar('#acN'); await esp(100); igual(E('D.vendas.length'), nv);
+    await imp(JSON.stringify(Object.assign(JSON.parse(j), { vendas: JSON.parse(j).vendas.slice(0, 5) }))); clicar('#acO'); await esp(700);
+    igual(E('D.vendas.length'), 5); ver((aviso() || '').startsWith('Backup restaurado'), aviso()); clicar('#amB'); await esp(100);
+  });
+  await teste('Depois de importar dá para voltar atrás', async () => {
+    E('desfazImport()'); await esp(300); ver((dlg() || '').startsWith('Voltar aos dados'), dlg()); clicar('#acO'); await esp(700); igual(E('D.vendas.length'), nv);
+  });
+  await teste('Ficheiro com chaves perigosas (__proto__) é limpo', async () => {
+    await imp('{"__proto__":{"polluted":1},"prods":[],"vendas":[],"caixa":[]}'); if (dlg()) { clicar('#acO'); await esp(700) }
+    igual(E('({}).polluted'), undefined, 'contaminou objetos'); igual(E("Object.prototype.hasOwnProperty.call(D,'__proto__')"), false, 'a chave perigosa ficou nos dados');
+  });
+
+  /* ===== 7. Voltar e ligação com a Pessoal ===== */
+  await novoApp(true);
+  grupo('Botão Voltar e ligação com a Bejoma Pessoal');
+  await teste('Voltar sem janelas pede licença para sair; Voltar com uma janela aberta só a fecha', async () => {
+    W.dispatchEvent(new W.PopStateEvent('popstate')); await esp(150); igual(q('#ex').style.display, 'flex', 'não pediu para sair'); E('exNo()'); await esp(150);
+    E("window.__v='x';confirmar('Voltar?').then(v=>__v=v)"); await esp(100); W.dispatchEvent(new W.PopStateEvent('popstate')); await esp(150);
+    igual(E('__v'), false, 'não fechou a janela'); ver(q('#ex').style.display !== 'flex', 'mostrou a saída');
+  });
+  await teste('O redesenho (R) continua imediato e uma aprovação inválida da Pessoal só mostra um aviso', async () => {
+    E("sessionStorage.setItem('" + PREF + "bej_apr_hash','xxx')"); igual(E('(()=>{const r=R();return r===undefined})()'), true, 'R() devolveu uma promessa');
+    await esp(250); ver((aviso() || '').includes('não é válida'), aviso()); clicar('#amB'); await esp(100);
+  });
+
+  /* ===== 8. PIN ===== */
+  await novoApp(true);
+  grupo('PIN, bloqueio e dados cifrados');
+  const nvp = E('D.vendas.length');
+  await teste('Definir um PIN cifra os dados', async () => {
+    E("$('pnA').value='739481';$('pnB').value='739481';$('pnW').value='casa do bolo azul'"); await EA('await pinSet()'); await esp(900);
+    ver(E('!!pinData()') && E('ENC') === true, 'PIN não ficou definido');
+  });
+  await teste('Bloquear fecha janelas abertas, tira os dados da memória e mostra o ecrã de bloqueio', async () => {
+    E("window.__r='x';confirmar('Posso apagar?').then(v=>__r=v)"); await esp(100); ver(dlg(), 'sem janela');
+    E('lockNow()'); await esp(300);
+    igual(E('__r'), false); ver(!q('#ac.on'), 'a janela ficou aberta'); igual([q('#lock').style.display, E('LOCKED'), E('D.vendas.length')], ['flex', true, 0]);
+  });
+  await teste('PIN errado não entra', async () => {
+    q('#lkPin').value = '654321'; await EA('await lkTry()'); await esp(500); ver(q('#lkMsg').textContent.includes('PIN errado'), q('#lkMsg').textContent); igual(E('LOCKED'), true);
+  });
+  await teste('PIN certo desbloqueia e devolve todos os dados', async () => {
+    q('#lkPin').value = '739481'; await EA('await lkTry()'); await esp(900); igual([E('LOCKED'), E('D.vendas.length')], [false, nvp]);
+  });
+  await teste('Depois de recarregar a app, pede o PIN e os dados cifrados voltam', async () => {
+    E('D.prods[0].venda=4321;save()'); await esp(1500); await carregar().catch(() => {});
+    for (let i = 0; i < 40 && !E("document.getElementById('lock').style.display==='flex'"); i++) await esp(150);
+    igual(q('#lock').style.display, 'flex', 'não pediu o PIN'); q('#lkPin').value = '739481'; await EA('await lkTry()'); await esp(1200);
+    igual([E('LOCKED'), E('D.vendas.length'), E('D.prods[0].venda')], [false, nvp, 4321]);
+  });
+
+  /* ===== 9. Acessibilidade ===== */
+  await novoApp(true);
+  grupo('Acessibilidade (leitores de ecrã)');
+  await teste('Nenhum botão ou campo visível fica sem nome em todas as páginas', async () => {
+    const maus = [];
+    for (const [n, s] of paginas()) {
+      E("goTab('" + n + "','" + s + "')"); await esp(750);
+      for (const b of W.document.querySelectorAll('button,[role=button]')) { if (!vis(b)) continue; if (!(b.getAttribute('aria-label') || b.getAttribute('aria-labelledby') || b.title || /[A-Za-zÀ-ÿ0-9]/.test(b.innerText || ''))) maus.push(n + '/' + s + ': botão "' + b.innerText + '"') }
+      for (const i of W.document.querySelectorAll('input,select,textarea')) { if (i.type === 'hidden' || !vis(i)) continue; if (!(i.getAttribute('aria-label') || i.getAttribute('aria-labelledby') || (i.labels && i.labels.length))) maus.push(n + '/' + s + ': campo ' + (i.id || i.type)) }
+    }
+    igual(maus, []);
+  });
+  await teste('A barra de baixo é uma região de navegação e marca a página atual', () => {
+    const tb = q('#tb'); igual(tb.getAttribute('aria-label'), 'Navegação principal'); ver(q('#tb button[aria-current="page"]'), 'sem aria-current');
+  });
+  await teste('Elementos clicáveis que não eram botões passam a ser botões com teclado', () => {
+    const f = [...W.document.querySelectorAll('[onclick]')].filter(e => vis(e) && !['BUTTON', 'A', 'INPUT', 'SELECT', 'TEXTAREA', 'SUMMARY', 'LABEL'].includes(e.tagName) && !e.querySelector('button,a,input,select,textarea'));
+    ver(f.every(e => e.getAttribute('role') === 'button' && e.tabIndex === 0), 'há elementos clicáveis sem role=button');
+  });
+  await teste('As janelas têm papel de diálogo', async () => {
+    E("window.__z=1;confirmar('Teste?')"); await esp(100); const a = q('#ac'); igual([a.getAttribute('role'), a.getAttribute('aria-modal')], ['alertdialog', 'true']); clicar('#acN'); await esp(100);
+  });
+
+  /* ===== 10. Segurança dos testes ===== */
+  grupo('Os seus dados reais');
+  limparTeste(); await apagarIDB(); $('#mundo').srcdoc = '<p></p>'; await esp(300);
+  await teste('Os dados reais da Gestão e os pedidos da Pessoal não foram tocados por estes testes', async () => {
+    const idb1 = await idbReal(); ver(ls0 === lsReal(), 'os dados guardados no navegador mudaram!'); ver(idb0 === idb1, 'a base de dados da Gestão mudou! (' + idb0 + ' → ' + idb1 + ')');
+  });
+}
+
+async function iniciar() {
+  $('#bIr').disabled = true; $('#bCop').disabled = true; $('#res').innerHTML = ''; feitos = 0; falhas = 0; lista.length = 0;
+  $('#resumo').className = 'mut'; $('#resumo').textContent = 'A preparar…';
+  try {
+    if (location.protocol !== 'http:' && location.protocol !== 'https:') throw new Error('abriu esta página a partir de um ficheiro guardado no telemóvel (' + location.protocol + '). Abra-a pelo endereço do site, por exemplo https://seunome.github.io/bejoma/testes.html');
+    let r;
+    try { r = await fetch('index.html', { cache: 'no-cache' }) }
+    catch (e) { throw new Error('não consegui descarregar o index.html (' + e.message + '). Confira: 1) abriu pelo endereço do site e não por um ficheiro guardado; 2) o testes.html está na mesma pasta do index.html; 3) tem internet.') }
+    if (!r.ok) throw new Error('o index.html não foi encontrado (erro ' + r.status + '). O testes.html tem de estar na mesma pasta do index.html.');
+    textoHtml = await r.text();
+    await correr();
+    $('#resumo').className = falhas ? 'mau' : 'ok';
+    $('#resumo').textContent = falhas ? '❌ ' + falhas + ' de ' + feitos + ' testes falharam' : '✅ Passaram todos os ' + feitos + ' testes';
+  } catch (e) {
+    $('#resumo').className = 'mau'; $('#resumo').textContent = 'Não foi possível executar: ' + e.message;
+    try { limparTeste() } catch (x) {}
+  }
+  $('#bIr').disabled = false; $('#bCop').disabled = false;
+}
+$('#end').textContent = 'Endereço desta página: ' + location.href;
+$('#bIr').onclick = iniciar;
+$('#bCop').onclick = async () => { const t = $('#resumo').textContent + '\n' + lista.join('\n'); try { await navigator.clipboard.writeText(t); $('#bCop').textContent = 'Copiado ✓' } catch (e) { prompt('Copie o resultado:', t) } setTimeout(() => $('#bCop').textContent = 'Copiar resultado', 2000) };
+if (location.hash === '#auto') iniciar();
+
+</script>
+</body>
+</html>
